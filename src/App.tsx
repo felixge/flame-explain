@@ -12,18 +12,23 @@ import Docs from './Docs';
 import Credits from './Credits';
 import './index.sass';
 
-export default function App() {
+interface Props{
+  planText?: string,
+}
+
+export default function App(p: Props) {
+
   return (
     <BrowserRouter>
         <Header/>
         <Switch>
           <Route path="/" exact>
-            <Visualizer/>
+            <Visualizer planText={p.planText} />
           </Route>
           {/* Because Visualizer doesn't have a key prop, this should use the
               same Visualizer instance as above. */}
           <Route path="/visualize">
-            <Visualizer/>
+            <Visualizer planText={p.planText}/>
           </Route>
           <Route path="/about">
             <About />

@@ -3,8 +3,12 @@ import VisualizerInput from './VisualizerInput';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
 import { useRouteMatch, Redirect } from "react-router-dom";
 
-export default function Visualizer() {
-    const [planText, setPlanText] = React.useState('');
+interface Props {
+    planText?: string,
+}
+
+export default function Visualizer(p: Props) {
+    const [planText, setPlanText] = React.useState(p.planText || '');
     
     if (useRouteMatch('/visualize')) {
         if (!planText) {
