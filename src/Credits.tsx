@@ -10,8 +10,10 @@ export default function Credits() {
             </p>
             <table>
                 <thead>
-                    <th>Project</th>
-                    <th>License</th>
+                    <tr>
+                        <th>Project</th>
+                        <th>License</th>
+                    </tr>
                 </thead>
                 <tbody>
                 <tr>
