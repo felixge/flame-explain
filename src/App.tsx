@@ -9,6 +9,7 @@ import Footer from './Footer';
 import Visualizer from './Visualizer';
 import About from './About';
 import Docs from './Docs';
+import Credits from './Credits';
 import './index.sass';
 
 export default function App() {
@@ -29,6 +30,9 @@ export default function App() {
           </Route>
           <Route path="/docs">
             <Docs />
+          </Route>
+          <Route path="/credits">
+            <Credits />
           </Route>
         </Switch>
         <Footer/>

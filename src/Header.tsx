@@ -21,6 +21,7 @@ export default function Header() {
                             </NavLink>
                             <NavLink activeClassName="is-active" to="/docs" className="navbar-item">Documentation</NavLink>
                             <NavLink activeClassName="is-active" to="/about" className="navbar-item">About</NavLink>
+                            <NavLink activeClassName="is-active" to="/credits" className="navbar-item">Credits</NavLink>
                         </div>
 
                         <div className="navbar-end">

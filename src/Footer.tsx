@@ -5,7 +5,7 @@ export default function Footer() {
         <footer className="footer">
         <div className="content has-text-centered">
         <p>
-            <strong>FlameExplain</strong> by <a href="https://felixge.de/">Felix Geisendörfer</a>.
+            <strong>FlameExplain<span role="img" aria-label="trademark">™️</span></strong> by <a href="https://felixge.de/">Felix Geisendörfer</a>.
             All rights reserved.
         </p>
         </div>
