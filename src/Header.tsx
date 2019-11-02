@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link, NavLink} from "react-router-dom";
 
-function Header() {
+export default function Header() {
     return (
         <div>
             <div className="container">
@@ -12,7 +12,13 @@ function Header() {
 
                     <div id="navbarBasicExample" className="navbar-menu">
                         <div className="navbar-start">
-                            <NavLink exact activeClassName="is-active" to="/" className="navbar-item">Home</NavLink>
+                            <NavLink 
+                                activeClassName="is-active" to="/" className="navbar-item"
+                                isActive={(_, {pathname}) => {
+                                    return ['/', '/visualize'].includes(pathname);
+                                }}>
+                                Home
+                            </NavLink>
                             <NavLink activeClassName="is-active" to="/docs" className="navbar-item">Documentation</NavLink>
                             <NavLink activeClassName="is-active" to="/about" className="navbar-item">About</NavLink>
                         </div>
@@ -40,5 +46,3 @@ function Header() {
         </div>
     );
 };
-
-export default Header;
