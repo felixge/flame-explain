@@ -45,6 +45,13 @@ export default function VisualizerFlamegraph(p: Props) {
 
         const fg = flamegraph()
             .width(flameRef.current.offsetWidth)
+            .label((n) => {
+                if (!n) {
+                    return '';
+                }
+                return formatDuration(n.value);
+            })
+            .inverted(true)
             .sort(true);
 
         d3.select(flameRef.current)
@@ -62,3 +69,20 @@ export default function VisualizerFlamegraph(p: Props) {
         </div>
     </section>;
 };
+
+function formatDuration(ms: number): string {
+    const msec = 1,
+           sec = 1000 * ms,
+           min = 60 * sec,
+           usec = msec / 1000;
+
+    if (ms > min) {
+        return (ms/min).toFixed(2) + ' m';
+    } else if (ms > sec) {
+        return (ms/sec).toFixed(2) + ' s';
+     } else if (ms > msec) {
+        return (ms/msec).toFixed(2) + ' ms';
+    } else {
+        return (ms / usec).toFixed(0) + ' μs';
+    }
+}
