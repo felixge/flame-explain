@@ -45,11 +45,14 @@ export default function VisualizerFlamegraph(p: Props) {
 
         const fg = flamegraph()
             .width(flameRef.current.offsetWidth)
-            .label((n) => {
-                if (!n) {
+            .label((d) => {
+                if (!d) {
                     return '';
                 }
-                return formatDuration(n.value);
+                return formatDuration(d.value) + ' (' + (100 * (d.value / fudged.value)).toFixed(1) + '% of total)';
+            })
+            .onClick((d) => {
+                console.log('click', d);
             })
             .inverted(true)
             .sort(true);
@@ -77,11 +80,11 @@ function formatDuration(ms: number): string {
            usec = msec / 1000;
 
     if (ms > min) {
-        return (ms/min).toFixed(2) + ' m';
+        return (ms/min).toFixed(1) + ' m';
     } else if (ms > sec) {
-        return (ms/sec).toFixed(2) + ' s';
+        return (ms/sec).toFixed(1) + ' s';
      } else if (ms > msec) {
-        return (ms/msec).toFixed(2) + ' ms';
+        return (ms/msec).toFixed(1) + ' ms';
     } else {
         return (ms / usec).toFixed(0) + ' μs';
     }
