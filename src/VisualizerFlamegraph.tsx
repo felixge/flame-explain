@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {fromPlan} from './lib/Convert';
 import {flamegraph} from 'd3-flame-graph';
 import {Node as FlameNode} from './lib/FlameJSON';
@@ -12,6 +13,7 @@ interface Props {
 export interface FoldedJSON {
     name: string,
     value: number,
+    explainNode: FlameNode,
     children?: FoldedJSON[],
 }
 
@@ -22,12 +24,14 @@ function flameJSON(n: FlameNode): FoldedJSON  {
     return {
         name: n.Label,
         value: n["Inclusive Time"],
+        explainNode: n,
         children: (n.Children || []).map(flameJSON),
     }
 }
 
 export default function VisualizerFlamegraph(p: Props) {
     const flameRef = React.useRef<HTMLDivElement>(null);
+    const detailRef = React.useRef<HTMLDivElement>(null);
 
     let fudged: FoldedJSON = {} as FoldedJSON;
     try {
@@ -52,7 +56,10 @@ export default function VisualizerFlamegraph(p: Props) {
                 return formatDuration(d.value) + ' (' + (100 * (d.value / fudged.value)).toFixed(1) + '% of total)';
             })
             .onClick((d) => {
-                console.log('click', d);
+                if (!detailRef.current) {
+                    return;
+                }
+                ReactDOM.render(<FlameDetail node={d.data.explainNode}/>, detailRef.current);
             })
             .inverted(true)
             .sort(true);
@@ -69,6 +76,7 @@ export default function VisualizerFlamegraph(p: Props) {
     return <section className="section">
         <div className="container">
             <div ref={flameRef} className="flamegraph" />
+            <div ref={detailRef}></div>
         </div>
     </section>;
 };
@@ -88,4 +96,23 @@ function formatDuration(ms: number): string {
     } else {
         return (ms / usec).toFixed(0) + ' μs';
     }
+}
+
+function FlameDetail(p: {node: FlameNode}) {
+    let rows:JSX.Element[] = [];
+    if (p.node.Source) {
+        rows = Object.keys(p.node.Source)
+            .filter((key) => {
+                let val = (p.node.Source as any)[key];
+                return ['string', 'number'].includes(typeof val);
+            })
+            .map((key) => {
+                return <tr key={key}>
+                    <th>{key}</th>
+                    <td>{(p.node.Source as any)[key]}</td>
+                </tr>;
+            })
+    }
+    console.log(rows);
+    return (<table><tbody>{rows}</tbody></table>);
 }
