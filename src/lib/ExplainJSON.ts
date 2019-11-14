@@ -133,7 +133,7 @@ type ConditionalNodeTypeFragment<
     : T;
 
 /**
- * Dear type god, what have I done? I hope you'll answer that this type
+ * Dear type god, what have I done? I hope the answer is that this type
  * intersects with NodeTargetRelFragment if T has a compatible "Node Type",
  * and also optionally intersects all combinations of a bunch of other
  * fragements that can show up for any type of node depending on the EXPLAIN
