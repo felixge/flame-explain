@@ -1,4 +1,4 @@
-import { Plan } from '../ExplainJSON'
+import {Plan} from '../ExplainJSON'
 
 /*
 In PG < 12, the query below does two scans on the CTE foo. The first is
@@ -19,8 +19,8 @@ WITH foo AS (
 SELECT * FROM foo WHERE EXISTS (SELECT * FROM foo) LIMIT 2
 
 */
-const plan:Plan = [{
-    "Plan": {
+const plan: Plan = [{
+  "Plan": {
     "Node Type": "Limit",
     "Parallel Aware": false,
     "Actual Startup Time": 102.165,
@@ -28,7 +28,7 @@ const plan:Plan = [{
     "Actual Rows": 2,
     "Actual Loops": 1,
     "Plans": [
-        {
+      {
         "Node Type": "Append",
         "Parent Relationship": "InitPlan",
         "Subplan Name": "CTE foo",
@@ -38,7 +38,7 @@ const plan:Plan = [{
         "Actual Rows": 2,
         "Actual Loops": 1,
         "Plans": [
-            {
+          {
             "Node Type": "Result",
             "Parent Relationship": "Member",
             "Parallel Aware": false,
@@ -46,8 +46,8 @@ const plan:Plan = [{
             "Actual Total Time": 102.133,
             "Actual Rows": 1,
             "Actual Loops": 1
-            },
-            {
+          },
+          {
             "Node Type": "Result",
             "Parent Relationship": "Member",
             "Parallel Aware": false,
@@ -55,8 +55,8 @@ const plan:Plan = [{
             "Actual Total Time": 202.198,
             "Actual Rows": 1,
             "Actual Loops": 1
-            },
-            {
+          },
+          {
             "Node Type": "Result",
             "Parent Relationship": "Member",
             "Parallel Aware": false,
@@ -64,8 +64,8 @@ const plan:Plan = [{
             "Actual Total Time": 0.000,
             "Actual Rows": 0,
             "Actual Loops": 0
-            },
-            {
+          },
+          {
             "Node Type": "Result",
             "Parent Relationship": "Member",
             "Parallel Aware": false,
@@ -73,10 +73,10 @@ const plan:Plan = [{
             "Actual Total Time": 0.000,
             "Actual Rows": 0,
             "Actual Loops": 0
-            }
+          }
         ]
-        },
-        {
+      },
+      {
         "Node Type": "CTE Scan",
         "Parent Relationship": "InitPlan",
         "Subplan Name": "InitPlan 2 (returns $1)",
@@ -87,8 +87,8 @@ const plan:Plan = [{
         "Actual Total Time": 102.154,
         "Actual Rows": 1,
         "Actual Loops": 1
-        },
-        {
+      },
+      {
         "Node Type": "Result",
         "Parent Relationship": "Outer",
         "Parallel Aware": false,
@@ -98,7 +98,7 @@ const plan:Plan = [{
         "Actual Loops": 1,
         "One-Time Filter": "$1",
         "Plans": [
-            {
+          {
             "Node Type": "CTE Scan",
             "Parent Relationship": "Outer",
             "Parallel Aware": false,
@@ -108,14 +108,14 @@ const plan:Plan = [{
             "Actual Total Time": 202.210,
             "Actual Rows": 2,
             "Actual Loops": 1
-            }
+          }
         ]
-        }
+      }
     ]
-    },
-    "Planning Time": 0.326,
-    "Triggers": [
-    ],
-    "Execution Time": 304.499
+  },
+  "Planning Time": 0.326,
+  "Triggers": [
+  ],
+  "Execution Time": 304.499
 }];
 export default plan;

@@ -1,4 +1,4 @@
-import { Plan } from "./ExplainJSON"
+import {Plan} from "./ExplainJSON"
 
 interface Test {
   query: string;
@@ -21,7 +21,7 @@ export type TestName =
   'Nested Loop';
 
 // TODO: Indicate if the test is verbose or not, also add text tests
-export const tests: { [N in TestName]: Test } = {
+export const tests: {[N in TestName]: Test} = {
   "Seq Scan": {
     query: "SELECT * FROM pg_class",
     explainJSON: [
