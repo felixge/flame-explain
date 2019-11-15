@@ -6,9 +6,11 @@ import {
     PlanAnalyzedFragment as ExplainPlanAnalyzed,
     NodeTimingFragment as ExplainNodeTiming,
 } from './ExplainJSON';
-import { Node as FlameNode, Timing as FlameTiming } from './FlameJSON';
+import { query, Node as FlameNode, Timing as FlameTiming } from './FlameJSON';
 import { AssertionError } from 'assert';
 import { Certificate } from 'crypto';
+
+import cteSleepUnion from './test-fixtures/CTESleepUnion';
 
 // test('toFlameJSON', async () => {
 //     let name: TestName;
@@ -276,116 +278,8 @@ describe('textNodeName', () => {
 //     })
 // });
 
-// WITH foo AS (
-//     SELECT 1 as i, pg_sleep(0.1)
-//     UNION ALL
-//     SELECT 2 as i, pg_sleep(0.2)
-//     UNION ALL
-//     SELECT 3 as i, pg_sleep(0.3)
-// )
-// SELECT * FROM foo WHERE EXISTS (SELECT * FROM foo) LIMIT 2;
-const trickyCTEPlan: ExplainPlan = [{
-    "Plan": {
-    "Node Type": "Limit",
-    "Parallel Aware": false,
-    "Actual Startup Time": 102.165,
-    "Actual Total Time": 304.393,
-    "Actual Rows": 2,
-    "Actual Loops": 1,
-    "Plans": [
-        {
-        "Node Type": "Append",
-        "Parent Relationship": "InitPlan",
-        "Subplan Name": "CTE foo",
-        "Parallel Aware": false,
-        "Actual Startup Time": 102.134,
-        "Actual Total Time": 304.335,
-        "Actual Rows": 2,
-        "Actual Loops": 1,
-        "Plans": [
-            {
-            "Node Type": "Result",
-            "Parent Relationship": "Member",
-            "Parallel Aware": false,
-            "Actual Startup Time": 102.133,
-            "Actual Total Time": 102.133,
-            "Actual Rows": 1,
-            "Actual Loops": 1
-            },
-            {
-            "Node Type": "Result",
-            "Parent Relationship": "Member",
-            "Parallel Aware": false,
-            "Actual Startup Time": 202.198,
-            "Actual Total Time": 202.198,
-            "Actual Rows": 1,
-            "Actual Loops": 1
-            },
-            {
-            "Node Type": "Result",
-            "Parent Relationship": "Member",
-            "Parallel Aware": false,
-            "Actual Startup Time": 0.000,
-            "Actual Total Time": 0.000,
-            "Actual Rows": 0,
-            "Actual Loops": 0
-            },
-            {
-            "Node Type": "Result",
-            "Parent Relationship": "Member",
-            "Parallel Aware": false,
-            "Actual Startup Time": 0.000,
-            "Actual Total Time": 0.000,
-            "Actual Rows": 0,
-            "Actual Loops": 0
-            }
-        ]
-        },
-        {
-        "Node Type": "CTE Scan",
-        "Parent Relationship": "InitPlan",
-        "Subplan Name": "InitPlan 2 (returns $1)",
-        "Parallel Aware": false,
-        "CTE Name": "foo",
-        "Alias": "foo_1",
-        "Actual Startup Time": 102.154,
-        "Actual Total Time": 102.154,
-        "Actual Rows": 1,
-        "Actual Loops": 1
-        },
-        {
-        "Node Type": "Result",
-        "Parent Relationship": "Outer",
-        "Parallel Aware": false,
-        "Actual Startup Time": 102.163,
-        "Actual Total Time": 304.388,
-        "Actual Rows": 2,
-        "Actual Loops": 1,
-        "One-Time Filter": "$1",
-        "Plans": [
-            {
-            "Node Type": "CTE Scan",
-            "Parent Relationship": "Outer",
-            "Parallel Aware": false,
-            "CTE Name": "foo",
-            "Alias": "foo",
-            "Actual Startup Time": 0.002,
-            "Actual Total Time": 202.210,
-            "Actual Rows": 2,
-            "Actual Loops": 1
-            }
-        ]
-        }
-    ]
-    },
-    "Planning Time": 0.326,
-    "Triggers": [
-    ],
-    "Execution Time": 304.499
-}];
-
 test('extractCTEs', () => {
-    let ctes = extractCTEs(trickyCTEPlan[0].Plan);
+    let ctes = extractCTEs(cteSleepUnion[0].Plan);
     expect(ctes["foo"].query["Node Type"]).toEqual('Append');
     const s1 = ctes["foo"].scans[0] as ExplainNodeTiming;
     const s2 = ctes["foo"].scans[1] as ExplainNodeTiming;
@@ -438,24 +332,17 @@ describe('flameNode', () => {
     });
 
     test('insert virtual nodes for planning/execution', () => {
-        const root = fromPlan(trickyCTEPlan);
-        const n1 = (root.Children || [])[1] as FlameNode&FlameTiming;
-        const n1_1 = (n1.Children || [])[0] as FlameNode&FlameTiming
-        const n1_1_1 = (n1_1.Children || [])[0] as FlameNode&FlameTiming
-        const n1_1_2 = (n1_1.Children || [])[1] as FlameNode&FlameTiming
-        const n1_1_3 = (n1_1.Children || [])[2] as FlameNode&FlameTiming
-        const n1_1_3_1 = (n1_1_3.Children || [])[0] as FlameNode&FlameTiming
+        const root = fromPlan(cteSleepUnion);
 
-        expect(n1.Label).toEqual('Execution');
-        expect(n1_1.Label).toEqual('Limit');
-        expect(n1_1_1.Label).toEqual('Append'); // The CTE InitPlan node
-        expect(n1_1_2.Label).toEqual('CTE Scan on foo foo_1');
-        expect(n1_1_3.Label).toEqual('Result');
-        expect(n1_1_3_1.Label).toEqual('CTE Scan on foo');
+        const exec = query(root, ['Execution']) as FlameNode&FlameTiming;
+        const limit = query(exec, ['Limit']) as FlameNode&FlameTiming
+        const append = query(limit, ['Append']) as FlameNode&FlameTiming
+        const cteScan1 = query(limit, ['CTE Scan on foo foo_1']) as FlameNode&FlameTiming
+        const cteScan2 = query(limit, ['Result', 'CTE Scan on foo']) as FlameNode&FlameTiming
 
-        const execTime = (trickyCTEPlan[0] as ExplainPlanAnalyzed)['Execution Time'];
-        expect(n1["Inclusive Time"]).toEqual(execTime);
-        expect(n1["Exclusive Time"]).toBeCloseTo(execTime- n1_1["Inclusive Time"], 3);
+        const execTime = (cteSleepUnion[0] as ExplainPlanAnalyzed)['Execution Time'];
+        expect(exec["Inclusive Time"]).toEqual(execTime);
+        expect(exec["Exclusive Time"]).toBeCloseTo(execTime- limit["Inclusive Time"], 3);
 
         const nodeSourceTime = (n: FlameNode):number => {
             if ('Actual Startup Time' in n.Source) {
@@ -464,15 +351,15 @@ describe('flameNode', () => {
             throw new Error('bad node: '+JSON.stringify(n));
         }
 
-        const csQuery = n1_1_1["Inclusive Time"];
-        const cs1 = nodeSourceTime(n1_1_2);
-        const cs2 = nodeSourceTime(n1_1_3_1);
+        const csQuery = append["Inclusive Time"];
+        const cs1 = nodeSourceTime(cteScan1);
+        const cs2 = nodeSourceTime(cteScan2);
         const csSum = cs1+cs2; 
 
-        expect(n1_1_2["Exclusive Time"]).toBeCloseTo(cs1 - cs1/csSum*csQuery, 3)
-        expect(n1_1_2["Inclusive Time"]).toBeCloseTo(cs1 - cs1/csSum*csQuery, 3)
-        expect(n1_1_3_1["Exclusive Time"]).toBeCloseTo(cs2 - cs2/csSum*csQuery, 3)
-        expect(n1_1_3_1["Inclusive Time"]).toBeCloseTo(cs2 - cs2/csSum*csQuery, 3)
+        expect(cteScan1["Exclusive Time"]).toBeCloseTo(cs1 - cs1/csSum*csQuery, 3)
+        expect(cteScan1["Inclusive Time"]).toBeCloseTo(cs1 - cs1/csSum*csQuery, 3)
+        expect(cteScan2["Exclusive Time"]).toBeCloseTo(cs2 - cs2/csSum*csQuery, 3)
+        expect(cteScan2["Inclusive Time"]).toBeCloseTo(cs2 - cs2/csSum*csQuery, 3)
 
         
 
