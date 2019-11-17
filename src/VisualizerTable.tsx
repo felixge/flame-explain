@@ -12,8 +12,8 @@ export default function VisualizerTable(p: Props) {
   let rows: JSX.Element[] = [];
 
   let maxInclusive = 0;
-  if ('Inclusive Time' in p.root) {
-    maxInclusive = p.root['Inclusive Time'];
+  if ('Total Time' in p.root) {
+    maxInclusive = p.root['Total Time'];
   }
 
   let visit = (node: FlameNode, depth: number = 0, lastChild: boolean[] = [true]) => {
@@ -50,11 +50,11 @@ export default function VisualizerTable(p: Props) {
 
     let indent = (depth + 1) * indentSize + 'px';
 
-    const selfColor = 'Exclusive Time' in node
-      ? `rgba(255,0,0,${node['Exclusive Time'] / maxInclusive})`
+    const selfColor = 'Self Time' in node
+      ? `rgba(255,0,0,${node['Self Time'] / maxInclusive})`
       : '';
-    const totalColor = 'Inclusive Time' in node
-      ? `rgba(255,0,0,${node['Inclusive Time'] / maxInclusive})`
+    const totalColor = 'Total Time' in node
+      ? `rgba(255,0,0,${node['Total Time'] / maxInclusive})`
       : '';
 
     rows.push(
@@ -63,10 +63,10 @@ export default function VisualizerTable(p: Props) {
         <td style={{position: 'relative'}}>{treeLines()}<div style={{marginLeft: indent}}>{node.Label}</div></td>
         <td>{'Actual Loops' in node.Source ? node.Source['Actual Loops'] : ''}</td>
         <td>{'Actual Rows' in node.Source ? node.Source['Actual Rows'] : ''}</td>
-        <td style={{backgroundColor: selfColor}} className="has-text-right">{'Exclusive Time' in node ? formatDuration(node['Exclusive Time']) : ''}</td>
-        <td style={{backgroundColor: selfColor}} className="has-text-right">{'Exclusive Time' in node ? formatPercent(node['Exclusive Time'] / maxInclusive) : ''}</td>
-        <td style={{backgroundColor: totalColor}} className="has-text-right">{'Inclusive Time' in node ? formatDuration(node['Inclusive Time']) : ''}</td>
-        <td style={{backgroundColor: totalColor}} className="has-text-right">{'Inclusive Time' in node ? formatPercent(node['Inclusive Time'] / maxInclusive) : ''}</td>
+        <td style={{backgroundColor: selfColor}} className="has-text-right">{'Self Time' in node ? formatDuration(node['Self Time']) : ''}</td>
+        <td style={{backgroundColor: selfColor}} className="has-text-right">{'Self Time' in node ? formatPercent(node['Self Time'] / maxInclusive) : ''}</td>
+        <td style={{backgroundColor: totalColor}} className="has-text-right">{'Total Time' in node ? formatDuration(node['Total Time']) : ''}</td>
+        <td style={{backgroundColor: totalColor}} className="has-text-right">{'Total Time' in node ? formatPercent(node['Total Time'] / maxInclusive) : ''}</td>
       </tr>
     );
     let children = node.Children || [];

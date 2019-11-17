@@ -12,22 +12,22 @@ export function fromPlan(plan: ExplainPlan): FlameNode {
   const child = fromNode(root.Plan, ctes) as FlameNode & FlameTiming;
   return {
     "Label": 'Query',
-    'Exclusive Time': 0,
-    "Inclusive Time": root["Execution Time"] + root["Planning Time"],
+    'Self Time': 0,
+    "Total Time": root["Execution Time"] + root["Planning Time"],
     "Virtual": true,
     "Source": root,
     "Children": [
       {
         "Label": 'Planning',
-        "Exclusive Time": root["Planning Time"],
-        "Inclusive Time": root["Planning Time"],
+        "Self Time": root["Planning Time"],
+        "Total Time": root["Planning Time"],
         "Virtual": true,
         "Source": root,
       } as FlameNode & FlameTiming,
       {
         "Label": 'Execution',
-        "Exclusive Time": root["Execution Time"] - child["Inclusive Time"],
-        "Inclusive Time": root["Execution Time"],
+        "Self Time": root["Execution Time"] - child["Total Time"],
+        "Total Time": root["Execution Time"],
         "Virtual": true,
         "Source": root,
         'Children': [child],
@@ -61,7 +61,7 @@ export function fromNode(n: ExplainNode, ctes: CTEs): FlameNode {
       inclTime *= (1 - 1 / cte.scanTime * cte.queryTime);
     }
 
-    rt['Inclusive Time'] = rt['Exclusive Time'] = inclTime;
+    rt['Total Time'] = rt['Self Time'] = inclTime;
 
   }
 
@@ -70,22 +70,22 @@ export function fromNode(n: ExplainNode, ctes: CTEs): FlameNode {
     r.Children = n.Plans
       .map((child) => {
         const childNode = fromNode(child, ctes);
-        if ('Inclusive Time' in childNode) {
-          childInclusiveTime += childNode['Inclusive Time'];
+        if ('Total Time' in childNode) {
+          childInclusiveTime += childNode['Total Time'];
         }
         return childNode;
       });
   }
 
   // Rounding errors on looped nodes can lead to parent nodes with less
-  // Inclusive Time than their children, which is non-sense. So we correct for
-  // this here. This also prevents our Exclusive Time calculation below from
+  // Total Time than their children, which is non-sense. So we correct for
+  // this here. This also prevents our Self Time calculation below from
   // going negative in these cases.
-  if (rt['Inclusive Time'] < childInclusiveTime) {
-    rt['Inclusive Time'] = childInclusiveTime;
+  if (rt['Total Time'] < childInclusiveTime) {
+    rt['Total Time'] = childInclusiveTime;
   }
 
-  rt['Exclusive Time'] = rt['Inclusive Time'] - childInclusiveTime;
+  rt['Self Time'] = rt['Total Time'] - childInclusiveTime;
 
   return r;
 }

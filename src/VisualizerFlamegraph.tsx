@@ -18,12 +18,12 @@ export interface FoldedJSON {
 }
 
 function flameJSON(n: FlameNode): FoldedJSON {
-  if (!('Inclusive Time' in n)) {
+  if (!('Total Time' in n)) {
     throw new Error('bad n');
   }
   return {
     name: n.Label,
-    value: n["Inclusive Time"],
+    value: n["Total Time"],
     explainNode: n,
     children: (n.Children || []).map(flameJSON),
   }
@@ -74,8 +74,8 @@ export default function VisualizerFlamegraph(p: Props) {
 
 
   return <div>
-      <div ref={flameRef} className="flamegraph" />
-      <div ref={detailRef}></div>
+    <div ref={flameRef} className="flamegraph" />
+    <div ref={detailRef}></div>
   </div>;
 };
 

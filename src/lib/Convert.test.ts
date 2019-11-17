@@ -298,8 +298,8 @@ describe('flameNode', () => {
 
   test('multiply time by loop count', () => {
     const n = fromNode(loopedSeqScan, {}) as FlameTiming;
-    expect(n["Exclusive Time"]).toEqual(15);
-    expect(n["Inclusive Time"]).toEqual(15);
+    expect(n["Self Time"]).toEqual(15);
+    expect(n["Total Time"]).toEqual(15);
   });
 
   test('insert virtual nodes for planning/execution', () => {
@@ -312,22 +312,22 @@ describe('flameNode', () => {
     const n = fromPlan(plan) as FlameNode & FlameTiming;
     expect(n.Label).toEqual('Query');
     expect(n.Source).toEqual(plan[0]);
-    expect(n["Exclusive Time"]).toEqual(0);
-    expect(n["Inclusive Time"]).toEqual(19 + 3);
+    expect(n["Self Time"]).toEqual(0);
+    expect(n["Total Time"]).toEqual(19 + 3);
     const c1 = (n.Children || [])[0] as FlameNode & FlameTiming;
     expect(c1.Label).toEqual('Planning');
     expect(c1.Source).toEqual(plan[0]);
-    expect(c1["Exclusive Time"]).toEqual(3);
-    expect(c1["Inclusive Time"]).toEqual(3);
+    expect(c1["Self Time"]).toEqual(3);
+    expect(c1["Total Time"]).toEqual(3);
     const c2 = (n.Children || [])[1] as FlameNode & FlameTiming;
     expect(c2.Label).toEqual('Execution');
     expect(c2.Source).toEqual(plan[0]);
-    // Usually the Execution's Exclusive Time will be 0, but we're testing
-    // the edge case here were the inclusive time of the child node is
+    // Usually the Execution's Self Time will be 0, but we're testing
+    // the edge case here were the Total Time of the child node is
     // smaller than the 'Execution Time' of the child node. This can happen
     // in the real world, see: https://postgrespro.com/list/thread-id/2454729
-    expect(c2["Exclusive Time"]).toEqual(19 - 3 * 5);
-    expect(c2["Inclusive Time"]).toEqual(19);
+    expect(c2["Self Time"]).toEqual(19 - 3 * 5);
+    expect(c2["Total Time"]).toEqual(19);
   });
 
   test('insert virtual nodes for planning/execution', () => {
@@ -340,8 +340,8 @@ describe('flameNode', () => {
     const cteScan2 = query(limit, ['Result', 'CTE Scan on foo']) as FlameNode & FlameTiming
 
     const execTime = (cteSleepUnion[0] as ExplainPlanAnalyzed)['Execution Time'];
-    expect(exec["Inclusive Time"]).toEqual(execTime);
-    expect(exec["Exclusive Time"]).toBeCloseTo(execTime - limit["Inclusive Time"], 3);
+    expect(exec["Total Time"]).toEqual(execTime);
+    expect(exec["Self Time"]).toBeCloseTo(execTime - limit["Total Time"], 3);
 
     const nodeSourceTime = (n: FlameNode): number => {
       if ('Actual Startup Time' in n.Source) {
@@ -350,19 +350,19 @@ describe('flameNode', () => {
       throw new Error('bad node: ' + JSON.stringify(n));
     }
 
-    const csQuery = append["Inclusive Time"];
+    const csQuery = append["Total Time"];
     const cs1 = nodeSourceTime(cteScan1);
     const cs2 = nodeSourceTime(cteScan2);
     const csSum = cs1 + cs2;
 
-    expect(cteScan1["Exclusive Time"]).toBeCloseTo(cs1 - cs1 / csSum * csQuery, 3)
-    expect(cteScan1["Inclusive Time"]).toBeCloseTo(cs1 - cs1 / csSum * csQuery, 3)
-    expect(cteScan2["Exclusive Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
-    expect(cteScan2["Inclusive Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
+    expect(cteScan1["Self Time"]).toBeCloseTo(cs1 - cs1 / csSum * csQuery, 3)
+    expect(cteScan1["Total Time"]).toBeCloseTo(cs1 - cs1 / csSum * csQuery, 3)
+    expect(cteScan2["Self Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
+    expect(cteScan2["Total Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
 
-    // expect(n1_1["Inclusive Time"]).toEqual(1000.651);
+    // expect(n1_1["Total Time"]).toEqual(1000.651);
     //const cteScanSum = 0.015 + 1000.613 + 0.004;
-    // expect(n1_1["Exclusive Time"]).toBeCloseTo(1000.651-1000.617-0.023-(1000.617-1000.613)-0.004, 3);
+    // expect(n1_1["Self Time"]).toBeCloseTo(1000.651-1000.617-0.023-(1000.617-1000.613)-0.004, 3);
     // console.log([n1_1.Children || {}].map((child) => {
     //     return child;
     // }));
@@ -371,8 +371,8 @@ describe('flameNode', () => {
   test('adjust for looped node rounding errors', () => {
     const root = fromPlan(pgIndexes);
     const materialize = query(root, ['Execution', 'Nested Loop Left Join', 'Materialize']) as FlameNode & FlameTiming;
-    expect(materialize['Exclusive Time']).toEqual(0);
-    expect(materialize['Inclusive Time']).toEqual(0.005);
+    expect(materialize['Self Time']).toEqual(0);
+    expect(materialize['Total Time']).toEqual(0.005);
   });
 
 })

@@ -2,8 +2,8 @@ import {PlanRoot, Node as ExplainNode} from './ExplainJSON';
 import {OptionalEmbed} from './Util';
 
 export type Timing = {
-  'Exclusive Time': number,
-  'Inclusive Time': number,
+  'Self Time': number,
+  'Total Time': number,
 };
 
 export type Node = OptionalEmbed<{
