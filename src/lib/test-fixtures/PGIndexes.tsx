@@ -14,8 +14,8 @@ const plan: Plan = [{
     "Total Cost": 40.91,
     "Plan Rows": 14,
     "Plan Width": 288,
-    "Actual Startup Time": 0.416,
-    "Actual Total Time": 7.580,
+    "Actual Startup Time": 0.497,
+    "Actual Total Time": 8.055,
     "Actual Rows": 130,
     "Actual Loops": 1,
     "Inner Unique": true,
@@ -31,8 +31,8 @@ const plan: Plan = [{
         "Total Cost": 39.50,
         "Plan Rows": 14,
         "Plan Width": 200,
-        "Actual Startup Time": 0.320,
-        "Actual Total Time": 1.153,
+        "Actual Startup Time": 0.364,
+        "Actual Total Time": 1.199,
         "Actual Rows": 130,
         "Actual Loops": 1,
         "Inner Unique": true,
@@ -47,8 +47,8 @@ const plan: Plan = [{
             "Total Cost": 38.31,
             "Plan Rows": 14,
             "Plan Width": 140,
-            "Actual Startup Time": 0.300,
-            "Actual Total Time": 1.025,
+            "Actual Startup Time": 0.330,
+            "Actual Total Time": 1.073,
             "Actual Rows": 130,
             "Actual Loops": 1,
             "Inner Unique": true,
@@ -62,8 +62,8 @@ const plan: Plan = [{
                 "Total Cost": 24.25,
                 "Plan Rows": 35,
                 "Plan Width": 72,
-                "Actual Startup Time": 0.285,
-                "Actual Total Time": 0.441,
+                "Actual Startup Time": 0.308,
+                "Actual Total Time": 0.469,
                 "Actual Rows": 130,
                 "Actual Loops": 1,
                 "Inner Unique": true,
@@ -80,10 +80,47 @@ const plan: Plan = [{
                     "Plan Rows": 161,
                     "Plan Width": 8,
                     "Actual Startup Time": 0.011,
-                    "Actual Total Time": 0.052,
+                    "Actual Total Time": 0.053,
                     "Actual Rows": 161,
                     "Actual Loops": 1
                   },
+                  {
+                    "Node Type": "Hash",
+                    "Parent Relationship": "Inner",
+                    "Parallel Aware": false,
+                    "Startup Cost": 17.11,
+                    "Total Cost": 17.11,
+                    "Plan Rows": 88,
+                    "Plan Width": 72,
+                    "Actual Startup Time": 0.274,
+                    "Actual Total Time": 0.274,
+                    "Actual Rows": 90,
+                    "Actual Loops": 1,
+                    "Hash Buckets": 1024,
+                    "Original Hash Buckets": 1024,
+                    "Hash Batches": 1,
+                    "Original Hash Batches": 1,
+                    "Peak Memory Usage": 18,
+                    "Plans": [
+                      {
+                        "Node Type": "Seq Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Relation Name": "pg_class",
+                        "Alias": "c",
+                        "Startup Cost": 0.00,
+                        "Total Cost": 17.11,
+                        "Plan Rows": 88,
+                        "Plan Width": 72,
+                        "Actual Startup Time": 0.011,
+                        "Actual Total Time": 0.234,
+                        "Actual Rows": 90,
+                        "Actual Loops": 1,
+                        "Filter": "(relkind = ANY ('{r,m}'::\"char\"[]))",
+                        "Rows Removed by Filter": 320
+                      }
+                    ]
+                  }
                 ]
               },
               {
@@ -98,8 +135,8 @@ const plan: Plan = [{
                 "Total Cost": 0.40,
                 "Plan Rows": 1,
                 "Plan Width": 72,
-                "Actual Startup Time": 0.003,
-                "Actual Total Time": 0.003,
+                "Actual Startup Time": 0.004,
+                "Actual Total Time": 0.004,
                 "Actual Rows": 1,
                 "Actual Loops": 130,
                 "Index Cond": "(oid = x.indexrelid)",
@@ -117,8 +154,8 @@ const plan: Plan = [{
             "Total Cost": 1.06,
             "Plan Rows": 6,
             "Plan Width": 68,
-            "Actual Startup Time": 0.014,
-            "Actual Total Time": 0.014,
+            "Actual Startup Time": 0.016,
+            "Actual Total Time": 0.016,
             "Actual Rows": 12,
             "Actual Loops": 1,
             "Hash Buckets": 1024,
@@ -138,7 +175,7 @@ const plan: Plan = [{
                 "Plan Rows": 6,
                 "Plan Width": 68,
                 "Actual Startup Time": 0.006,
-                "Actual Total Time": 0.009,
+                "Actual Total Time": 0.010,
                 "Actual Rows": 12,
                 "Actual Loops": 1
               }
@@ -178,9 +215,9 @@ const plan: Plan = [{
       }
     ]
   },
-  "Planning Time": 1.287,
+  "Planning Time": 0.974,
   "Triggers": [
   ],
-  "Execution Time": 7.698
+  "Execution Time": 8.190
 }]
 export default plan;
