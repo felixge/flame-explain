@@ -73,12 +73,10 @@ export default function VisualizerFlamegraph(p: Props) {
   })
 
 
-  return <section className="section">
-    <div className="container">
+  return <div>
       <div ref={flameRef} className="flamegraph" />
       <div ref={detailRef}></div>
-    </div>
-  </section>;
+  </div>;
 };
 
 function formatDuration(ms: number): string {

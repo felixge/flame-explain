@@ -15,7 +15,8 @@ export default function Header() {
               <NavLink
                 activeClassName="is-active" to="/" className="navbar-item"
                 isActive={(_, {pathname}) => {
-                  return ['/', '/visualize'].includes(pathname);
+                  // match '/' and '/visualize/*'
+                  return (/^\/(visualize\/.+)?$/).test(pathname);
                 }}>
                 Home
                             </NavLink>
@@ -38,7 +39,7 @@ export default function Header() {
               FlameExplain
         </h1>
             <h2 className="subtitle">
-              The PostgreSQL EXPLAIN flame graph visualizer that <Link to="/about" className="has-text-warning">actually works</Link>.
+              The next generation PostgreSQL EXPLAIN visualizer that <Link to="/about" className="has-text-warning">actually works</Link>.
         </h2>
           </div>
 

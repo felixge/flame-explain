@@ -2,15 +2,28 @@ import React from 'react';
 import {Link} from "react-router-dom";
 
 interface Props {
+  errorText: string | null,
   planText: string,
   onChange: (planText: string) => void;
-  onSubmit: () => void;
 }
 
 export default function VisualizerInput(p: Props) {
+  let errorDiv: JSX.Element | null = null;
+  if (p.planText && p.errorText !== null) {
+    errorDiv = <div className="notification is-danger">{p.errorText}</div>;
+  }
+
+  const handleSubmit = (e: React.SyntheticEvent) => {
+    if (p.errorText !== null) {
+      e.preventDefault();
+    }
+  };
+
+
   return (
     <section className="section">
       <div className="container">
+        {errorDiv}
         <div className="field">
           <p>
             Prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
@@ -24,9 +37,15 @@ export default function VisualizerInput(p: Props) {
         </div>
         <div className="field is-pulled-right">
           <p className="control">
-            <Link onClick={() => p.onSubmit()} className="button is-success" to="/visualize">
+            <Link
+              onClick={handleSubmit}
+              className="button is-success"
+              to="/visualize/table"
+              //@ts-ignore TODO: figure out why I'm getting a type error here
+              disabled={p.errorText !== null}
+            >
               <span role="img" aria-label="flame">🔥</span>&nbsp;Explain
-                        </Link>
+            </Link>
           </p>
         </div>
       </div>
