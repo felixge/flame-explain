@@ -9,6 +9,11 @@
  * This file is manually derrived from the PostgreSQL source code, and was last
  * updated for PostgreSQL 12.0 [1].
  *
+ * TROUBLESHOOTING ADVICE: Typescript may sometimes produce very long and
+ * cryptic error messages when trying to assign a value to the Plan type. The
+ * best way to debug those is to remove parts from the plan until it passes
+ * type checking, which usually allows to identify the true source of the error.
+ *
  * [1] https://github.com/postgres/postgres/blob/REL_12_0/src/backend/commands/explain.c
  */
 
@@ -79,6 +84,10 @@ interface NodeCommonFragment {
   /** Available starting in PostgreSQL 9.6 and later. */
   "Parallel Aware"?: boolean;
   "Subplan Name"?: string,
+
+  // TODO: what node types can these two be on? any?
+  "Filter"?: string;
+  "Rows Removed by Filter"?: number;
 
   "Plans"?: Node[];
 };
@@ -229,6 +238,16 @@ type NodeResult = NodeWithFragments<{
   "One-Time Filter"?: string;
 }>;
 
+type NodeHash = NodeWithFragments<{
+  "Node Type": "Hash";
+  "Hash Buckets": number;
+  "Original Hash Buckets": number;
+  "Hash Batches": number;
+  "Original Hash Batches": number,
+  /** kB */
+  "Peak Memory Usage": number,
+}>;
+
 type SpecializedNode =
   NodeModifyTable |
   NodeForeignScan |
@@ -243,7 +262,8 @@ type SpecializedNode =
   NodeTableFunctionScan |
   NodeCTEorWorkTableScan |
   NodeNamedTuplestoreScan |
-  NodeResult;
+  NodeResult |
+  NodeHash;
 
 type MakeUnspecializedNodes<T> = T extends NodeType ? NodeWithFragments<{"Node Type": T}> : never;
 
