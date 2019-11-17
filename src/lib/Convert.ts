@@ -65,16 +65,27 @@ export function fromNode(n: ExplainNode, ctes: CTEs): FlameNode {
 
   }
 
+  let childInclusiveTime = 0;
   if (n.Plans) {
     r.Children = n.Plans
       .map((child) => {
         const childNode = fromNode(child, ctes);
         if ('Inclusive Time' in childNode) {
-          rt['Exclusive Time'] -= childNode["Inclusive Time"]
+          childInclusiveTime += childNode['Inclusive Time'];
         }
         return childNode;
       });
   }
+
+  // Rounding errors on looped nodes can lead to parent nodes with less
+  // Inclusive Time than their children, which is non-sense. So we correct for
+  // this here. This also prevents our Exclusive Time calculation below from
+  // going negative in these cases.
+  if (rt['Inclusive Time'] < childInclusiveTime) {
+    rt['Inclusive Time'] = childInclusiveTime;
+  }
+
+  rt['Exclusive Time'] = rt['Inclusive Time'] - childInclusiveTime;
 
   return r;
 }

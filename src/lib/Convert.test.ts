@@ -9,6 +9,7 @@ import {
 import {query, Node as FlameNode, Timing as FlameTiming} from './FlameJSON';
 
 import cteSleepUnion from './test-fixtures/CTESleepUnion';
+import pgIndexes from './test-fixtures/PGIndexes';
 
 // test('toFlameJSON', async () => {
 //     let name: TestName;
@@ -359,8 +360,6 @@ describe('flameNode', () => {
     expect(cteScan2["Exclusive Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
     expect(cteScan2["Inclusive Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
 
-
-
     // expect(n1_1["Inclusive Time"]).toEqual(1000.651);
     //const cteScanSum = 0.015 + 1000.613 + 0.004;
     // expect(n1_1["Exclusive Time"]).toBeCloseTo(1000.651-1000.617-0.023-(1000.617-1000.613)-0.004, 3);
@@ -368,4 +367,12 @@ describe('flameNode', () => {
     //     return child;
     // }));
   });
+
+  test('adjust for looped node rounding errors', () => {
+    const root = fromPlan(pgIndexes);
+    const materialize = query(root, ['Execution', 'Nested Loop Left Join', 'Materialize']) as FlameNode & FlameTiming;
+    expect(materialize['Exclusive Time']).toEqual(0);
+    expect(materialize['Inclusive Time']).toEqual(0.005);
+  });
+
 })
