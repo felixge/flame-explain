@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import plan from './lib/test-fixtures/CTESleepUnion';
+import plan from './lib/test-fixtures/PGIndexes';
 
 ReactDOM.render(<App
   planText={JSON.stringify(plan)}
