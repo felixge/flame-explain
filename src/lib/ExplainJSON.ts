@@ -14,6 +14,7 @@
 
 import {OptionalEmbed} from './Util';
 
+
 export type PlanAnalyzedFragment = {
   "Planning Time": number;
   "Execution Time": number;
@@ -169,11 +170,25 @@ type NodeIndexScan = NodeWithFragments<{
   "Scan Direction": "Backward" | "NoMovement" | "Forward" | "?";
 }>;
 
-type NodeJoin = NodeWithFragments<{
-  "Node Type": "Nested Loop" | "Merge Join" | "Hash Join";
+type NodeJoinFragment = {
   "Join Type": "Inner" | "Left" | "Full" | "Right" | "Semi" | "Anti" | "???";
   "Inner Unique"?: boolean;
-}>;
+  "Join Filter"?: string;
+  "Rows Removed by Join Filter"?: number;
+}
+
+type NodeNestedLoop = NodeWithFragments<{
+  "Node Type": "Nested Loop";
+} & NodeJoinFragment>;
+
+type NodeHashJoin = NodeWithFragments<{
+  "Node Type": "Hash Join";
+  "Hash Cond": string;
+} & NodeJoinFragment>;
+
+type NodeMergeJoin = NodeWithFragments<{
+  "Node Type": "Merge Join";
+} & NodeJoinFragment>;
 
 type NodeAggregate = NodeWithFragments<{
   "Node Type": "Aggregate";
@@ -219,7 +234,9 @@ type SpecializedNode =
   NodeForeignScan |
   NodeBitmapIndexScan |
   NodeIndexScan |
-  NodeJoin |
+  NodeNestedLoop |
+  NodeHashJoin |
+  NodeMergeJoin |
   NodeAggregate |
   NodeSetOp |
   NodeFunctionScan |
