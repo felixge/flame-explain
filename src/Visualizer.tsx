@@ -2,7 +2,7 @@ import React from 'react';
 import VisualizerInput from './VisualizerInput';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
 import VisualizerTable from './VisualizerTable';
-import {fromPlan} from './lib/Convert';
+import {transformPlan} from './lib/Transform';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {Link} from "react-router-dom";
 import {Node as FlameNode} from './lib/TransformedPlan';
@@ -18,7 +18,7 @@ export default function Visualizer(p: Props) {
   let errorText: string | null = null;
   try {
     let data = JSON.parse(planText);
-    rootNode = fromPlan(data);
+    rootNode = transformPlan(data);
   } catch (e) {
     errorText = e + '';
   }

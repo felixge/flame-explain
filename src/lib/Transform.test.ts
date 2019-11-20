@@ -1,4 +1,4 @@
-import {fromNode, fromPlan, textNodeName, extractCTEs} from './Convert'
+import {fromNode, transformPlan, textNodeName, extractCTEs} from './Transform'
 // import { tests, TestName } from './tests'
 import {
   Plan as ExplainPlan,
@@ -309,7 +309,7 @@ describe('flameNode', () => {
       "Plan": loopedSeqScan,
     }];
 
-    const n = fromPlan(plan) as FlameNode & FlameTiming;
+    const n = transformPlan(plan) as FlameNode & FlameTiming;
     expect(n.Label).toEqual('Query');
     expect(n.Source).toEqual(plan[0]);
     expect(n["Self Time"]).toEqual(0);
@@ -331,7 +331,7 @@ describe('flameNode', () => {
   });
 
   test('insert virtual nodes for planning/execution', () => {
-    const root = fromPlan(cteSleepUnion);
+    const root = transformPlan(cteSleepUnion);
 
     const exec = query(root, ['Execution']) as FlameNode & FlameTiming;
     const limit = query(exec, ['Limit']) as FlameNode & FlameTiming
@@ -369,7 +369,7 @@ describe('flameNode', () => {
   });
 
   test('adjust for looped node rounding errors', () => {
-    const root = fromPlan(pgIndexes);
+    const root = transformPlan(pgIndexes);
     const materialize = query(root, ['Execution', 'Nested Loop Left Join', 'Materialize']) as FlameNode & FlameTiming;
     expect(materialize['Self Time']).toEqual(0);
     expect(materialize['Total Time']).toEqual(0.005);

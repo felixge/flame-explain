@@ -1,7 +1,7 @@
 import {Plan as RPlan, Node as RNode} from './RawPlan';
 import {Node as TNode, Timing as TTiming} from './TransformedPlan';
 
-export function fromPlan(plan: RPlan): TNode {
+export function transformPlan(plan: RPlan): TNode {
   const root = plan[0];
   let ctes = extractCTEs(root.Plan);
 
