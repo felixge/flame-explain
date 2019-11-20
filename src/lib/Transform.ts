@@ -2,6 +2,33 @@ import {Plan as RPlan, Node as RNode} from './RawPlan';
 import {Node as TNode, Timing as TTiming} from './TransformedPlan';
 
 export function transformPlan(rPlan: RPlan): TNode {
+  let tRoot = {
+    "Label": '',
+    'Self Time': 0,
+    "Total Time": 0,
+    "Virtual": true,
+    "Source": rPlan[0],
+    "Children": [
+      {
+        "Label": 'Query 1',
+        'Self Time': 0,
+        "Total Time": 0,
+        "Virtual": true,
+        "Source": rPlan[0],
+      },
+      {
+        "Label": 'Query 2',
+        'Self Time': 0,
+        "Total Time": 0,
+        "Virtual": true,
+        "Source": rPlan[0],
+      },
+    ],
+  };
+  return tRoot;
+}
+
+export function transformPlan2(rPlan: RPlan): TNode {
   // TODO(fg) rewritten queries (with ALSO) can have multiple plans
   const root = rPlan[0];
   let ctes = extractCTEs(root.Plan);

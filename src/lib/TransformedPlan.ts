@@ -1,4 +1,4 @@
-import {PlanRoot, Node as ExplainNode} from './RawPlan';
+import {PlanRoot as RawPlanRoot, Node as RawNode} from './RawPlan';
 import {OptionalEmbed} from './Util';
 
 export type Timing = {
@@ -13,7 +13,7 @@ export type Node = OptionalEmbed<{
    **/
   'Virtual': boolean,
   'Label': string,
-  'Source': ExplainNode | PlanRoot,
+  'Source': RawNode | RawPlanRoot,
   'Children'?: Node[]
 }, Timing>;
 
