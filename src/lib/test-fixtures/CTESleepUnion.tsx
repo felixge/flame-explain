@@ -9,6 +9,7 @@ tuple has already been stored in memory. However, the second scan has to pay the
 cost of pg_sleep(0.2). pg_sleep(0.3) is never executed because the main query
 has a limit of 2.
 
+EXPLAIN (ANALYZE, FORMAT JSON)
 WITH foo AS (
     SELECT 1 as i, pg_sleep(0.1)
     UNION ALL
@@ -23,8 +24,12 @@ const plan: Plan = [{
   "Plan": {
     "Node Type": "Limit",
     "Parallel Aware": false,
-    "Actual Startup Time": 102.165,
-    "Actual Total Time": 304.393,
+    "Startup Cost": 0.10,
+    "Total Cost": 0.14,
+    "Plan Rows": 2,
+    "Plan Width": 8,
+    "Actual Startup Time": 101.186,
+    "Actual Total Time": 302.680,
     "Actual Rows": 2,
     "Actual Loops": 1,
     "Plans": [
@@ -33,8 +38,12 @@ const plan: Plan = [{
         "Parent Relationship": "InitPlan",
         "Subplan Name": "CTE foo",
         "Parallel Aware": false,
-        "Actual Startup Time": 102.134,
-        "Actual Total Time": 304.335,
+        "Startup Cost": 0.00,
+        "Total Cost": 0.08,
+        "Plan Rows": 3,
+        "Plan Width": 8,
+        "Actual Startup Time": 101.128,
+        "Actual Total Time": 302.608,
         "Actual Rows": 2,
         "Actual Loops": 1,
         "Plans": [
@@ -42,8 +51,12 @@ const plan: Plan = [{
             "Node Type": "Result",
             "Parent Relationship": "Member",
             "Parallel Aware": false,
-            "Actual Startup Time": 102.133,
-            "Actual Total Time": 102.133,
+            "Startup Cost": 0.00,
+            "Total Cost": 0.01,
+            "Plan Rows": 1,
+            "Plan Width": 8,
+            "Actual Startup Time": 101.126,
+            "Actual Total Time": 101.127,
             "Actual Rows": 1,
             "Actual Loops": 1
           },
@@ -51,8 +64,12 @@ const plan: Plan = [{
             "Node Type": "Result",
             "Parent Relationship": "Member",
             "Parallel Aware": false,
-            "Actual Startup Time": 202.198,
-            "Actual Total Time": 202.198,
+            "Startup Cost": 0.00,
+            "Total Cost": 0.01,
+            "Plan Rows": 1,
+            "Plan Width": 8,
+            "Actual Startup Time": 201.477,
+            "Actual Total Time": 201.477,
             "Actual Rows": 1,
             "Actual Loops": 1
           },
@@ -60,15 +77,10 @@ const plan: Plan = [{
             "Node Type": "Result",
             "Parent Relationship": "Member",
             "Parallel Aware": false,
-            "Actual Startup Time": 0.000,
-            "Actual Total Time": 0.000,
-            "Actual Rows": 0,
-            "Actual Loops": 0
-          },
-          {
-            "Node Type": "Result",
-            "Parent Relationship": "Member",
-            "Parallel Aware": false,
+            "Startup Cost": 0.00,
+            "Total Cost": 0.01,
+            "Plan Rows": 1,
+            "Plan Width": 8,
             "Actual Startup Time": 0.000,
             "Actual Total Time": 0.000,
             "Actual Rows": 0,
@@ -83,8 +95,12 @@ const plan: Plan = [{
         "Parallel Aware": false,
         "CTE Name": "foo",
         "Alias": "foo_1",
-        "Actual Startup Time": 102.154,
-        "Actual Total Time": 102.154,
+        "Startup Cost": 0.00,
+        "Total Cost": 0.06,
+        "Plan Rows": 3,
+        "Plan Width": 0,
+        "Actual Startup Time": 101.136,
+        "Actual Total Time": 101.136,
         "Actual Rows": 1,
         "Actual Loops": 1
       },
@@ -92,8 +108,12 @@ const plan: Plan = [{
         "Node Type": "Result",
         "Parent Relationship": "Outer",
         "Parallel Aware": false,
-        "Actual Startup Time": 102.163,
-        "Actual Total Time": 304.388,
+        "Startup Cost": 0.00,
+        "Total Cost": 0.06,
+        "Plan Rows": 3,
+        "Plan Width": 8,
+        "Actual Startup Time": 101.184,
+        "Actual Total Time": 302.675,
         "Actual Rows": 2,
         "Actual Loops": 1,
         "One-Time Filter": "$1",
@@ -104,8 +124,12 @@ const plan: Plan = [{
             "Parallel Aware": false,
             "CTE Name": "foo",
             "Alias": "foo",
-            "Actual Startup Time": 0.002,
-            "Actual Total Time": 202.210,
+            "Startup Cost": 0.00,
+            "Total Cost": 0.06,
+            "Plan Rows": 3,
+            "Plan Width": 8,
+            "Actual Startup Time": 0.004,
+            "Actual Total Time": 201.492,
             "Actual Rows": 2,
             "Actual Loops": 1
           }
@@ -113,9 +137,9 @@ const plan: Plan = [{
       }
     ]
   },
-  "Planning Time": 0.326,
+  "Planning Time": 0.307,
   "Triggers": [
   ],
-  "Execution Time": 304.499
+  "Execution Time": 302.832
 }];
 export default plan;
