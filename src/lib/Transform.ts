@@ -1,8 +1,9 @@
 import {Plan as RPlan, Node as RNode} from './RawPlan';
 import {Node as TNode, Timing as TTiming} from './TransformedPlan';
 
-export function transformPlan(plan: RPlan): TNode {
-  const root = plan[0];
+export function transformPlan(rPlan: RPlan): TNode {
+  // TODO(fg) rewritten queries (with ALSO) can have multiple plans
+  const root = rPlan[0];
   let ctes = extractCTEs(root.Plan);
 
   if (!('Execution Time' in root)) {

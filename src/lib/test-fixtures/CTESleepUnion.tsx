@@ -1,4 +1,4 @@
-import {Plan} from '../ExplainJSON'
+import {Plan as RPlan} from '../RawPlan'
 
 /*
 In PG < 12, the query below does two scans on the CTE foo. The first is
@@ -20,7 +20,7 @@ WITH foo AS (
 SELECT * FROM foo WHERE EXISTS (SELECT * FROM foo) LIMIT 2
 
 */
-const plan: Plan = [{
+const plan: RPlan = [{
   "Plan": {
     "Node Type": "Limit",
     "Parallel Aware": false,

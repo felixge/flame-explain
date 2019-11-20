@@ -1,11 +1,11 @@
-import {Plan} from '../ExplainJSON'
+import {Plan as RPlan} from '../RawPlan'
 
 /*
 Note: Looped Materialize with average execution time of 0.
 
 SELECT * FROM pg_indexes;
 */
-const plan: Plan = [{
+const plan: RPlan = [{
   "Plan": {
     "Node Type": "Nested Loop",
     "Parallel Aware": false,
