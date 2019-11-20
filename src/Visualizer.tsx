@@ -5,7 +5,7 @@ import VisualizerTable from './VisualizerTable';
 import {fromPlan} from './lib/Convert';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {Link} from "react-router-dom";
-import {Node as FlameNode} from './lib/FlameJSON';
+import {Node as FlameNode} from './lib/TransformedPlan';
 
 interface Props {
   planText?: string,

@@ -1,4 +1,4 @@
-import {PlanRoot, Node as ExplainNode} from './ExplainJSON';
+import {PlanRoot, Node as ExplainNode} from './RawPlan';
 import {OptionalEmbed} from './Util';
 
 export type Timing = {

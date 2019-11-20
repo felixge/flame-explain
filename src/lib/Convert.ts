@@ -1,5 +1,5 @@
-import {Plan as ExplainPlan, Node as ExplainNode} from './ExplainJSON';
-import {Node as FlameNode, Timing as FlameTiming} from './FlameJSON';
+import {Plan as ExplainPlan, Node as ExplainNode} from './RawPlan';
+import {Node as FlameNode, Timing as FlameTiming} from './TransformedPlan';
 
 export function fromPlan(plan: ExplainPlan): FlameNode {
   const root = plan[0];

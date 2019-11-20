@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {fromPlan} from './lib/Convert';
 import {flamegraph} from 'd3-flame-graph';
-import {Node as FlameNode} from './lib/FlameJSON';
+import {Node as FlameNode} from './lib/TransformedPlan';
 import * as d3 from 'd3';
 import 'd3-flame-graph/src/flamegraph.css'
 

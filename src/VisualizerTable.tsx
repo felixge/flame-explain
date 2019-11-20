@@ -1,5 +1,5 @@
 import React from 'react';
-import {Node as FlameNode} from './lib/FlameJSON';
+import {Node as FlameNode} from './lib/TransformedPlan';
 
 interface Props {
   root: FlameNode;

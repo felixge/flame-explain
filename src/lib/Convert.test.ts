@@ -5,8 +5,8 @@ import {
   Node as ExplainNode,
   PlanAnalyzedFragment as ExplainPlanAnalyzed,
   NodeTimingFragment as ExplainNodeTiming,
-} from './ExplainJSON';
-import {query, Node as FlameNode, Timing as FlameTiming} from './FlameJSON';
+} from './RawPlan';
+import {query, Node as FlameNode, Timing as FlameTiming} from './TransformedPlan';
 
 import cteSleepUnion from './test-fixtures/CTESleepUnion';
 import pgIndexes from './test-fixtures/PGIndexes';
