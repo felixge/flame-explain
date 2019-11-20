@@ -1,7 +1,7 @@
-import {Plan as ExplainPlan, Node as ExplainNode} from './RawPlan';
-import {Node as FlameNode, Timing as FlameTiming} from './TransformedPlan';
+import {Plan as RPlan, Node as RNode} from './RawPlan';
+import {Node as TNode, Timing as TTiming} from './TransformedPlan';
 
-export function fromPlan(plan: ExplainPlan): FlameNode {
+export function fromPlan(plan: RPlan): TNode {
   const root = plan[0];
   let ctes = extractCTEs(root.Plan);
 
@@ -9,7 +9,7 @@ export function fromPlan(plan: ExplainPlan): FlameNode {
     return fromNode(root.Plan, ctes);
   }
 
-  const child = fromNode(root.Plan, ctes) as FlameNode & FlameTiming;
+  const child = fromNode(root.Plan, ctes) as TNode & TTiming;
   return {
     "Label": 'Query',
     'Self Time': 0,
@@ -23,7 +23,7 @@ export function fromPlan(plan: ExplainPlan): FlameNode {
         "Total Time": root["Planning Time"],
         "Virtual": true,
         "Source": root,
-      } as FlameNode & FlameTiming,
+      } as TNode & TTiming,
       {
         "Label": 'Execution',
         "Self Time": root["Execution Time"] - child["Total Time"],
@@ -31,13 +31,13 @@ export function fromPlan(plan: ExplainPlan): FlameNode {
         "Virtual": true,
         "Source": root,
         'Children': [child],
-      } as FlameNode & FlameTiming,
+      } as TNode & TTiming,
     ],
-  } as FlameNode & FlameTiming;
+  } as TNode & TTiming;
 }
 
-export function fromNode(n: ExplainNode, ctes: CTEs): FlameNode {
-  let r: FlameNode = {
+export function fromNode(n: RNode, ctes: CTEs): TNode {
+  let r: TNode = {
     "Label": textNodeName(n),
     "Virtual": false,
     "Source": n,
@@ -45,7 +45,7 @@ export function fromNode(n: ExplainNode, ctes: CTEs): FlameNode {
 
   // TODO: Is there a better way to tell typescript that we can assign
   // timing info to r despite the assignment above not including it?
-  let rt = r as FlameNode & FlameTiming;
+  let rt = r as TNode & TTiming;
   if ('Actual Total Time' in n && 'Actual Loops' in n) {
     let inclTime = nodeTimeLooped(n) || 0;
     if (n["Node Type"] === 'CTE Scan') {
@@ -98,16 +98,16 @@ type CTEs = {
 /** Useful information about a CTE inside of a query plan. */
 type CTE = {
   /** InitPlan node for this CTE, i.e. the actual CTE query plan itself. */
-  initNode: ExplainNode,
+  initNode: RNode,
   /** Total time spent executing the initNode */
   initNodeTime: number,
   /** List of all CTE Scan nodes for this CTE. */
-  scans: ExplainNode[],
+  scans: RNode[],
   /** Total time spent executing the scan nodes for this CTE. */
   scanTime: number,
 }
 
-export function extractCTEs(n: ExplainNode, ctes?: CTEs): CTEs {
+export function extractCTEs(n: RNode, ctes?: CTEs): CTEs {
   ctes = ctes || {};
   const prefix = 'CTE ';
   let cteName: string = "";
@@ -140,7 +140,7 @@ export function extractCTEs(n: ExplainNode, ctes?: CTEs): CTEs {
   return ctes;
 };
 
-function nodeTimeLooped(n: ExplainNode): number | void {
+function nodeTimeLooped(n: RNode): number | void {
   if ('Actual Total Time' in n && 'Actual Loops' in n) {
     return n["Actual Total Time"] * n["Actual Loops"];
   }
@@ -153,7 +153,7 @@ function nodeTimeLooped(n: ExplainNode): number | void {
  * See https://github.com/postgres/postgres/blob/REL_12_0/src/backend/commands/explain.c#L1044
  * @param n 
  */
-export function textNodeName(n: ExplainNode): string {
+export function textNodeName(n: RNode): string {
   let pname: string;
   switch (n["Node Type"]) {
     case 'Aggregate':
