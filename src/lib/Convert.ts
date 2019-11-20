@@ -58,7 +58,7 @@ export function fromNode(n: ExplainNode, ctes: CTEs): FlameNode {
       // approach is to take the time of the CTE Scan divided by the
       // time spent on all CTE Scans multiplied by the time spent in
       // the query node.
-      inclTime *= (1 - 1 / cte.scanTime * cte.queryTime);
+      inclTime *= (1 - 1 / cte.scanTime * cte.initNodeTime);
     }
 
     rt['Total Time'] = rt['Self Time'] = inclTime;
@@ -90,30 +90,39 @@ export function fromNode(n: ExplainNode, ctes: CTEs): FlameNode {
   return r;
 }
 
+/** Named list of all CTEs contained in a query plan. */
 type CTEs = {
-  [key: string]: {
-    query: ExplainNode,
-    scans: ExplainNode[],
-    scanTime: number,
-    queryTime: number,
-  }
+  [key: string]: CTE
 };
+
+/** Useful information about a CTE inside of a query plan. */
+type CTE = {
+  /** InitPlan node for this CTE, i.e. the actual CTE query plan itself. */
+  initNode: ExplainNode,
+  /** Total time spent executing the initNode */
+  initNodeTime: number,
+  /** List of all CTE Scan nodes for this CTE. */
+  scans: ExplainNode[],
+  /** Total time spent executing the scan nodes for this CTE. */
+  scanTime: number,
+}
 
 export function extractCTEs(n: ExplainNode, ctes?: CTEs): CTEs {
   ctes = ctes || {};
+  const prefix = 'CTE ';
   let cteName: string = "";
   if (n["Node Type"] === 'CTE Scan') {
     cteName = n["CTE Name"];
-  } else if (n["Subplan Name"] && n["Subplan Name"].startsWith('CTE ')) {
-    cteName = n["Subplan Name"].substr(4);
+  } else if (n["Subplan Name"] && n["Subplan Name"].startsWith(prefix)) {
+    cteName = n["Subplan Name"].substr(prefix.length);
   }
 
   if (cteName) {
     let cte = ctes[cteName] = ctes[cteName] || {
-      query: null,
+      initNode: null,
       scans: [],
       scanTime: 0,
-      queryTime: 0,
+      initNodeTime: 0,
     };
     let time = nodeTimeLooped(n) || 0;
 
@@ -121,8 +130,8 @@ export function extractCTEs(n: ExplainNode, ctes?: CTEs): CTEs {
       cte.scans.push(n);
       cte.scanTime += time;
     } else {
-      cte.query = n;
-      cte.queryTime = time;
+      cte.initNode = n;
+      cte.initNodeTime = time;
     }
   }
 

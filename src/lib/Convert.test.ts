@@ -279,11 +279,11 @@ describe('textNodeName', () => {
 
 test('extractCTEs', () => {
   let ctes = extractCTEs(cteSleepUnion[0].Plan);
-  expect(ctes["foo"].query["Node Type"]).toEqual('Append');
+  expect(ctes["foo"].initNode["Node Type"]).toEqual('Append');
   const s1 = ctes["foo"].scans[0] as ExplainNodeTiming;
   const s2 = ctes["foo"].scans[1] as ExplainNodeTiming;
-  expect(s1["Actual Total Time"]).toEqual(102.154);
-  expect(s2["Actual Total Time"]).toEqual(202.210);
+  expect(s1["Actual Total Time"]).toEqual(101.136);
+  expect(s2["Actual Total Time"]).toEqual(201.492);
 });
 
 describe('flameNode', () => {
