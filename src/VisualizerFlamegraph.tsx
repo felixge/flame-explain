@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {transformPlan} from './lib/Transform';
+import {transformQueries} from './lib/Transform';
 import {flamegraph} from 'd3-flame-graph';
-import {Node as FlameNode} from './lib/TransformedPlan';
+import {Node as FlameNode} from './lib/FlameExplain';
 import * as d3 from 'd3';
 import 'd3-flame-graph/src/flamegraph.css'
 
@@ -36,7 +36,7 @@ export default function VisualizerFlamegraph(p: Props) {
   let fudged: FoldedJSON = {} as FoldedJSON;
   try {
     let data = JSON.parse(p.planText);
-    let node = transformPlan(data);
+    let node = transformQueries(data);
     fudged = flameJSON(node);
   } catch (e) {
     // TODO handle

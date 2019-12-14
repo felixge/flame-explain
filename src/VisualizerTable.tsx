@@ -1,5 +1,8 @@
 import React from 'react';
-import {Node as FlameNode} from './lib/TransformedPlan';
+import {Node as FlameNode} from './lib/FlameExplain';
+import {faExclamationTriangle as iconWarning} from '@fortawesome/free-solid-svg-icons'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {formatDuration} from './lib/Util';
 
 interface Props {
   root: FlameNode;
@@ -16,10 +19,24 @@ export default function VisualizerTable(p: Props) {
     maxInclusive = p.root['Total Time'];
   }
 
-  let visit = (node: FlameNode, depth: number = 0, lastChild: boolean[] = [true]) => {
-    if (depth > 0) {
-      const indentSize = 16;
+  let calcMaxSelfTime = (n: FlameNode): number => {
+    let max = 0;
+    if ('Self Time' in n) {
+      max = n['Self Time'];
+    }
+    (n.Children || []).forEach(child => {
+      max = Math.max(max, calcMaxSelfTime(child));
+    });
+    return max;
+  }
+  let maxSelfTime = calcMaxSelfTime(p.root);
 
+  let visit = (node: FlameNode, depth: number = 0, lastChild: boolean[] = [true]) => {
+    const indentSize = 16;
+    let row: JSX.Element | null = null;
+
+    // TODO allow filtering virtual nodes
+    if (true) {
       // Generate the |- lines for making the table look like a tree view.
       const treeLines = (): JSX.Element[] => {
         const elements: JSX.Element[] = [];
@@ -52,29 +69,33 @@ export default function VisualizerTable(p: Props) {
       let indent = (depth + 1) * indentSize + 'px';
 
       const selfColor = 'Self Time' in node
-        ? `rgba(255,0,0,${node['Self Time'] / maxInclusive})`
+        ? `rgba(255,0,0,${node['Self Time'] / maxSelfTime})`
         : '';
       const totalColor = 'Total Time' in node
         ? `rgba(255,0,0,${node['Total Time'] / maxInclusive})`
         : '';
 
-      rows.push(
-        <tr key={rows.length}>
-          <td className="has-text-right">{rows.length + 1}</td>
-          <td style={{position: 'relative'}}>{treeLines()}<div style={{marginLeft: indent}}>{node.Label}</div></td>
-          <td>{'Actual Loops' in node.Source ? node.Source['Actual Loops'] : ''}</td>
-          <td>{'Actual Rows' in node.Source ? node.Source['Actual Rows'] : ''}</td>
-          <td style={{backgroundColor: selfColor}} className="has-text-right">{'Self Time' in node ? formatDuration(node['Self Time']) : ''}</td>
-          <td style={{backgroundColor: selfColor}} className="has-text-right">{'Self Time' in node ? formatPercent(node['Self Time'] / maxInclusive) : ''}</td>
-          <td style={{backgroundColor: totalColor}} className="has-text-right">{'Total Time' in node ? formatDuration(node['Total Time']) : ''}</td>
-          <td style={{backgroundColor: totalColor}} className="has-text-right">{'Total Time' in node ? formatPercent(node['Total Time'] / maxInclusive) : ''}</td>
-        </tr>
-      );
+      row = <tr key={rows.length}>
+        <td className="has-text-right">{rows.length + 1}</td>
+        <td style={{position: 'relative'}}>
+          {treeLines()}
+          <div style={{marginLeft: indent}}>{node.Label}
+            &nbsp;
+        {(node.Warnings || []).map((warning, i) => <FontAwesomeIcon key={i} title={warning} color="grey" icon={iconWarning} />)}
+          </div></td>
+        <td>{'Actual Rows' in node.Source ? node.Source['Actual Rows'] : ''}</td>
+        <td>{'Actual Loops' in node.Source ? node.Source['Actual Loops'] : ''}</td>
+        <td style={{backgroundColor: totalColor}} className="has-text-right">{'Total Time' in node ? formatDuration(node['Total Time']) : ''}</td>
+        <td style={{backgroundColor: totalColor}} className="has-text-right">{'Total Time' in node ? formatPercent(node['Total Time'] / maxInclusive) : ''}</td>
+        <td style={{backgroundColor: selfColor}} className="has-text-right">{'Self Time' in node ? formatDuration(node['Self Time']) : ''}</td>
+        <td style={{backgroundColor: selfColor}} className="has-text-right">{'Self Time' in node ? formatPercent(node['Self Time'] / maxInclusive) : ''}</td>
+      </tr>;
+      rows.push(row);
     }
 
     let children = node.Children || [];
     children.forEach(
-      (child, i) => visit(child, depth + 1, lastChild.concat(children.length === i + 1))
+      (child, i) => visit(child, depth + (row ? 1 : 0), lastChild.concat(children.length === i + 1))
     );
   };
   visit(p.root);
@@ -86,10 +107,10 @@ export default function VisualizerTable(p: Props) {
         <tr>
           <th className="has-text-centered">#</th>
           <th>Node</th>
-          <th>Rows</th>
+          <th>Actual Rows</th>
           <th>Loops</th>
-          <th className="has-text-centered" colSpan={2}>Self Time</th>
           <th className="has-text-centered" colSpan={2}>Total Time</th>
+          <th className="has-text-centered" colSpan={2}>Self Time</th>
         </tr>
       </thead>
       <tbody>
@@ -103,21 +124,4 @@ function formatPercent(f: number): string {
   return (isNaN(f))
     ? '-'
     : (f * 100).toFixed(2) + '%';
-}
-
-function formatDuration(ms: number): string {
-  const msec = 1,
-    sec = 1000 * ms,
-    min = 60 * sec,
-    usec = msec / 1000;
-
-  if (ms > min) {
-    return (ms / min).toFixed(1) + ' m';
-  } else if (ms > sec) {
-    return (ms / sec).toFixed(1) + ' s';
-  } else if (ms > msec) {
-    return (ms / msec).toFixed(1) + ' ms';
-  } else {
-    return (ms / usec).toFixed(0) + ' μs';
-  }
 }

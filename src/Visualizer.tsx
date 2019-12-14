@@ -2,10 +2,10 @@ import React from 'react';
 import VisualizerInput from './VisualizerInput';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
 import VisualizerTable from './VisualizerTable';
-import {transformPlan} from './lib/Transform';
+import {transformQueries} from './lib/Transform';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {Link} from "react-router-dom";
-import {Node as FlameNode} from './lib/TransformedPlan';
+import {Node as FlameNode} from './lib/FlameExplain';
 
 interface Props {
   planText?: string,
@@ -18,7 +18,7 @@ export default function Visualizer(p: Props) {
   let errorText: string | null = null;
   try {
     let data = JSON.parse(planText);
-    rootNode = transformPlan(data);
+    rootNode = transformQueries(data);
   } catch (e) {
     errorText = e + '';
   }
@@ -35,7 +35,7 @@ export default function Visualizer(p: Props) {
         <div className="tabs is-toggle">
           <ul>
             <li className={visualizer === 'table' ? 'is-active' : ''}>
-              <Link to="/visualize/table">Table</Link>
+              <Link to="/visualize/table">Tree Table</Link>
             </li>
             <li className={visualizer === 'flamegraph' ? 'is-active' : ''}>
               <Link to="/visualize/flamegraph">Flame Graph</Link>
