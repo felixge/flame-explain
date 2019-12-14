@@ -21,11 +21,6 @@ export default function App(p: Props) {
     <BrowserRouter>
       <Header />
       <Switch>
-        <Route path="/" exact>
-          <Visualizer planText={p.planText} />
-        </Route>
-        {/* Because Visualizer doesn't have a key prop, this should use the
-              same Visualizer instance as above. */}
         <Route path="/visualize">
           <Visualizer planText={p.planText} />
         </Route>

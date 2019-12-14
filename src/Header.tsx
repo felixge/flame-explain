@@ -13,13 +13,11 @@ export default function Header() {
           <div id="navbarBasicExample" className="navbar-menu">
             <div className="navbar-start">
               <NavLink
-                activeClassName="is-active" to="/" className="navbar-item"
-                isActive={(_, {pathname}) => {
-                  // match '/' and '/visualize/*'
-                  return (/^\/(visualize\/.+)?$/).test(pathname);
-                }}>
-                Home
-                            </NavLink>
+                activeClassName="is-active"
+                to="/visualize/input"
+                className="navbar-item"
+                isActive={(_, {pathname}) => pathname.startsWith('/visualize')}
+              >Visualize</NavLink>
               <NavLink activeClassName="is-active" to="/docs" className="navbar-item">Documentation</NavLink>
               <NavLink activeClassName="is-active" to="/about" className="navbar-item">About</NavLink>
               <NavLink activeClassName="is-active" to="/credits" className="navbar-item">Credits</NavLink>
