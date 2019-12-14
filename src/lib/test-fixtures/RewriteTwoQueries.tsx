@@ -1,4 +1,4 @@
-import {Plan as RPlan} from '../RawPlan'
+import {Queries} from '../RawExplain'
 
 /**
 Perhaps a bit exotic, but EXPLAIN ANALYZE may return multiple query plans when
@@ -13,7 +13,7 @@ DO ALSO INSERT INTO bar VALUES (NEW.id);
 EXPLAIN (ANALYZE, FORMAT JSON)
 INSERT INTO foo SELECT * FROM generate_series(1, 100000);
 */
-const plan: RPlan = [
+const queries: Queries = [
   {
     "Plan": {
       "Node Type": "ModifyTable",
@@ -91,4 +91,4 @@ const plan: RPlan = [
     "Execution Time": 128.802
   }
 ];
-export default plan;
+export default queries;

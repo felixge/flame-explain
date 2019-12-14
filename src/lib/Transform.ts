@@ -1,177 +1,330 @@
-import {Plan as RPlan, Node as RNode} from './RawPlan';
-import {Node as TNode, Timing as TTiming} from './TransformedPlan';
+import {Queries, Node as RNode} from './RawExplain';
+import {Node as FNode} from './FlameExplain';
+import {formatDuration} from './Util';
 
-export function transformPlan(rPlan: RPlan): TNode {
-  let tRoot = {
-    "Label": '',
-    'Self Time': 0,
-    "Total Time": 0,
-    "Virtual": true,
-    "Source": rPlan[0],
-    "Children": [
-      {
-        "Label": 'Query 1',
-        'Self Time': 0,
-        "Total Time": 0,
-        "Virtual": true,
-        "Source": rPlan[0],
-      },
-      {
-        "Label": 'Query 2',
-        'Self Time': 0,
-        "Total Time": 0,
-        "Virtual": true,
-        "Source": rPlan[0],
-      },
-    ],
-  };
-  return tRoot;
+type virtualNodeOptions = {
+  label: string;
+  children: FNode[];
+  totalTime?: number;
+  selfTime?: number;
+  source?: FNode;
 }
 
-export function transformPlan2(rPlan: RPlan): TNode {
-  // TODO(fg) rewritten queries (with ALSO) can have multiple plans
-  const root = rPlan[0];
-  let ctes = extractCTEs(root.Plan);
+function virtualNode(o: virtualNodeOptions): FNode {
+  const totalTime = (o.totalTime !== undefined)
+    ? o.totalTime
+    : o.children.reduce((acc, child) => {
+      return ('Total Time' in child)
+        ? acc + child['Total Time']
+        : 0;
+    }, 0);
 
-  if (!('Execution Time' in root)) {
-    return fromNode(root.Plan, ctes);
-  }
-
-  const child = fromNode(root.Plan, ctes) as TNode & TTiming;
   return {
-    "Label": 'Query',
-    'Self Time': 0,
-    "Total Time": root["Execution Time"] + root["Planning Time"],
+    "Label": o.label,
     "Virtual": true,
-    "Source": root,
-    "Children": [
-      {
-        "Label": 'Planning',
-        "Self Time": root["Planning Time"],
-        "Total Time": root["Planning Time"],
-        "Virtual": true,
-        "Source": root,
-      } as TNode & TTiming,
-      {
-        "Label": 'Execution',
-        "Self Time": root["Execution Time"] - child["Total Time"],
-        "Total Time": root["Execution Time"],
-        "Virtual": true,
-        "Source": root,
-        'Children': [child],
-      } as TNode & TTiming,
-    ],
-  } as TNode & TTiming;
-}
-
-export function fromNode(n: RNode, ctes: CTEs): TNode {
-  let r: TNode = {
-    "Label": textNodeName(n),
-    "Virtual": false,
-    "Source": n,
+    "Source": o.source || {},
+    "Self Time": 0,
+    "Total Time": totalTime,
+    "Children": o.children,
   };
+}
 
-  // TODO: Is there a better way to tell typescript that we can assign
-  // timing info to r despite the assignment above not including it?
-  let rt = r as TNode & TTiming;
-  if ('Actual Total Time' in n && 'Actual Loops' in n) {
-    let inclTime = nodeTimeLooped(n) || 0;
-    if (n["Node Type"] === 'CTE Scan') {
-      let cte = ctes[n["CTE Name"]];
-      // PostgreSQL CTEs consist of one CTE InitPlan query node,
-      // plus one or more CTE Scans. The time spent in the
-      // CTE InitPlan is also attributed to the CTE Scan nodes. There
-      // is no perfect way to tell how much time of a CTE Scan was
-      // spent in the InitPlan query, but IMO it's fairly reasonable
-      // approach is to take the time of the CTE Scan divided by the
-      // time spent on all CTE Scans multiplied by the time spent in
-      // the query node.
-      inclTime *= (1 - 1 / cte.scanTime * cte.initNodeTime);
-    }
+export function transformQueries(queries: Queries): FNode {
+  let root = virtualNode({
+    label: 'Queries',
+    children: queries.map((query, i) => {
+      let children: FNode[] = [];
+      if ('Execution Time' in query) {
+        //let ctes = extractCTEs(query.Plan);
 
-    rt['Total Time'] = rt['Self Time'] = inclTime;
+        children = [
+          virtualNode({
+            label: 'Planning',
+            totalTime: query['Planning Time'],
+            children: [],
+          }),
+          virtualNode({
+            label: 'Execution',
+            totalTime: query['Execution Time'],
+            children: [rawToFlame(query.Plan)],
+          }),
+        ]
+      }
 
-  }
-
-  let childInclusiveTime = 0;
-  if (n.Plans) {
-    r.Children = n.Plans
-      .map((child) => {
-        const childNode = fromNode(child, ctes);
-        if ('Total Time' in childNode) {
-          childInclusiveTime += childNode['Total Time'];
-        }
-        return childNode;
+      let queryNode = virtualNode({
+        label: 'Query ' + (i + 1),
+        children: children,
       });
+
+      return queryNode;
+    }),
+  });
+
+  // Most of the time we'll only have a single query, so we can get rid of the
+  // top level "Queries" node and avoid numbering the queries.
+  if (root.Children && root.Children.length === 1) {
+    root = root.Children[0];
+    root.Label = 'Query';
   }
 
-  // Rounding errors on looped nodes can lead to parent nodes with less
-  // Total Time than their children, which is non-sense. So we correct for
-  // this here. This also prevents our Self Time calculation below from
-  // going negative in these cases.
-  if (rt['Total Time'] < childInclusiveTime) {
-    rt['Total Time'] = childInclusiveTime;
-  }
+  root = setParents(root);
+  root = setFilterParents(root);
+  root = setCTEParents(root);
+  root = calcFilterTime(root);
+  root = calcCTETime(root);
+  root = virtualNodes(root);
+  root = calcSelfTime(root);
+  root = addWarnings(root);
 
-  rt['Self Time'] = rt['Total Time'] - childInclusiveTime;
-
-  return r;
+  return root
 }
 
-/** Named list of all CTEs contained in a query plan. */
-type CTEs = {
-  [key: string]: CTE
-};
-
-/** Useful information about a CTE inside of a query plan. */
-type CTE = {
-  /** InitPlan node for this CTE, i.e. the actual CTE query plan itself. */
-  initNode: RNode,
-  /** Total time spent executing the initNode */
-  initNodeTime: number,
-  /** List of all CTE Scan nodes for this CTE. */
-  scans: RNode[],
-  /** Total time spent executing the scan nodes for this CTE. */
-  scanTime: number,
-}
-
-export function extractCTEs(n: RNode, ctes?: CTEs): CTEs {
-  ctes = ctes || {};
-  const prefix = 'CTE ';
-  let cteName: string = "";
-  if (n["Node Type"] === 'CTE Scan') {
-    cteName = n["CTE Name"];
-  } else if (n["Subplan Name"] && n["Subplan Name"].startsWith(prefix)) {
-    cteName = n["Subplan Name"].substr(prefix.length);
+function rawToFlame(p: RNode): FNode {
+  let totalTime = 0;
+  if ('Actual Total Time' in p) {
+    totalTime = p['Actual Total Time'];
+  }
+  if ('Actual Loops' in p) {
+    totalTime *= p["Actual Loops"];
   }
 
-  if (cteName) {
-    let cte = ctes[cteName] = ctes[cteName] || {
-      initNode: null,
-      scans: [],
-      scanTime: 0,
-      initNodeTime: 0,
-    };
-    let time = nodeTimeLooped(n) || 0;
+  let fnode: FNode = {
+    "Label": textNodeName(p),
+    "Source": p,
+    "Virtual": false,
+    "Self Time": totalTime,
+    "Total Time": totalTime,
+  }
 
-    if (n["Node Type"] === 'CTE Scan') {
-      cte.scans.push(n);
-      cte.scanTime += time;
-    } else {
-      cte.initNode = n;
-      cte.initNodeTime = time;
+  if (p.Plans) {
+    fnode.Children = (p.Plans).map(rawToFlame);
+  }
+
+
+  return fnode;
+}
+
+function addWarnings(n: FNode): FNode {
+  if (!('Total Time' in n)) {
+    return n;
+  }
+
+  let childTotal = 0;
+  (n.Children || []).forEach(child => {
+    if ('Total Time' in child) {
+      childTotal += child['Total Time'];
+    }
+    addWarnings(child);
+  });
+
+  let selfDelta = Math.abs(n['Total Time'] - (childTotal + n['Self Time']));
+  if (childTotal > n['Total Time']) {
+    n.Warnings = (n.Warnings || []).concat('The children of this node have a cumulative total time exceeding this node\'s total time.');
+  } else if (selfDelta > 0.001) {
+    n.Warnings = (n.Warnings || []).concat('The self time of this node is off by ' + formatDuration(selfDelta));
+  }
+
+  return n;
+}
+
+function calcSelfTime(n: FNode): FNode {
+  if (!('Total Time' in n)) {
+    return n;
+  }
+
+  let childTotal = 0;
+  (n.Children || []).forEach(child => {
+    if ('Total Time' in child) {
+      childTotal += child['Total Time'];
+    }
+    calcSelfTime(child);
+  });
+  n['Self Time'] = n['Total Time'] - childTotal
+
+  return n;
+}
+
+function virtualNodes(n: FNode): FNode {
+  n.Children = (n.Children || []).map(virtualNodes);
+
+  let {Source: s} = n;
+  if ('Subplan Name' in s && s['Subplan Name']) {
+    n = virtualNode({
+      label: s["Subplan Name"],
+      children: [n],
+    });
+  }
+
+  return n;
+}
+
+function setParents(n: FNode, parent: FNode | undefined = undefined): FNode {
+  n.Parent = parent;
+  (n.Children || []).forEach(child => setParents(child, n));
+  return n;
+}
+
+
+function setFilterParents(n: FNode): FNode {
+  (n.Children || []).forEach(setFilterParents);
+
+  const filters: string[] = [];
+  const ns = n.Source;
+  if ('Filter' in ns && ns.Filter) {
+    filters.push(ns.Filter);
+  }
+  if ('One-Time Filter' in ns && ns["One-Time Filter"]) {
+    filters.push(ns["One-Time Filter"]);
+  }
+  if (!filters.length) {
+    return n;
+  }
+
+  const ids: {[key: string]: boolean} = {};
+  filters.forEach(filter => {
+    (filter.match(/\$\d+/g) || []).forEach(id => {
+      ids[id] = true;
+    });
+  });
+
+  for (const id in ids) {
+    // Note: The InitPlan for our node's filter might be a direct child of
+    // this node.
+    let p: FNode | undefined = n;
+    while (p) {
+      let parent = (p.Children || []).find(pc => {
+        const pcs = pc.Source;
+        return 'Parent Relationship' in pcs
+          && pcs["Parent Relationship"] === 'InitPlan'
+          && (pcs["Subplan Name"] || '').includes('(returns ' + id + ')');
+      });
+
+      if (parent) {
+        n.FilterParent = parent;
+        parent.FilterChildren = (parent.FilterChildren || []).concat(n);
+        break;
+      }
+
+      p = p.Parent;
+    }
+
+    if (!n.FilterParent) {
+      n.Warnings = (n.Warnings || []).concat(
+        'Could not find parent filter node returning ' + id + '.'
+      );
     }
   }
 
-  (n.Plans || []).forEach((plan) => extractCTEs(plan, ctes));
+  return n;
+}
 
-  return ctes;
-};
+function calcFilterTime(n: FNode): FNode {
+  (n.Children || []).forEach(calcFilterTime);
 
-function nodeTimeLooped(n: RNode): number | void {
-  if ('Actual Total Time' in n && 'Actual Loops' in n) {
-    return n["Actual Total Time"] * n["Actual Loops"];
+  if (!('Total Time' in n && n.FilterChildren)) {
+    return n;
   }
+
+  let initTime = n["Total Time"];
+  let childCount = n.FilterChildren.length;
+  n.FilterChildren.forEach(child => {
+    if (!('Total Time' in child)) {
+      return
+    }
+    const delta = initTime / childCount;
+
+    let p: FNode | undefined = child;
+    while (p) {
+      if ((p.Children || []).find(pc => pc === n)) {
+        return n;
+      }
+
+      if ('Total Time' in p) {
+        p["Total Time"] -= delta;
+      }
+      p = p.Parent;
+    }
+  });
+
+  return n;
+}
+
+function setCTEParents(n: FNode): FNode {
+  (n.Children || []).forEach(setCTEParents);
+
+  const ns = n.Source;
+  if (!('Node Type' in ns && ns["Node Type"] === 'CTE Scan')) {
+    return n;
+  }
+
+  let p: FNode | undefined = n;
+  while (p) {
+    let parent = (p.Children || []).find(pc => {
+      const pcs = pc.Source;
+      return 'Parent Relationship' in pcs
+        && pcs["Parent Relationship"] === 'InitPlan'
+        && pcs["Subplan Name"] === 'CTE ' + ns["CTE Name"];
+    });
+
+    if (parent) {
+      n.CTEParent = parent;
+      parent.CTEScans = (parent.CTEScans || []).concat(n);
+      return n;
+    }
+
+    p = p.Parent;
+  }
+
+  n.Warnings = (n.Warnings || []).concat('Could not find parent CTE node.');
+
+  return n;
+}
+
+function calcCTETime(n: FNode): FNode {
+  (n.Children || []).forEach(calcCTETime);
+
+  // Return early unless n is a CTE parent node.
+  if (!('Total Time' in n && n.CTEScans)) {
+    return n;
+  }
+
+  let initTime = n["Total Time"];
+  let scanTime = 0;
+  (n.CTEScans || []).forEach(scan => {
+    if ('Total Time' in scan) {
+      scanTime += scan["Total Time"]
+    }
+  });
+
+  (n.CTEScans || []).forEach(scan => {
+    if (!('Total Time' in scan)) {
+      return
+    }
+
+    // Sometimes the CTE Scan is a child of the CTEParent, in this case we must
+    // not apply our fancy calculation below. See CTESimple for an example.
+    if (scan.CTEParent && scan.CTEParent.Parent === scan) {
+      return;
+    }
+
+    let before = scan["Total Time"];
+    scan["Total Time"] *= (1 - 1 / scanTime * initTime);
+    let delta = before - scan["Total Time"];
+
+    let p = scan.Parent;
+    while (p) {
+      if ((p.Children || []).find(pc => pc === n)) {
+        return n;
+      }
+
+      if ('Total Time' in p) {
+        p["Total Time"] -= delta;
+      }
+      p = p.Parent;
+    }
+  });
+
+  return n;
 }
 
 /**

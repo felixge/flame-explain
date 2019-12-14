@@ -19,20 +19,24 @@
 
 import {OptionalEmbed} from './Util';
 
+/** Queries defines the JSON array that is produced by EXPLAIN (FORMAT JSON).
+ * Each element contains the explanation of one query. In most cases, there is
+ * only a single query element, however query rewrite rules can produce multiple
+ * queries.
+ */
+export type Queries = Array<Query>;
 
-export type PlanAnalyzedFragment = {
+export type Query = OptionalEmbed<{
+  // TODO rename Node to Plan
+  "Plan": Node;
+}, QueryAnalyzedFragment>;
+
+export type QueryAnalyzedFragment = {
   "Planning Time": number;
   "Execution Time": number;
   "Triggers": Array<any>;
 }
 
-type PlanCommonFragment = {
-  "Plan": Node;
-}
-
-export type PlanRoot = OptionalEmbed<PlanCommonFragment, PlanAnalyzedFragment>;
-
-export type Plan = Array<PlanRoot>;
 
 /**
  * NodeType should cover all node types. Last updated for REL_12_0 [1]

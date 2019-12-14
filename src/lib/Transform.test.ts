@@ -1,11 +1,11 @@
-import {fromNode, transformPlan, textNodeName, extractCTEs} from './Transform'
+import {fromNode, transformQueries, textNodeName, extractCTEs} from './Transform'
 // import { tests, TestName } from './tests'
 import {
   Plan as ExplainPlan,
   Node as ExplainNode,
   PlanAnalyzedFragment as ExplainPlanAnalyzed,
   NodeTimingFragment as ExplainNodeTiming,
-} from './RawPlan';
+} from './RawExplain';
 import {query, Node as FlameNode, Timing as FlameTiming} from './TransformedPlan';
 
 import cteSleepUnion from './test-fixtures/CTESleepUnion';
@@ -309,7 +309,7 @@ describe('flameNode', () => {
       "Plan": loopedSeqScan,
     }];
 
-    const n = transformPlan(plan) as FlameNode & FlameTiming;
+    const n = transformQueries(plan) as FlameNode & FlameTiming;
     expect(n.Label).toEqual('Query');
     expect(n.Source).toEqual(plan[0]);
     expect(n["Self Time"]).toEqual(0);
@@ -331,7 +331,7 @@ describe('flameNode', () => {
   });
 
   test('insert virtual nodes for planning/execution', () => {
-    const root = transformPlan(cteSleepUnion);
+    const root = transformQueries(cteSleepUnion);
 
     const exec = query(root, ['Execution']) as FlameNode & FlameTiming;
     const limit = query(exec, ['Limit']) as FlameNode & FlameTiming
@@ -369,7 +369,7 @@ describe('flameNode', () => {
   });
 
   test('adjust for looped node rounding errors', () => {
-    const root = transformPlan(pgIndexes);
+    const root = transformQueries(pgIndexes);
     const materialize = query(root, ['Execution', 'Nested Loop Left Join', 'Materialize']) as FlameNode & FlameTiming;
     expect(materialize['Self Time']).toEqual(0);
     expect(materialize['Total Time']).toEqual(0.005);
