@@ -1,6 +1,18 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
+import CTESleepUnion from './lib/test-fixtures/CTESleepUnion';
+import CTESimple from './lib/test-fixtures/CTESimple';
+import PGIndexes from './lib/test-fixtures/PGIndexes';
+
+const jsonify = (j: any) => JSON.stringify(j, null, 2);
+
+const plans: {[key: string]: string} = {
+  'CTESleepUnion': jsonify(CTESleepUnion),
+  'CTESimple': jsonify(CTESimple),
+  'PGIndexes': jsonify(PGIndexes),
+};
+
 interface Props {
   errorText: string | null,
   planText: string,
@@ -19,15 +31,36 @@ export default function VisualizerInput(p: Props) {
     }
   };
 
+  let selectedPlan = '';
+  for (const key in plans) {
+    if (p.planText === plans[key]) {
+      selectedPlan = key;
+      break;
+    }
+  }
 
   return (
     <div>
       {errorDiv}
       <div className="field">
         <p>
-          Prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
+          Or prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
           , execute it, paste the resulting JSON below and then hit <strong><span role="img" aria-label="flame">🔥</span>&nbsp;Explain</strong>.
         </p>
+      </div>
+      <div className="field">
+        <div className="select">
+          <select value={selectedPlan} onChange={e => {
+            p.onChange(plans[e.target.value] || '');
+          }}>
+            <option value="">Paste your own Plan</option>
+            {
+              Object.keys(plans).map(plan => {
+                return <option value={plan} key={plan}>{plan}</option>
+              })
+            }
+          </select>
+        </div>
       </div>
       <div className="field">
         <p className="control">

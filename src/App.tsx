@@ -3,6 +3,7 @@ import {
   BrowserRouter,
   Switch,
   Route,
+  Redirect,
 } from "react-router-dom";
 import Header from './Header';
 import Footer from './Footer';
@@ -21,6 +22,9 @@ export default function App(p: Props) {
     <BrowserRouter>
       <Header />
       <Switch>
+        <Route path="/" exact={true}>
+          <Redirect to="/visualize/input" />;
+        </Route>
         <Route path="/visualize">
           <Visualizer planText={p.planText} />
         </Route>

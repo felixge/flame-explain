@@ -34,7 +34,7 @@ export default function Visualizer(p: Props) {
       tab = <VisualizerInput
         errorText={errorText}
         planText={planText}
-        onChange={setPlanText}
+        onChange={(text) => {setPlanText(text)}}
       />;
       break;
     case 'table':
