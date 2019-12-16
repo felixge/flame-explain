@@ -35,7 +35,16 @@ export function transformQueries(queries: Queries): FNode {
     children: queries.map((query, i) => {
       let children: FNode[] = [];
       if ('Execution Time' in query) {
-        //let ctes = extractCTEs(query.Plan);
+        let queryRoot = rawToFlame(query.Plan);
+        queryRoot = calcLoopTime(queryRoot);
+        queryRoot = setParents(queryRoot);
+        queryRoot = setFilterParents(queryRoot);
+        queryRoot = setCTEParents(queryRoot);
+        queryRoot = calcFilterTime(queryRoot);
+        queryRoot = calcCTETime(queryRoot);
+        queryRoot = virtualNodes(queryRoot);
+        queryRoot = calcSelfTime(queryRoot);
+        queryRoot = addWarnings(queryRoot);
 
         children = [
           virtualNode({
@@ -46,7 +55,7 @@ export function transformQueries(queries: Queries): FNode {
           virtualNode({
             label: 'Execution',
             totalTime: query['Execution Time'],
-            children: [rawToFlame(query.Plan)],
+            children: [queryRoot],
           }),
         ]
       }
@@ -67,15 +76,6 @@ export function transformQueries(queries: Queries): FNode {
     root.Label = 'Query';
   }
 
-  root = setParents(root);
-  root = setFilterParents(root);
-  root = setCTEParents(root);
-  root = calcFilterTime(root);
-  root = calcCTETime(root);
-  root = virtualNodes(root);
-  root = calcSelfTime(root);
-  root = addWarnings(root);
-
   return root
 }
 
@@ -83,9 +83,6 @@ function rawToFlame(p: RNode): FNode {
   let totalTime = 0;
   if ('Actual Total Time' in p) {
     totalTime = p['Actual Total Time'];
-  }
-  if ('Actual Loops' in p) {
-    totalTime *= p["Actual Loops"];
   }
 
   let fnode: FNode = {
@@ -100,8 +97,35 @@ function rawToFlame(p: RNode): FNode {
     fnode.Children = (p.Plans).map(rawToFlame);
   }
 
-
   return fnode;
+}
+
+function calcLoopTime(n: FNode): FNode {
+  (n.Children || []).forEach(calcLoopTime);
+
+  const ns = n.Source;
+  if (!('Actual Loops' in ns && 'Total Time' in n && ns["Actual Loops"] > 1)) {
+    return n;
+  }
+
+  n["Total Time"] = ns["Actual Loops"] * n["Total Time"];
+
+  // Due to rounding errors, our total time above may be smaller than the sum
+  // of child node total time. It seems reasonable to adjust for that by making
+  // this node's total time to be as big as the sum of its child nodes in this
+  // case.
+  let childTotal = 0;
+  (n.Children || []).forEach(child => {
+    if ('Total Time' in child) {
+      childTotal += child['Total Time'];
+    }
+  });
+
+  if (childTotal > n["Total Time"]) {
+    n["Total Time"] = childTotal;
+  }
+
+  return n;
 }
 
 function addWarnings(n: FNode): FNode {
