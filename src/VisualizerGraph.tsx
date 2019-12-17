@@ -71,14 +71,12 @@ function newGraph(n: FNode): Graph {
 }
 
 function newNodes(n: FNode, nodes: Node[] = [], depth = 1): Node[] {
-  if (!n.Virtual) {
     nodes.push({
       ID: nodes.length + 1,
       Label: n.Label,
       Source: n,
       Rank: depth,
     });
-  }
   (n.Children || []).forEach(child => newNodes(child, nodes, depth + 1));
   return nodes;
 }
