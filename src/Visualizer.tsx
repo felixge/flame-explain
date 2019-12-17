@@ -2,6 +2,7 @@ import React from 'react';
 import VisualizerInput from './VisualizerInput';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
 import VisualizerTable from './VisualizerTable';
+import VisualizerGraph from './VisualizerGraph';
 import {transformQueries} from './lib/Transform';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {Link} from "react-router-dom";
@@ -30,6 +31,12 @@ export default function Visualizer(p: Props) {
 
   let tab: JSX.Element;
   switch (match.params.tab) {
+    case 'graph':
+      if (!rootNode) {
+        return <Redirect to="/" />;
+      }
+      tab = <VisualizerGraph root={rootNode} />;
+      break;
     case 'input':
       tab = <VisualizerInput
         errorText={errorText}
@@ -63,6 +70,9 @@ export default function Visualizer(p: Props) {
           </li>
           <li className={match.params.tab === 'flamegraph' ? 'is-active' : ''}>
             <Link to="/visualize/flamegraph">Flame Graph</Link>
+          </li>
+          <li className={match.params.tab === 'graph' ? 'is-active' : ''}>
+            <Link to="/visualize/graph">Graph</Link>
           </li>
         </ul>
       </div>

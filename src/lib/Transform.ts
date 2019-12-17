@@ -7,7 +7,7 @@ type virtualNodeOptions = {
   children: FNode[];
   totalTime?: number;
   selfTime?: number;
-  source?: FNode;
+  source?: RNode;
 }
 
 function virtualNode(o: virtualNodeOptions): FNode {
@@ -19,7 +19,7 @@ function virtualNode(o: virtualNodeOptions): FNode {
         : 0;
     }, 0);
 
-  return {
+  let n = {
     "Label": o.label,
     "Virtual": true,
     "Source": o.source || {},
@@ -27,6 +27,10 @@ function virtualNode(o: virtualNodeOptions): FNode {
     "Total Time": totalTime,
     "Children": o.children,
   };
+  o.children.forEach(child => {
+    child.Parent = n;
+  });
+  return n;
 }
 
 export function transformQueries(queries: Queries): FNode {
@@ -173,18 +177,22 @@ function virtualNodes(n: FNode): FNode {
 
   let {Source: s} = n;
   if ('Subplan Name' in s && s['Subplan Name']) {
+    let parent = n.Parent;
     n = virtualNode({
       label: s["Subplan Name"],
       children: [n],
+      // @ts-ignore
+      source: n.Source,
     });
+    n.Parent = parent;
   }
 
   return n;
 }
 
 function setParents(n: FNode, parent: FNode | undefined = undefined): FNode {
-  n.Parent = parent;
   (n.Children || []).forEach(child => setParents(child, n));
+  n.Parent = parent;
   return n;
 }
 
