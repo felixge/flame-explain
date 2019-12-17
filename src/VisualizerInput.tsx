@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import CTESleepUnion from './lib/test-fixtures/CTESleepUnion';
 import CTESimple from './lib/test-fixtures/CTESimple';
 import PGIndexes from './lib/test-fixtures/PGIndexes';
+import RewriteTwoQueries from './lib/test-fixtures/RewriteTwoQueries';
 
 const jsonify = (j: any) => JSON.stringify(j, null, 2);
 
@@ -11,6 +12,7 @@ const plans: {[key: string]: string} = {
   'CTESleepUnion': jsonify(CTESleepUnion),
   'CTESimple': jsonify(CTESimple),
   'PGIndexes': jsonify(PGIndexes),
+  'RewriteTwoQueries': jsonify(RewriteTwoQueries),
 };
 
 interface Props {
