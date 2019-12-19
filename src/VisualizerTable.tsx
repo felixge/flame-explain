@@ -36,7 +36,7 @@ export default function VisualizerTable(p: Props) {
     let row: JSX.Element | null = null;
 
     // TODO allow filtering virtual nodes
-    if (true) {
+    if (!node.Root) {
       // Generate the |- lines for making the table look like a tree view.
       const treeLines = (): JSX.Element[] => {
         const elements: JSX.Element[] = [];

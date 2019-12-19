@@ -2,37 +2,6 @@ import {Queries, Node as RNode} from './RawExplain';
 import {Node as FNode} from './FlameExplain';
 import {formatDuration} from './Util';
 
-type virtualNodeOptions = {
-  label: string;
-  children: FNode[];
-  totalTime?: number;
-  selfTime?: number;
-  source?: RNode;
-}
-
-function virtualNode(o: virtualNodeOptions): FNode {
-  const totalTime = (o.totalTime !== undefined)
-    ? o.totalTime
-    : o.children.reduce((acc, child) => {
-      return ('Total Time' in child)
-        ? acc + child['Total Time']
-        : 0;
-    }, 0);
-
-  let n = {
-    "Label": o.label,
-    "Virtual": true,
-    "Source": o.source || {},
-    "Self Time": 0,
-    "Total Time": totalTime,
-    "Children": o.children,
-  };
-  o.children.forEach(child => {
-    child.Parent = n;
-  });
-  return n;
-}
-
 export function transformQueries(queries: Queries): FNode {
   let root = virtualNode({
     label: 'Queries',
@@ -47,8 +16,6 @@ export function transformQueries(queries: Queries): FNode {
         queryRoot = calcFilterTime(queryRoot);
         queryRoot = calcCTETime(queryRoot);
         queryRoot = virtualNodes(queryRoot);
-        queryRoot = calcSelfTime(queryRoot);
-        queryRoot = addWarnings(queryRoot);
 
         children = [
           virtualNode({
@@ -80,7 +47,49 @@ export function transformQueries(queries: Queries): FNode {
     root.Label = 'Query';
   }
 
+  root = virtualNode({
+    label: '',
+    root: true,
+    children: [root]
+  });
+
+  root = calcSelfTime(root);
+  root = addWarnings(root);
+
   return root
+}
+
+type virtualNodeOptions = {
+  label: string;
+  children: FNode[];
+  totalTime?: number;
+  selfTime?: number;
+  source?: RNode;
+  root?: boolean;
+}
+
+function virtualNode(o: virtualNodeOptions): FNode {
+  const totalTime = (o.totalTime !== undefined)
+    ? o.totalTime
+    : o.children.reduce((acc, child) => {
+      return ('Total Time' in child)
+        ? acc + child['Total Time']
+        : 0;
+    }, 0);
+
+  let n = {
+    "Label": o.label,
+    "Virtual": true,
+    "Source": o.source || {},
+    "Self Time": 0,
+    "Total Time": totalTime,
+    "Children": o.children,
+    "Root": o.root || false,
+  };
+  o.children.forEach(child => {
+    child.Parent = n;
+  });
+  return n;
 }
 
 function rawToFlame(p: RNode): FNode {
@@ -95,6 +104,7 @@ function rawToFlame(p: RNode): FNode {
     "Virtual": false,
     "Self Time": totalTime,
     "Total Time": totalTime,
+    "Root": false,
   }
 
   if (p.Plans) {

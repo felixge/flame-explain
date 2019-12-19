@@ -21,6 +21,10 @@ function flameJSON(n: FlameNode): FoldedJSON {
   if (!('Total Time' in n)) {
     throw new Error('bad n');
   }
+  if (n.Root && n.Children) {
+    return flameJSON(n.Children[0]);
+  }
+
   return {
     name: n.Label,
     value: n["Total Time"],

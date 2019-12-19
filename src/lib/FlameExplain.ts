@@ -18,6 +18,7 @@ export type Node = OptionalEmbed<{
   'FilterParent'?: Node,
   'FilterChildren'?: Node[],
   'Warnings'?: string[],
+  'Root': boolean,
 }, Timing>;
 
 export type Timing = {
