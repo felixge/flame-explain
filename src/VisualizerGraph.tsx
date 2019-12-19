@@ -2,7 +2,7 @@ import React from 'react';
 import {Node as FNode} from './lib/FlameExplain';
 import {graphlib, render} from 'dagre-d3';
 import * as d3 from 'd3';
-//import {formatDuration} from './lib/Util';
+import {formatDuration} from './lib/Util';
 
 interface Props {
   root: FNode;
@@ -20,12 +20,35 @@ export default function VisualizerGraph(p: Props) {
     // @ts-ignore
     let dg = new graphlib.Graph().setGraph({rankdir: 'BT'});
     g.Nodes.forEach(node => {
-      dg.setNode(node.ID.toString(), {label: node.Source.Label, rank: node.Rank});
+      let style = '';
+      if (node.Source.Virtual) {
+        style = 'stroke-dasharray: 5, 5;';
+      }
+
+      let extra = '';
+      if ('Total Time' in node.Source) {
+        extra += '\nTotal: ' + formatDuration(node.Source["Total Time"]);
+        extra += '\nSelf: ' + formatDuration(node.Source["Self Time"]);
+      }
+
+      dg.setNode(node.ID.toString(), {
+        label: '#' + (node.ID + 1) + ': ' + node.Source.Label + extra,
+        style: style,
+      });
     });
     g.Edges.forEach(edge => {
-      //dg.setEdge(edge.From.toString(), edge.To.toString(), {label: 'foo'});
+      let style = '';
+      let label = edge.Label;
+      if (edge.Virtual) {
+        style = 'stroke-dasharray: 5, 5; fill: #fff;';
+      }
+
       const weight = 1;
-      dg.setEdge(edge.From.toString(), edge.To.toString(), {label: edge.Label, weight: weight});
+      dg.setEdge(edge.From.toString(), edge.To.toString(), {
+        label: label,
+        weight: weight,
+        style: style,
+      });
     });
 
 
@@ -54,30 +77,21 @@ function newGraph(n: FNode): Graph {
   const nodes = newNodes(n);
   const edges = newEdges(nodes);
 
-  nodes.sort((a, b) => {
-    if (a.Rank < b.Rank) {
-      return -1;
-    } else if (a.Rank > b.Rank) {
-      return 1
-    }
-    return 0;
-  });
-  console.log(nodes);
-
   return {
     Nodes: nodes,
     Edges: edges,
   };
 }
 
-function newNodes(n: FNode, nodes: Node[] = [], depth = 1): Node[] {
+function newNodes(n: FNode, nodes: Node[] = []): Node[] {
+  if (!n.Root) {
     nodes.push({
-      ID: nodes.length + 1,
+      ID: nodes.length,
       Label: n.Label,
       Source: n,
-      Rank: depth,
     });
-  (n.Children || []).forEach(child => newNodes(child, nodes, depth + 1));
+  }
+  (n.Children || []).forEach(child => newNodes(child, nodes));
   return nodes;
 }
 
@@ -91,16 +105,22 @@ function newEdges(nodes: Node[]): Edge[] {
       let parent = nodes.find(node => node.Source === candidate);
       if (parent) {
         let label: string = key;
-        if (key === 'Parent'
-          && 'Parent Relationship' in node.Source.Source
-          && node.Source.Source["Parent Relationship"]) {
-          label = node.Source.Source["Parent Relationship"];
+        let virtual = parent.Source.Virtual;
+        if (key === 'Parent') {
+          if ('Parent Relationship' in node.Source.Source
+            && node.Source.Source["Parent Relationship"]) {
+            label = node.Source.Source["Parent Relationship"];
+          }
+        } else {
+          virtual = true;
         }
+
 
         edges.push({
           From: node.ID,
           To: parent.ID,
           Label: label,
+          Virtual: virtual,
         });
       }
     });
@@ -117,11 +137,11 @@ type Node = {
   ID: number;
   Label: string;
   Source: FNode;
-  Rank: number;
 };
 
 type Edge = {
   From: number;
   To: number;
   Label: string;
+  Virtual: boolean;
 };
