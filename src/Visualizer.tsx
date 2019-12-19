@@ -72,7 +72,7 @@ export default function Visualizer(p: Props) {
             <Link to="/visualize/flamegraph">Flame Graph</Link>
           </li>
           <li className={match.params.tab === 'graph' ? 'is-active' : ''}>
-            <Link to="/visualize/graph">Graph</Link>
+            <Link to="/visualize/graph">Network Graph</Link>
           </li>
         </ul>
       </div>
