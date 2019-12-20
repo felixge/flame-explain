@@ -1,11 +1,11 @@
 import React from 'react';
 import {Link} from "react-router-dom";
-import fixtures from '../lib/test-fixtures';
+import examplePlans from '../lib/example_plans';
 
 const plans: {[key: string]: string} = {};
-for (let name in fixtures) {
+for (let name in examplePlans) {
   // @ts-ignore
-  plans[name] = JSON.stringify(fixtures[name], null, 2);
+  plans[name] = JSON.stringify(examplePlans[name], null, 2);
 }
 
 interface Props {

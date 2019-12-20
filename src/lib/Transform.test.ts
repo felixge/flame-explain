@@ -1,6 +1,6 @@
 import {textNodeName, transformQueries} from './Transform'
 import {textTable, Column} from './TextTable';
-import fixtures from './test-fixtures';
+import examplePlans from './example_plans';
 
 describe('textNodeName', () => {
   test('Result', () => {
@@ -250,9 +250,9 @@ describe('textNodeName', () => {
 
 describe('transformQueries', () => {
   describe('time accounting snapshots are matching', () => {
-    for (let name in fixtures) {
+    for (let name in examplePlans) {
       test(name, () => {
-        const root = transformQueries(fixtures[name]);
+        const root = transformQueries(examplePlans[name]);
         const columns: Column[] = [
           '#',
           'Label',
