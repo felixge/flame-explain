@@ -3,10 +3,10 @@ import VisualizerInput from './VisualizerInput';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
 import VisualizerTable from './VisualizerTable';
 import VisualizerGraph from './VisualizerGraph';
-import {transformQueries} from './lib/Transform';
+import {transformQueries} from '../lib/Transform';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {Link} from "react-router-dom";
-import {Node as FlameNode} from './lib/FlameExplain';
+import {Node as FlameNode} from '../lib/FlameExplain';
 
 interface Props {
   planText?: string,

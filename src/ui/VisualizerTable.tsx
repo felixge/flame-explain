@@ -1,8 +1,8 @@
 import React from 'react';
-import {Node as FlameNode} from './lib/FlameExplain';
+import {Node as FlameNode} from '../lib/FlameExplain';
 import {faExclamationTriangle as iconWarning} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {formatDuration} from './lib/Util';
+import {formatDuration} from '../lib/Util';
 
 interface Props {
   root: FlameNode;

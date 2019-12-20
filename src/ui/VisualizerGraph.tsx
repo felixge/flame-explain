@@ -1,8 +1,8 @@
 import React from 'react';
-import {Node as FNode} from './lib/FlameExplain';
+import {Node as FNode} from '../lib/FlameExplain';
 import {graphlib, render} from 'dagre-d3';
 import * as d3 from 'd3';
-import {formatDuration} from './lib/Util';
+import {formatDuration} from '../lib/Util';
 
 interface Props {
   root: FNode;

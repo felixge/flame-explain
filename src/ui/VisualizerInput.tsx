@@ -1,10 +1,11 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
-import CTESleepUnion from './lib/test-fixtures/CTESleepUnion';
-import CTESimple from './lib/test-fixtures/CTESimple';
-import PGIndexes from './lib/test-fixtures/PGIndexes';
-import RewriteTwoQueries from './lib/test-fixtures/RewriteTwoQueries';
+// TODO(fg) include via index
+import CTESleepUnion from '../lib/test-fixtures/CTESleepUnion';
+import CTESimple from '../lib/test-fixtures/CTESimple';
+import PGIndexes from '../lib/test-fixtures/PGIndexes';
+import RewriteTwoQueries from '../lib/test-fixtures/RewriteTwoQueries';
 
 const jsonify = (j: any) => JSON.stringify(j, null, 2);
 
