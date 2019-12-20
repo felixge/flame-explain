@@ -1,20 +1,12 @@
 import React from 'react';
 import {Link} from "react-router-dom";
+import fixtures from '../lib/test-fixtures';
 
-// TODO(fg) include via index
-import CTESleepUnion from '../lib/test-fixtures/CTESleepUnion';
-import CTESimple from '../lib/test-fixtures/CTESimple';
-import PGIndexes from '../lib/test-fixtures/PGIndexes';
-import RewriteTwoQueries from '../lib/test-fixtures/RewriteTwoQueries';
-
-const jsonify = (j: any) => JSON.stringify(j, null, 2);
-
-const plans: {[key: string]: string} = {
-  'CTESleepUnion': jsonify(CTESleepUnion),
-  'CTESimple': jsonify(CTESimple),
-  'PGIndexes': jsonify(PGIndexes),
-  'RewriteTwoQueries': jsonify(RewriteTwoQueries),
-};
+const plans: {[key: string]: string} = {};
+for (let name in fixtures) {
+  // @ts-ignore
+  plans[name] = JSON.stringify(fixtures[name], null, 2);
+}
 
 interface Props {
   errorText: string | null,

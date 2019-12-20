@@ -1,16 +1,14 @@
-import {readdirSync} from 'fs';
-import {basename} from 'path';
-import {Queries} from '../RawExplain';
+// TODO(fg) it'd be nice to export all our plans without so much boilerplate,
+// but I haven't been able to make it work with the build system for now : /.
 
-const fixtures: {[k: string]: Queries} = {};
-const ext = '.tsx';
+import CTESimple from './CTESimple';
+import CTESleepUnion from './CTESleepUnion';
+import PGIndexes from './PGIndexes';
+import RewriteTwoQueries from './RewriteTwoQueries';
 
-readdirSync(__dirname)
-  .filter(path => path.endsWith(ext) && path !== basename(__filename))
-  .forEach(path => {
-    const data = require('./' + path);
-    const name = basename(path, ext);
-    fixtures[name] = data.default;
-  });
-
-export default fixtures;
+export default {
+  CTESimple,
+  CTESleepUnion,
+  PGIndexes,
+  RewriteTwoQueries
+};
