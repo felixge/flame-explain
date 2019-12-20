@@ -1,24 +1,6 @@
-import {fromNode, transformQueries, textNodeName, extractCTEs} from './Transform'
-// import { tests, TestName } from './tests'
-import {
-  Plan as ExplainPlan,
-  Node as ExplainNode,
-  PlanAnalyzedFragment as ExplainPlanAnalyzed,
-  NodeTimingFragment as ExplainNodeTiming,
-} from './RawExplain';
-import {query, Node as FlameNode, Timing as FlameTiming} from './TransformedPlan';
-
-import cteSleepUnion from './test-fixtures/CTESleepUnion';
-import pgIndexes from './test-fixtures/PGIndexes';
-
-// test('toFlameJSON', async () => {
-//     let name: TestName;
-//     for (name in tests) {
-//         const test = tests[name];
-//         const fold = toFolded(test.explainJSON);
-//         expect(fold).toMatchSnapshot(name);
-//     }
-// });
+import {textNodeName, transformQueries} from './Transform'
+import {textTable, Column} from './TextTable';
+import fixtures from './test-fixtures';
 
 describe('textNodeName', () => {
   test('Result', () => {
@@ -96,6 +78,7 @@ describe('textNodeName', () => {
   test('Join Type', () => {
     expect(textNodeName({
       "Node Type": 'Hash Join',
+      "Hash Cond": '',
       "Join Type": "Left",
     })).toEqual('Hash Left Join');
     expect(textNodeName({
@@ -104,6 +87,7 @@ describe('textNodeName', () => {
     })).toEqual('Merge Left Join');
     expect(textNodeName({
       "Node Type": 'Hash Join',
+      "Hash Cond": '',
       "Join Type": "Inner",
     })).toEqual('Hash Join');
     expect(textNodeName({
@@ -264,115 +248,22 @@ describe('textNodeName', () => {
   });
 });
 
-// describe('toFlameTextNodeName', () => {
-//     test('Subplan Name', () => {
-//         expect(toFlameTextNodeName({
-//             "Node Type": "Nested Loop",
-//             "Parent Relationship": "InitPlan",
-//             "Subplan Name": "CTE sleep",
-//             "Parallel Aware": false,
-//             "Join Type": "Inner",
-//             "Inner Unique": false,
-//         })).toEqual('CTE sleep: Nested Loop')
-//     })
-// });
-
-test('extractCTEs', () => {
-  let ctes = extractCTEs(cteSleepUnion[0].Plan);
-  expect(ctes["foo"].initNode["Node Type"]).toEqual('Append');
-  const s1 = ctes["foo"].scans[0] as ExplainNodeTiming;
-  const s2 = ctes["foo"].scans[1] as ExplainNodeTiming;
-  expect(s1["Actual Total Time"]).toEqual(101.136);
-  expect(s2["Actual Total Time"]).toEqual(201.492);
-});
-
-describe('flameNode', () => {
-  const loopedSeqScan: ExplainNode = {
-    "Node Type": "Seq Scan",
-    'Actual Total Time': 3,
-    'Actual Loops': 5,
-    'Relation Name': 'foo',
-    "Alias": 'bar',
-    "Schema": "baz",
-  };
-
-  test('multiply time by loop count', () => {
-    const n = fromNode(loopedSeqScan, {}) as FlameTiming;
-    expect(n["Self Time"]).toEqual(15);
-    expect(n["Total Time"]).toEqual(15);
-  });
-
-  test('insert virtual nodes for planning/execution', () => {
-    const plan: ExplainPlan = [{
-      "Execution Time": 19,
-      "Planning Time": 3,
-      "Plan": loopedSeqScan,
-    }];
-
-    const n = transformQueries(plan) as FlameNode & FlameTiming;
-    expect(n.Label).toEqual('Query');
-    expect(n.Source).toEqual(plan[0]);
-    expect(n["Self Time"]).toEqual(0);
-    expect(n["Total Time"]).toEqual(19 + 3);
-    const c1 = (n.Children || [])[0] as FlameNode & FlameTiming;
-    expect(c1.Label).toEqual('Planning');
-    expect(c1.Source).toEqual(plan[0]);
-    expect(c1["Self Time"]).toEqual(3);
-    expect(c1["Total Time"]).toEqual(3);
-    const c2 = (n.Children || [])[1] as FlameNode & FlameTiming;
-    expect(c2.Label).toEqual('Execution');
-    expect(c2.Source).toEqual(plan[0]);
-    // Usually the Execution's Self Time will be 0, but we're testing
-    // the edge case here were the Total Time of the child node is
-    // smaller than the 'Execution Time' of the child node. This can happen
-    // in the real world, see: https://postgrespro.com/list/thread-id/2454729
-    expect(c2["Self Time"]).toEqual(19 - 3 * 5);
-    expect(c2["Total Time"]).toEqual(19);
-  });
-
-  test('insert virtual nodes for planning/execution', () => {
-    const root = transformQueries(cteSleepUnion);
-
-    const exec = query(root, ['Execution']) as FlameNode & FlameTiming;
-    const limit = query(exec, ['Limit']) as FlameNode & FlameTiming
-    const append = query(limit, ['Append']) as FlameNode & FlameTiming
-    const cteScan1 = query(limit, ['CTE Scan on foo foo_1']) as FlameNode & FlameTiming
-    const cteScan2 = query(limit, ['Result', 'CTE Scan on foo']) as FlameNode & FlameTiming
-
-    const execTime = (cteSleepUnion[0] as ExplainPlanAnalyzed)['Execution Time'];
-    expect(exec["Total Time"]).toEqual(execTime);
-    expect(exec["Self Time"]).toBeCloseTo(execTime - limit["Total Time"], 3);
-
-    const nodeSourceTime = (n: FlameNode): number => {
-      if ('Actual Startup Time' in n.Source) {
-        return n.Source["Actual Total Time"];
-      }
-      throw new Error('bad node: ' + JSON.stringify(n));
+describe('transformQueries', () => {
+  describe('time accounting snapshots are matching', () => {
+    for (let name in fixtures) {
+      test(name, () => {
+        const root = transformQueries(fixtures[name]);
+        const columns: Column[] = [
+          '#',
+          'Label',
+          'Actual Total Time',
+          'Total Time',
+          'Self Time',
+          'Virtual',
+        ];
+        const table = textTable(root, {title: name, columns: columns});
+        expect(table).toMatchSnapshot();
+      });
     }
-
-    const csQuery = append["Total Time"];
-    const cs1 = nodeSourceTime(cteScan1);
-    const cs2 = nodeSourceTime(cteScan2);
-    const csSum = cs1 + cs2;
-
-    expect(cteScan1["Self Time"]).toBeCloseTo(cs1 - cs1 / csSum * csQuery, 3)
-    expect(cteScan1["Total Time"]).toBeCloseTo(cs1 - cs1 / csSum * csQuery, 3)
-    expect(cteScan2["Self Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
-    expect(cteScan2["Total Time"]).toBeCloseTo(cs2 - cs2 / csSum * csQuery, 3)
-
-    // expect(n1_1["Total Time"]).toEqual(1000.651);
-    //const cteScanSum = 0.015 + 1000.613 + 0.004;
-    // expect(n1_1["Self Time"]).toBeCloseTo(1000.651-1000.617-0.023-(1000.617-1000.613)-0.004, 3);
-    // console.log([n1_1.Children || {}].map((child) => {
-    //     return child;
-    // }));
   });
-
-  test('adjust for looped node rounding errors', () => {
-    const root = transformQueries(pgIndexes);
-    const materialize = query(root, ['Execution', 'Nested Loop Left Join', 'Materialize']) as FlameNode & FlameTiming;
-    expect(materialize['Self Time']).toEqual(0);
-    expect(materialize['Total Time']).toEqual(0.005);
-  });
-
-})
+});

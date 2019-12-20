@@ -3,7 +3,7 @@ import {formatDuration} from './Util';
 // @ts-ignore no type definitions
 import AsciiTable from 'ascii-table';
 
-type Column =
+export type Column =
   '#' |
   'Actual Loops' |
   'Actual Rows' |
@@ -14,14 +14,26 @@ type Column =
   'Total Time' |
   'Virtual';
 
-export function textTable(n: FNode, cols: Column[]): string {
-  let table = new AsciiTable();
-  table.setHeading(...cols);
+export function textTable(
+  n: FNode,
+  {columns = [], title = ''}: {
+    columns: Column[],
+    title?: string
+  }
+): string {
+  let table = new AsciiTable(title);
+  table.setHeading(...columns);
+
+  columns.forEach((col, i) => {
+    if (!(col === '#' || col === 'Label')) {
+      table.setAlignRight(i);
+    }
+  });
 
   let rowNum = 1;
   const visit = (n: FNode, depth = 0) => {
     if (!n.Root) {
-      const colVals = cols.map(c => extractColumn(n, c, rowNum, depth));
+      const colVals = columns.map(c => extractColumn(n, c, rowNum, depth));
       table.addRow(...colVals);
       rowNum++;
       depth++;
