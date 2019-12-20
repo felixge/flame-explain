@@ -37,11 +37,12 @@ export default function VisualizerInput(p: Props) {
   return (
     <div>
       {errorDiv}
-      <div className="field">
+      <div className="field content">
         <p>
-          Or prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
+          Prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
           , execute it, paste the resulting JSON below and then hit <strong><span role="img" aria-label="flame">🔥</span>&nbsp;Explain</strong>.
         </p>
+        <p>Or pick a sample plan from the drop down:</p>
       </div>
       <div className="field">
         <div className="select">
