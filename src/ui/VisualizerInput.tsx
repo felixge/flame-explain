@@ -4,8 +4,7 @@ import examplePlans from '../lib/example_plans';
 
 const plans: {[key: string]: string} = {};
 for (let name in examplePlans) {
-  // @ts-ignore
-  plans[name] = JSON.stringify(examplePlans[name], null, 2);
+  plans[name] = JSON.stringify(examplePlans[name].queries, null, 2);
 }
 
 interface Props {
@@ -27,9 +26,11 @@ export default function VisualizerInput(p: Props) {
   };
 
   let selectedPlan = '';
+  let description = '';
   for (const key in plans) {
     if (p.planText === plans[key]) {
       selectedPlan = key;
+      description = examplePlans[key].description;
       break;
     }
   }
@@ -58,6 +59,7 @@ export default function VisualizerInput(p: Props) {
           </select>
         </div>
       </div>
+      {description !== '' ? <div className="content"><pre>{description.trim()}</pre></div> : null}
       <div className="field">
         <p className="control">
           <textarea onChange={e => p.onChange(e.target.value)} value={p.planText} className="textarea is-family-monospace" placeholder="Paste your JSON Query Plan here." rows={15}></textarea>

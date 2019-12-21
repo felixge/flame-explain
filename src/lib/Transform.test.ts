@@ -252,7 +252,7 @@ describe('transformQueries', () => {
   describe('time accounting snapshots are matching', () => {
     for (let name in examplePlans) {
       test(name, () => {
-        const root = transformQueries(examplePlans[name]);
+        const root = transformQueries(examplePlans[name].queries);
         const columns: Column[] = [
           '#',
           'Label',
