@@ -3,6 +3,7 @@
 import {Queries} from '../RawExplain';
 import CTESimple from './CTESimple';
 import CTESleepUnion from './CTESleepUnion';
+import NestedLoop from './NestedLoop';
 import PGIndexes from './PGIndexes';
 import RewriteTwoQueries from './RewriteTwoQueries';
 
@@ -14,6 +15,7 @@ export type ExamplePlan = {
 const Plans: {[key: string]: ExamplePlan} = {
   CTESimple,
   CTESleepUnion,
+  NestedLoop,
   PGIndexes,
   RewriteTwoQueries,
 }

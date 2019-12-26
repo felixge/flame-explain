@@ -28,6 +28,7 @@ export type Timing = {
 
 export function query(n: Node, path: Array<string>, i: number = 0): Node {
   let matches = (n.Children || []).filter((n) => n.Label === path[i]);
+
   i += 1;
   if (matches.length === 1) {
     if (i === path.length) {
@@ -39,6 +40,24 @@ export function query(n: Node, path: Array<string>, i: number = 0): Node {
   let candidates = (n.Children || []).map((c) => JSON.stringify(c.Label)).join(', ');
   throw new Error(`${matches.length} matches for: ${pathS} in: ${candidates}`);
 };
+
+export function findAll(n: Node, match: (n: Node) => boolean): Node[] {
+  const matches: Node[] = [];
+
+  const visit = (n: Node) => {
+    if (match(n)) {
+      matches.push(n);
+    }
+    (n.Children || []).forEach(visit);
+  };
+  visit(n);
+
+  return matches;
+}
+
+export function findFirst(n: Node, match: (n: Node) => boolean): Node {
+  return findAll(n, match)[0];
+}
 
 /** Recursively evaluates if any numbers in the given node don't "add up". I.e.
  * returns false if a node's children total time exceeds its own time, or a node's

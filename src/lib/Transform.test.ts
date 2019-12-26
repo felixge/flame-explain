@@ -1,6 +1,7 @@
 import {textNodeName, transformQueries} from './Transform'
-import {textTable, Column} from './TextTable';
+import {textTable, Column, queryFirst} from './TextTable';
 import examplePlans from './example_plans';
+import NestedLoop from './example_plans/NestedLoop';
 
 describe('textNodeName', () => {
   test('Result', () => {
@@ -265,5 +266,41 @@ describe('transformQueries', () => {
         expect(table).toMatchSnapshot();
       });
     }
+  });
+
+  describe('account for "Actual Loops"', () => {
+    test('enabled', () => {
+      const root = transformQueries(NestedLoop.queries);
+      const nl = queryFirst(root, '**', 'Nested Loop');
+      expect(nl).toMatchObject({
+        'Actual Total Time': '59 μs',
+        'Self Time': '30 μs',
+        'Total Time': '59 μs',
+      });
+      const gsB = queryFirst(nl.Source, 'Function Scan on generate_series b');
+      expect(gsB).toMatchObject({
+        'Actual Loops': '10',
+        'Actual Total Time': '2 μs',
+        'Self Time': '20 μs',
+        'Total Time': '20 μs',
+      });
+    });
+
+    test('disabled', () => {
+      const root = transformQueries(NestedLoop.queries, {Loops: false});
+      const nl = queryFirst(root, '**', 'Nested Loop');
+      expect(nl).toMatchObject({
+        'Actual Total Time': '59 μs',
+        'Self Time': '48 μs',
+        'Total Time': '59 μs',
+      });
+      const gsB = queryFirst(nl.Source, 'Function Scan on generate_series b');
+      expect(gsB).toMatchObject({
+        'Actual Loops': '10',
+        'Actual Total Time': '2 μs',
+        'Self Time': '2 μs',
+        'Total Time': '2 μs',
+      });
+    });
   });
 });

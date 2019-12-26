@@ -2,14 +2,25 @@ import {Queries, Node as RNode} from './RawExplain';
 import {Node as FNode} from './FlameExplain';
 import {formatDuration} from './Util';
 
-export function transformQueries(queries: Queries): FNode {
+export type transformOptions = {
+  Loops?: boolean;
+};
+
+const defaultOptions: transformOptions = {
+  Loops: true,
+};
+
+export function transformQueries(queries: Queries, opt?: transformOptions): FNode {
+  opt = Object.assign({}, defaultOptions, opt);
   let root = virtualNode({
     label: 'Queries',
     children: queries.map((query, i) => {
       let children: FNode[] = [];
       if ('Execution Time' in query) {
         let queryRoot = rawToFlame(query.Plan);
-        queryRoot = calcLoopTime(queryRoot);
+        if (opt?.Loops) {
+          queryRoot = calcLoopTime(queryRoot);
+        }
         queryRoot = setParents(queryRoot);
         queryRoot = setFilterParents(queryRoot);
         queryRoot = setCTEParents(queryRoot);

@@ -37,6 +37,21 @@ exports[`transformQueries time accounting snapshots are matching CTESleepUnion 1
 '-------------------------------------------------------------------------------------------'"
 `;
 
+exports[`transformQueries time accounting snapshots are matching NestedLoop 1`] = `
+".-----------------------------------------------------------------------------------------------------.
+|                                             NestedLoop                                              |
+|-----------------------------------------------------------------------------------------------------|
+| # |                  Label                   | Actual Total Time | Total Time | Self Time | Virtual |
+|---|------------------------------------------|-------------------|------------|-----------|---------|
+| 1 | Query                                    |                   |     154 μs |      0 μs |       x |
+| 2 |   Planning                               |                   |      67 μs |     67 μs |       x |
+| 3 |   Execution                              |                   |      87 μs |     28 μs |       x |
+| 4 |     Nested Loop                          |             59 μs |      59 μs |     30 μs |         |
+| 5 |       Function Scan on generate_series a |              9 μs |       9 μs |      9 μs |         |
+| 6 |       Function Scan on generate_series b |              2 μs |      20 μs |     20 μs |         |
+'-----------------------------------------------------------------------------------------------------'"
+`;
+
 exports[`transformQueries time accounting snapshots are matching PGIndexes 1`] = `
 ".-------------------------------------------------------------------------------------------------------------------------.
 |                                                        PGIndexes                                                        |

@@ -3,16 +3,20 @@ import {formatDuration} from './Util';
 // @ts-ignore no type definitions
 import AsciiTable from 'ascii-table';
 
-export type Column =
-  '#' |
-  'Actual Loops' |
-  'Actual Rows' |
-  'Actual Total Time' |
-  'Label' |
-  'Node Type' |
-  'Self Time' |
-  'Total Time' |
-  'Virtual';
+export type Column = keyof Row;
+
+export type Row = {
+  '#': string,
+  'Actual Loops': string,
+  'Actual Rows': string,
+  'Actual Total Time': string,
+  'Label': string,
+  'Node Type': string,
+  'Self Time': string,
+  'Total Time': string,
+  'Virtual': string,
+  'Source': FNode,
+};
 
 export function textTable(
   n: FNode,
@@ -25,7 +29,7 @@ export function textTable(
   table.setHeading(...columns);
 
   columns.forEach((col, i) => {
-    if (!(col === '#' || col === 'Label')) {
+    if (col !== 'Label') {
       table.setAlignRight(i);
     }
   });
@@ -33,7 +37,8 @@ export function textTable(
   let rowNum = 1;
   const visit = (n: FNode, depth = 0) => {
     if (!n.Root) {
-      const colVals = columns.map(c => extractColumn(n, c, rowNum, depth));
+      const row = toRow(n, {depth: depth, rowNum: rowNum});
+      const colVals = columns.map(c => row[c]);
       table.addRow(...colVals);
       rowNum++;
       depth++;
@@ -46,39 +51,70 @@ export function textTable(
   return table.toString();
 }
 
-export function extractColumn(n: FNode, c: Column, rowNum: number, depth: number): any {
-  switch (c) {
-    case '#':
-      return rowNum;
-    case 'Actual Loops':
-      return ('Actual Loops' in n.Source)
-        ? n.Source["Actual Loops"]
-        : '';
-    case 'Actual Rows':
-      return ('Actual Rows' in n.Source)
-        ? n.Source["Actual Rows"]
-        : '';
-    case 'Actual Total Time':
-      return ('Actual Total Time' in n.Source)
-        ? formatDuration(n.Source["Actual Total Time"])
-        : '';
-    case 'Label':
-      return '  '.repeat(depth) + n.Label;
-    case 'Node Type':
-      return ('Node Type' in n.Source)
-        ? n.Source["Node Type"]
-        : '';
-    case 'Self Time':
-      return ('Self Time' in n)
-        ? formatDuration(n["Self Time"])
-        : '';
-    case 'Total Time':
-      return ('Total Time' in n)
-        ? formatDuration(n["Total Time"])
-        : '';
-    case 'Virtual':
-      return (n.Virtual)
-        ? 'x'
-        : '';
-  }
+type extractOptions = {
+  rowNum?: number,
+  depth?: number,
+};
+
+export function toRow(n: FNode, o?: extractOptions): Row {
+  return {
+    '#': o?.rowNum?.toString() || '',
+    'Actual Loops': ('Actual Loops' in n.Source)
+      ? n.Source["Actual Loops"].toString()
+      : '',
+    'Actual Rows': ('Actual Rows' in n.Source)
+      ? n.Source["Actual Rows"].toString()
+      : '',
+    'Actual Total Time': ('Actual Total Time' in n.Source)
+      ? formatDuration(n.Source["Actual Total Time"])
+      : '',
+    'Label': '  '.repeat(o?.depth || 0) + n.Label,
+    'Node Type': ('Node Type' in n.Source)
+      ? n.Source["Node Type"]
+      : '',
+    'Self Time': ('Self Time' in n)
+      ? formatDuration(n["Self Time"])
+      : '',
+    'Source': n,
+    'Total Time': ('Total Time' in n)
+      ? formatDuration(n["Total Time"])
+      : '',
+    'Virtual': (n.Virtual)
+      ? 'x'
+      : '',
+  };
 }
+
+type path = '*' | '**' | string;
+
+export function queryAll(n: FNode, ...path: path[]): Row[] {
+  const rows: Row[] = [];
+  const visit = (n: FNode, path: string[]) => {
+    if (path.length === 0) {
+      return;
+    }
+
+    if (path[0] === n.Label || path[0] === '*') {
+      path = path.slice(1);
+    } else if (path[0] === '**' && path[1] === n.Label) {
+      path = path.slice(2);
+    } else if (path[0] === '**') {
+    } else {
+      return;
+    }
+
+    if (path.length === 0) {
+      rows.push(toRow(n));
+      return;
+    }
+
+    (n.Children || []).forEach(child => visit(child, path));
+  };
+  (n.Children || []).forEach(child => visit(child, path))
+
+  return rows;
+};
+
+export function queryFirst(n: FNode, ...path: string[]): Row {
+  return queryAll(n, ...path)[0];
+};
