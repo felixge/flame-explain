@@ -258,6 +258,7 @@ describe('transformQueries', () => {
           '#',
           'Label',
           'Actual Total Time',
+          'Actual Loops',
           'Total Time',
           'Self Time',
           'Virtual',
