@@ -5,6 +5,7 @@ import CTESimple from './CTESimple';
 import CTESleepUnion from './CTESleepUnion';
 import NestedLoop from './NestedLoop';
 import PGIndexes from './PGIndexes';
+import ParallelCount from './ParallelCount';
 import RewriteTwoQueries from './RewriteTwoQueries';
 
 export type ExamplePlan = {
@@ -17,6 +18,7 @@ const Plans: {[key: string]: ExamplePlan} = {
   CTESleepUnion,
   NestedLoop,
   PGIndexes,
+  ParallelCount,
   RewriteTwoQueries,
 }
 

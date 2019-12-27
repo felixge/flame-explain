@@ -26,7 +26,9 @@ export function textTable(
   }
 ): string {
   let table = new AsciiTable(title);
+  let warnTable = new AsciiTable();
   table.setHeading(...columns);
+  warnTable.setHeading('#', 'Warning');
 
   columns.forEach((col, i) => {
     if (col !== 'Label') {
@@ -35,11 +37,17 @@ export function textTable(
   });
 
   let rowNum = 1;
+  let warnCount = 0;
   const visit = (n: FNode, depth = 0) => {
     if (!n.Root) {
       const row = toRow(n, {depth: depth, rowNum: rowNum});
       const colVals = columns.map(c => row[c]);
       table.addRow(...colVals);
+      n.Warnings?.forEach(warning => {
+        warnTable.addRow(rowNum, warning);
+        warnCount += 1;
+      });
+
       rowNum++;
       depth++;
     }
@@ -48,7 +56,11 @@ export function textTable(
   }
   visit(n);
 
-  return table.toString();
+  let out = table.toString();
+  if (warnCount > 0) {
+    out += '\n\n' + warnTable.toString();
+  }
+  return out;
 }
 
 type extractOptions = {

@@ -76,6 +76,29 @@ exports[`transformQueries time accounting snapshots are matching PGIndexes 1`] =
 '----------------------------------------------------------------------------------------------------------------------------------------'"
 `;
 
+exports[`transformQueries time accounting snapshots are matching ParallelCount 1`] = `
+".--------------------------------------------------------------------------------------------------------------.
+|                                                ParallelCount                                                 |
+|--------------------------------------------------------------------------------------------------------------|
+| # |               Label                | Actual Total Time | Actual Loops | Total Time | Self Time | Virtual |
+|---|------------------------------------|-------------------|--------------|------------|-----------|---------|
+| 1 | Query                              |                   |              |   851.0 ms |      0 μs |       x |
+| 2 |   Planning                         |                   |              |      54 μs |     54 μs |       x |
+| 3 |   Execution                        |                   |              |   851.0 ms |   16.2 ms |       x |
+| 4 |     Finalize Aggregate             |          834.7 ms |            1 |   834.7 ms |  -16.2 ms |         |
+| 5 |       Gather                       |          850.9 ms |            1 |   850.9 ms |    -1.6 s |         |
+| 6 |         Partial Aggregate          |          830.6 ms |            3 |      2.5 s |     1.1 s |         |
+| 7 |           Parallel Seq Scan on foo |          473.4 ms |            3 |      1.4 s |     1.4 s |         |
+'--------------------------------------------------------------------------------------------------------------'
+
+.----------------------------------------------------------------------------------------------.
+| # |                                         Warning                                          |
+|---|------------------------------------------------------------------------------------------|
+| 4 | The children of this node have a cumulative total time exceeding this node's total time. |
+| 5 | The children of this node have a cumulative total time exceeding this node's total time. |
+'----------------------------------------------------------------------------------------------'"
+`;
+
 exports[`transformQueries time accounting snapshots are matching RewriteTwoQueries 1`] = `
 ".---------------------------------------------------------------------------------------------------------------------.
 |                                                  RewriteTwoQueries                                                  |
