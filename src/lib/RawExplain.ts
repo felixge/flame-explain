@@ -252,6 +252,21 @@ type NodeHash = NodeWithFragments<{
   "Peak Memory Usage": number,
 }>;
 
+type GatherFragment = OptionalEmbed<{
+  "Workers Planned": number;
+}, {
+  "Workers Launched": number;
+}>;
+
+type NodeGather = NodeWithFragments<{
+  "Node Type": "Gather";
+  "Single Copy": boolean;
+} & GatherFragment>;
+
+type NodeGatherMerge = NodeWithFragments<{
+  "Node Type": "Gather Merge";
+} & GatherFragment>;
+
 type SpecializedNode =
   NodeModifyTable |
   NodeForeignScan |
@@ -267,7 +282,9 @@ type SpecializedNode =
   NodeCTEorWorkTableScan |
   NodeNamedTuplestoreScan |
   NodeResult |
-  NodeHash;
+  NodeHash |
+  NodeGather |
+  NodeGatherMerge;
 
 type MakeUnspecializedNodes<T> = T extends NodeType ? NodeWithFragments<{"Node Type": T}> : never;
 
