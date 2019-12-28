@@ -308,20 +308,31 @@ describe('transformQueries', () => {
 
   describe('account for parallel "Actual Loops"', () => {
     test('enabled', () => {
-      //const root = transformQueries(NestedLoop.queries);
-      //const nl = queryFirst(root, '**', 'Nested Loop');
-      //expect(nl).toMatchObject({
-      //'Actual Total Time': '59 μs',
-      //'Self Time': '30 μs',
-      //'Total Time': '59 μs',
-      //});
-      //const gsB = queryFirst(nl.Source, 'Function Scan on generate_series b');
-      //expect(gsB).toMatchObject({
-      //'Actual Loops': '10',
-      //'Actual Total Time': '2 μs',
-      //'Self Time': '20 μs',
-      //'Total Time': '20 μs',
-      //});
+      const root = transformQueries(ParallelCount.queries, {Loops: true});
+      const fa = queryFirst(root, '**', 'Finalize Aggregate');
+      expect(fa).toMatchObject({
+        'Actual Total Time': '834.7 ms',
+        'Self Time': '-16.2 ms',
+        'Total Time': '834.7 ms',
+      });
+      const ga = queryFirst(fa.Source, 'Gather');
+      expect(ga).toMatchObject({
+        'Actual Total Time': '850.9 ms',
+        'Self Time': '20.3 ms',
+        'Total Time': '850.9 ms',
+      });
+      const pa = queryFirst(ga.Source, 'Partial Aggregate');
+      expect(pa).toMatchObject({
+        'Actual Total Time': '830.6 ms',
+        'Self Time': '357.2 ms',
+        'Total Time': '830.6 ms',
+      });
+      const ps = queryFirst(pa.Source, 'Parallel Seq Scan on foo');
+      expect(ps).toMatchObject({
+        'Actual Total Time': '473.4 ms',
+        'Self Time': '473.4 ms',
+        'Total Time': '473.4 ms',
+      });
     });
 
     test('disabled', () => {

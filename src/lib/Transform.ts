@@ -125,15 +125,22 @@ function rawToFlame(p: RNode): FNode {
   return fnode;
 }
 
-function calcLoopTime(n: FNode): FNode {
-  (n.Children || []).forEach(calcLoopTime);
-
+function calcLoopTime(n: FNode, gatherLoops: number | undefined = undefined): FNode {
   const ns = n.Source;
+  if ('Node Type' in ns && ns['Node Type'] === 'Gather' && 'Actual Loops' in ns) {
+    gatherLoops = ns["Actual Loops"];
+  }
+
+  (n.Children || []).forEach(child => calcLoopTime(child, gatherLoops));
+
   if (!('Actual Loops' in ns && 'Total Time' in n && ns["Actual Loops"] > 1)) {
     return n;
   }
 
-  n["Total Time"] = ns["Actual Loops"] * n["Total Time"];
+  const loops = (gatherLoops === undefined)
+    ? ns['Actual Loops']
+    : gatherLoops;
+  n["Total Time"] = loops * n["Total Time"];
 
   // Due to rounding errors, our total time above may be smaller than the sum
   // of child node total time. It seems reasonable to adjust for that by making
