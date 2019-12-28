@@ -84,18 +84,12 @@ exports[`transformQueries time accounting snapshots are matching ParallelCount 1
 |---|------------------------------------|-------------------|--------------|------------|-----------|---------|
 | 1 | Query                              |                   |              |   851.0 ms |      0 μs |       x |
 | 2 |   Planning                         |                   |              |      54 μs |     54 μs |       x |
-| 3 |   Execution                        |                   |              |   851.0 ms |   16.2 ms |       x |
-| 4 |     Finalize Aggregate             |          834.7 ms |            1 |   834.7 ms |  -16.2 ms |         |
+| 3 |   Execution                        |                   |              |   851.0 ms |     57 μs |       x |
+| 4 |     Finalize Aggregate             |          834.7 ms |            1 |   850.9 ms |      0 μs |         |
 | 5 |       Gather                       |          850.9 ms |            1 |   850.9 ms |   20.3 ms |         |
 | 6 |         Partial Aggregate          |          830.6 ms |            3 |   830.6 ms |  357.2 ms |         |
 | 7 |           Parallel Seq Scan on foo |          473.4 ms |            3 |   473.4 ms |  473.4 ms |         |
-'--------------------------------------------------------------------------------------------------------------'
-
-.----------------------------------------------------------------------------------------------.
-| # |                                         Warning                                          |
-|---|------------------------------------------------------------------------------------------|
-| 4 | The children of this node have a cumulative total time exceeding this node's total time. |
-'----------------------------------------------------------------------------------------------'"
+'--------------------------------------------------------------------------------------------------------------'"
 `;
 
 exports[`transformQueries time accounting snapshots are matching RewriteTwoQueries 1`] = `

@@ -18,14 +18,14 @@ export function transformQueries(queries: Queries, opt?: transformOptions): FNod
       let children: FNode[] = [];
       if ('Execution Time' in query) {
         let queryRoot = rawToFlame(query.Plan);
-        if (opt?.Loops) {
-          queryRoot = calcLoopTime(queryRoot);
-        }
         queryRoot = setParents(queryRoot);
         queryRoot = setFilterParents(queryRoot);
         queryRoot = setCTEParents(queryRoot);
         queryRoot = calcFilterTime(queryRoot);
         queryRoot = calcCTETime(queryRoot);
+        if (opt?.Loops) {
+          queryRoot = calcLoopTime(queryRoot);
+        }
         queryRoot = virtualNodes(queryRoot);
 
         children = [
@@ -131,9 +131,9 @@ function calcLoopTime(n: FNode, gatherLoops: number | undefined = undefined): FN
     gatherLoops = ns["Actual Loops"];
   }
 
-  (n.Children || []).forEach(child => calcLoopTime(child, gatherLoops));
+  n.Children?.forEach(child => calcLoopTime(child, gatherLoops));
 
-  if (!('Actual Loops' in ns && 'Total Time' in n && ns["Actual Loops"] > 1)) {
+  if (!('Actual Loops' in ns && 'Total Time' in n)) {
     return n;
   }
 
@@ -147,7 +147,7 @@ function calcLoopTime(n: FNode, gatherLoops: number | undefined = undefined): FN
   // this node's total time to be as big as the sum of its child nodes in this
   // case.
   let childTotal = 0;
-  (n.Children || []).forEach(child => {
+  n.Children?.forEach(child => {
     if ('Total Time' in child) {
       childTotal += child['Total Time'];
     }
