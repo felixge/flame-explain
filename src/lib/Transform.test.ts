@@ -312,8 +312,8 @@ describe('transformQueries', () => {
       const fa = queryFirst(root, '**', 'Finalize Aggregate');
       expect(fa).toMatchObject({
         'Actual Total Time': '834.7 ms',
-        'Self Time': '-16.2 ms',
-        'Total Time': '834.7 ms',
+        'Self Time': '0 μs',
+        'Total Time': '850.9 ms',
       });
       const ga = queryFirst(fa.Source, 'Gather');
       expect(ga).toMatchObject({

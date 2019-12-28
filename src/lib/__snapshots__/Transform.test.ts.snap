@@ -92,6 +92,39 @@ exports[`transformQueries time accounting snapshots are matching ParallelCount 1
 '--------------------------------------------------------------------------------------------------------------'"
 `;
 
+exports[`transformQueries time accounting snapshots are matching ParallelCountAppend 1`] = `
+".---------------------------------------------------------------------------------------------------------------------------.
+|                                                    ParallelCountAppend                                                    |
+|---------------------------------------------------------------------------------------------------------------------------|
+| #  |                     Label                      | Actual Total Time | Actual Loops | Total Time | Self Time | Virtual |
+|----|------------------------------------------------|-------------------|--------------|------------|-----------|---------|
+|  1 | Query                                          |                   |              |   500.8 ms |      0 μs |       x |
+|  2 |   Planning                                     |                   |              |     265 μs |    265 μs |       x |
+|  3 |   Execution                                    |                   |              |   500.5 ms |    193 μs |       x |
+|  4 |     Nested Loop                                |          497.5 ms |            1 |   500.3 ms |      0 μs |         |
+|  5 |       Nested Loop                              |          497.5 ms |            1 |   500.3 ms |      0 μs |         |
+|  6 |         Append                                 |          170.6 ms |            1 |   170.6 ms |      0 μs |         |
+|  7 |           Finalize Aggregate                   |           89.9 ms |            1 |    89.9 ms |      0 μs |         |
+|  8 |             Gather                             |           89.9 ms |            1 |    89.9 ms |    4.1 ms |         |
+|  9 |               Partial Aggregate                |           85.9 ms |            3 |    85.9 ms |   36.6 ms |         |
+| 10 |                 Parallel Seq Scan on foo       |           49.3 ms |            3 |    49.3 ms |   49.3 ms |         |
+| 11 |           Finalize Aggregate                   |           80.7 ms |            1 |    80.7 ms |      0 μs |         |
+| 12 |             Gather                             |           80.7 ms |            1 |    80.7 ms |    3.5 ms |         |
+| 13 |               Partial Aggregate                |           77.2 ms |            3 |    77.2 ms |   33.2 ms |         |
+| 14 |                 Parallel Seq Scan on foo foo_1 |           43.9 ms |            3 |    43.9 ms |   43.9 ms |         |
+| 15 |         Append                                 |          163.4 ms |            2 |   329.7 ms |      0 μs |         |
+| 16 |           Finalize Aggregate                   |           80.4 ms |            2 |   160.9 ms |      0 μs |         |
+| 17 |             Gather                             |           80.4 ms |            2 |   160.9 ms |    7.3 ms |         |
+| 18 |               Partial Aggregate                |           76.8 ms |            6 |   153.6 ms |   66.2 ms |         |
+| 19 |                 Parallel Seq Scan on foo foo_2 |           43.7 ms |            6 |    87.4 ms |   87.4 ms |         |
+| 20 |           Finalize Aggregate                   |           83.0 ms |            2 |   168.9 ms |      0 μs |         |
+| 21 |             Gather                             |           84.4 ms |            2 |   168.9 ms |   10.0 ms |         |
+| 22 |               Partial Aggregate                |           79.4 ms |            6 |   158.9 ms |   68.2 ms |         |
+| 23 |                 Parallel Seq Scan on foo foo_3 |           45.3 ms |            6 |    90.7 ms |   90.7 ms |         |
+| 24 |       Function Scan on generate_series a       |              3 μs |            4 |      12 μs |     12 μs |         |
+'---------------------------------------------------------------------------------------------------------------------------'"
+`;
+
 exports[`transformQueries time accounting snapshots are matching RewriteTwoQueries 1`] = `
 ".---------------------------------------------------------------------------------------------------------------------.
 |                                                  RewriteTwoQueries                                                  |
