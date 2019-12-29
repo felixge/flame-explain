@@ -146,13 +146,7 @@ function calcLoopTime(n: FNode, gatherLoops: number | undefined = undefined): FN
   // of child node total time. It seems reasonable to adjust for that by making
   // this node's total time to be as big as the sum of its child nodes in this
   // case.
-  let childTotal = 0;
-  n.Children?.forEach(child => {
-    if ('Total Time' in child) {
-      childTotal += child['Total Time'];
-    }
-  });
-
+  const childTotal = sumChildTotalTime(n);
   if (childTotal > n["Total Time"]) {
     n["Total Time"] = childTotal;
   }
@@ -160,18 +154,35 @@ function calcLoopTime(n: FNode, gatherLoops: number | undefined = undefined): FN
   return n;
 }
 
+function sumChildTotalTime(n: FNode): number {
+  const ns = n.Source;
+  let childTotal = 0;
+  n.Children?.forEach(child => {
+    if (!('Total Time' in child)) {
+      return;
+    }
+
+    if ('Node Type' in ns &&
+      ns['Node Type'] === 'Append' &&
+      ns['Parallel Aware']
+    ) {
+      childTotal = Math.max(childTotal, child['Total Time']);
+    } else {
+      childTotal += child['Total Time'];
+    }
+  });
+  return childTotal;
+}
+
 function addWarnings(n: FNode): FNode {
+  n.Children?.forEach(addWarnings);
+
   if (!('Total Time' in n)) {
     return n;
   }
 
-  let childTotal = 0;
-  (n.Children || []).forEach(child => {
-    if ('Total Time' in child) {
-      childTotal += child['Total Time'];
-    }
-    addWarnings(child);
-  });
+
+  const childTotal = sumChildTotalTime(n);
 
   let selfDelta = Math.abs(n['Total Time'] - (childTotal + n['Self Time']));
   if (childTotal > n['Total Time']) {
@@ -184,18 +195,14 @@ function addWarnings(n: FNode): FNode {
 }
 
 function calcSelfTime(n: FNode): FNode {
+  n.Children?.forEach(calcSelfTime);
+
   if (!('Total Time' in n)) {
     return n;
   }
 
-  let childTotal = 0;
-  (n.Children || []).forEach(child => {
-    if ('Total Time' in child) {
-      childTotal += child['Total Time'];
-    }
-    calcSelfTime(child);
-  });
-  n['Self Time'] = n['Total Time'] - childTotal
+  const childTotal = sumChildTotalTime(n);
+  n['Self Time'] = n['Total Time'] - childTotal;
 
   return n;
 }

@@ -76,6 +76,39 @@ exports[`transformQueries time accounting snapshots are matching PGIndexes 1`] =
 '----------------------------------------------------------------------------------------------------------------------------------------'"
 `;
 
+exports[`transformQueries time accounting snapshots are matching ParallelAppendCount 1`] = `
+".---------------------------------------------------------------------------------------------------------------------.
+|                                                 ParallelAppendCount                                                 |
+|---------------------------------------------------------------------------------------------------------------------|
+| #  |                  Label                   | Actual Total Time | Actual Loops | Total Time | Self Time | Virtual |
+|----|------------------------------------------|-------------------|--------------|------------|-----------|---------|
+|  1 | Query                                    |                   |              |   678.7 ms |      0 μs |       x |
+|  2 |   Planning                               |                   |              |     227 μs |    227 μs |       x |
+|  3 |   Execution                              |                   |              |   678.5 ms |  -13.0 ms |       x |
+|  4 |     Nested Loop                          |          675.1 ms |            1 |   691.5 ms |      0 μs |         |
+|  5 |       Nested Loop                        |          675.0 ms |            1 |   691.5 ms |      0 μs |         |
+|  6 |         Gather                           |          210.8 ms |            1 |   223.9 ms |      0 μs |         |
+|  7 |           Parallel Append                |          144.8 ms |            3 |   223.9 ms |      0 μs |         |
+|  8 |             Aggregate                    |          223.9 ms |            1 |   223.9 ms |   95.9 ms |         |
+|  9 |               Seq Scan on foo            |          128.0 ms |            1 |   128.0 ms |  128.0 ms |         |
+| 10 |             Aggregate                    |          210.6 ms |            1 |   210.6 ms |   96.7 ms |         |
+| 11 |               Seq Scan on foo foo_1      |          113.9 ms |            1 |   113.9 ms |  113.9 ms |         |
+| 12 |         Gather                           |          233.8 ms |            2 |   467.6 ms |   16.1 ms |         |
+| 13 |           Parallel Append                |          145.3 ms |            6 |   451.5 ms |      0 μs |         |
+| 14 |             Aggregate                    |          225.7 ms |            2 |   451.5 ms |  193.3 ms |         |
+| 15 |               Seq Scan on foo foo_2      |          129.1 ms |            2 |   258.1 ms |  258.1 ms |         |
+| 16 |             Aggregate                    |          210.0 ms |            2 |   420.1 ms |  193.3 ms |         |
+| 17 |               Seq Scan on foo foo_3      |          113.4 ms |            2 |   226.8 ms |  226.8 ms |         |
+| 18 |       Function Scan on generate_series a |              4 μs |            4 |      16 μs |     16 μs |         |
+'---------------------------------------------------------------------------------------------------------------------'
+
+.----------------------------------------------------------------------------------------------.
+| # |                                         Warning                                          |
+|---|------------------------------------------------------------------------------------------|
+| 3 | The children of this node have a cumulative total time exceeding this node's total time. |
+'----------------------------------------------------------------------------------------------'"
+`;
+
 exports[`transformQueries time accounting snapshots are matching ParallelCount 1`] = `
 ".--------------------------------------------------------------------------------------------------------------.
 |                                                ParallelCount                                                 |

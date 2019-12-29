@@ -6,6 +6,7 @@ import CTESimple from './CTESimple';
 import CTESleepUnion from './CTESleepUnion';
 import NestedLoop from './NestedLoop';
 import PGIndexes from './PGIndexes';
+import ParallelAppendCount from './ParallelAppendCount';
 import ParallelCount from './ParallelCount';
 import ParallelCountAppend from './ParallelCountAppend';
 import RewriteTwoQueries from './RewriteTwoQueries';
@@ -20,6 +21,7 @@ const Plans: {[key: string]: ExamplePlan} = {
   CTESleepUnion,
   NestedLoop,
   PGIndexes,
+  ParallelAppendCount,
   ParallelCount,
   ParallelCountAppend,
   RewriteTwoQueries,
