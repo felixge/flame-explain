@@ -93,8 +93,14 @@ interface NodeCommonFragment {
   "Filter"?: string;
   "Rows Removed by Filter"?: number;
 
+  "Workers"?: Worker[];
+
   "Plans"?: Node[];
 };
+
+type Worker = {
+  "Worker Number": number;
+} & NodeTimingFragment & NodeAnalyzedFragment;
 
 interface NodeCostFragment {
   "Startup Cost": number,
