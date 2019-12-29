@@ -125,21 +125,23 @@ function rawToFlame(p: RNode): FNode {
   return fnode;
 }
 
-function calcLoopTime(n: FNode, gatherLoops: number | undefined = undefined): FNode {
+function calcLoopTime(n: FNode, gather: FNode | undefined = undefined): FNode {
   const ns = n.Source;
   if ('Node Type' in ns && ns['Node Type'] === 'Gather' && 'Actual Loops' in ns) {
-    gatherLoops = ns["Actual Loops"];
+    gather = n;
   }
 
-  n.Children?.forEach(child => calcLoopTime(child, gatherLoops));
+  n.Children?.forEach(child => calcLoopTime(child, gather));
 
   if (!('Actual Loops' in ns && 'Total Time' in n)) {
     return n;
   }
 
-  const loops = (gatherLoops === undefined)
-    ? ns['Actual Loops']
-    : gatherLoops;
+  let loops = ns['Actual Loops'];
+  if (gather !== undefined && 'Actual Loops' in gather.Source) {
+    loops = gather.Source["Actual Loops"];
+  }
+
   n["Total Time"] = loops * n["Total Time"];
 
   // Due to rounding errors, our total time above may be smaller than the sum
