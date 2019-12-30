@@ -92,6 +92,7 @@ interface NodeCommonFragment {
   // TODO: what node types can these two be on? any?
   "Filter"?: string;
   "Rows Removed by Filter"?: number;
+  "Output"?: string[];
 
   "Workers"?: Worker[];
 
@@ -226,6 +227,7 @@ type NodeFunctionScan = NodeWithFragments<{
   "Node Type": "Function Scan";
   "Function Name": string;
   "Schema"?: string;
+  "Function Call"?: string;
 }>
 
 type NodeTableFunctionScan = NodeWithFragments<{
