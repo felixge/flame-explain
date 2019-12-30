@@ -23,9 +23,11 @@ export function transformQueries(queries: Queries, opt?: transformOptions): FNod
         queryRoot = setCTEParents(queryRoot);
         queryRoot = calcFilterTime(queryRoot);
         queryRoot = calcCTETime(queryRoot);
+        queryRoot = calcParallelAppendTime(queryRoot);
         if (opt?.Loops) {
           queryRoot = calcLoopTime(queryRoot);
         }
+        queryRoot = calcChildBoost(queryRoot);
         queryRoot = virtualNodes(queryRoot);
 
         children = [
@@ -144,32 +146,64 @@ function calcLoopTime(n: FNode, gather: FNode | undefined = undefined): FNode {
 
   n["Total Time"] = loops * n["Total Time"];
 
-  // Due to rounding errors, our total time above may be smaller than the sum
-  // of child node total time. It seems reasonable to adjust for that by making
-  // this node's total time to be as big as the sum of its child nodes in this
-  // case.
-  const childTotal = sumChildTotalTime(n);
-  if (childTotal > n["Total Time"]) {
-    n["Total Time"] = childTotal;
-  }
 
   return n;
 }
 
-function sumChildTotalTime(n: FNode): number {
+function calcChildBoost(n: FNode): FNode {
+  n.Children?.forEach(calcChildBoost);
+  // Due to looped node rounding errors, and in some other cases, our total
+  // time above may be smaller than the sum of child node total time. It seems
+  // reasonable to adjust for that by making this node's total time to be as
+  // big as the sum of its child nodes in this case.
+  if (!('Total Time' in n)) {
+    return n;
+  }
+
+  const childTotal = sumChildTotalTime(n);
+  if (childTotal > n["Total Time"]) {
+    n["Total Time"] = childTotal;
+  }
+  return n;
+}
+
+function calcParallelAppendTime(n: FNode, scale: number = 1): FNode {
+  if ('Total Time' in n && scale !== 1) {
+    n["Total Time"] *= scale;
+  }
+
   const ns = n.Source;
+  if ('Node Type' in ns
+    && ns["Node Type"] === 'Append'
+    && ns["Parallel Aware"]) {
+
+    let workerTime: {[k: string]: number} = {};
+    let totalTime = 0;
+    n.Children?.forEach(child => {
+      const cs = child.Source;
+      let id = 'leader'; // leader
+      // TODO: deal with plans that are not VERBOSE
+      if ('Workers' in cs && cs.Workers && cs.Workers.length === 1) {
+        id = cs.Workers[0]["Worker Number"].toString();
+      }
+      if ('Total Time' in child) {
+        workerTime[id] = (workerTime[id] || 0) + child["Total Time"];
+        totalTime += child["Total Time"];
+      }
+    });
+
+    let max = Math.max(...Object.keys(workerTime).map(id => workerTime[id]));
+    scale = max / totalTime;
+  }
+
+  n.Children?.forEach(child => calcParallelAppendTime(child, scale));
+  return n;
+}
+
+function sumChildTotalTime(n: FNode): number {
   let childTotal = 0;
   n.Children?.forEach(child => {
-    if (!('Total Time' in child)) {
-      return;
-    }
-
-    if ('Node Type' in ns &&
-      ns['Node Type'] === 'Append' &&
-      ns['Parallel Aware']
-    ) {
-      childTotal = Math.max(childTotal, child['Total Time']);
-    } else {
+    if ('Total Time' in child) {
       childTotal += child['Total Time'];
     }
   });

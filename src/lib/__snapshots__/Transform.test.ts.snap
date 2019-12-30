@@ -85,46 +85,46 @@ exports[`transformQueries time accounting snapshots are matching ParallelAppend 
 |  1 | Query                                  |                   |              |   430.4 ms |      0 μs |       x |
 |  2 |   Planning                             |                   |              |     149 μs |    149 μs |       x |
 |  3 |   Execution                            |                   |              |   430.2 ms |    115 μs |       x |
-|  4 |     Gather                             |          430.1 ms |            1 |   430.1 ms |   80.8 ms |         |
-|  5 |       Parallel Append                  |          349.3 ms |            3 |   349.3 ms |  128.0 ms |         |
-|  6 |         Aggregate                      |          221.2 ms |            1 |   221.2 ms |   96.0 ms |         |
-|  7 |           Seq Scan on public.foo       |          125.2 ms |            1 |   125.2 ms |  125.2 ms |         |
-|  8 |         Aggregate                      |          220.1 ms |            1 |   220.1 ms |   94.2 ms |         |
-|  9 |           Seq Scan on public.foo foo_1 |          125.9 ms |            1 |   125.9 ms |  125.9 ms |         |
-| 10 |         Aggregate                      |          200.4 ms |            1 |   200.4 ms |   92.6 ms |         |
-| 11 |           Seq Scan on public.foo foo_2 |          107.8 ms |            1 |   107.8 ms |  107.8 ms |         |
-| 12 |         Aggregate                      |          199.8 ms |            1 |   199.8 ms |   92.1 ms |         |
-| 13 |           Seq Scan on public.foo foo_3 |          107.7 ms |            1 |   107.7 ms |  107.7 ms |         |
-| 14 |         Aggregate                      |          206.3 ms |            1 |   206.3 ms |   95.2 ms |         |
-| 15 |           Seq Scan on public.foo foo_4 |          111.1 ms |            1 |   111.1 ms |  111.1 ms |         |
+|  4 |     Gather                             |          430.1 ms |            1 |   430.1 ms |    9.7 ms |         |
+|  5 |       Parallel Append                  |          349.3 ms |            3 |   420.5 ms |      0 μs |         |
+|  6 |         Aggregate                      |          221.2 ms |            1 |    88.8 ms |   38.5 ms |         |
+|  7 |           Seq Scan on public.foo       |          125.2 ms |            1 |    50.2 ms |   50.2 ms |         |
+|  8 |         Aggregate                      |          220.1 ms |            1 |    88.3 ms |   37.8 ms |         |
+|  9 |           Seq Scan on public.foo foo_1 |          125.9 ms |            1 |    50.5 ms |   50.5 ms |         |
+| 10 |         Aggregate                      |          200.4 ms |            1 |    80.4 ms |   37.2 ms |         |
+| 11 |           Seq Scan on public.foo foo_2 |          107.8 ms |            1 |    43.2 ms |   43.2 ms |         |
+| 12 |         Aggregate                      |          199.8 ms |            1 |    80.2 ms |   37.0 ms |         |
+| 13 |           Seq Scan on public.foo foo_3 |          107.7 ms |            1 |    43.2 ms |   43.2 ms |         |
+| 14 |         Aggregate                      |          206.3 ms |            1 |    82.8 ms |   38.2 ms |         |
+| 15 |           Seq Scan on public.foo foo_4 |          111.1 ms |            1 |    44.6 ms |   44.6 ms |         |
 '-------------------------------------------------------------------------------------------------------------------'"
 `;
 
 exports[`transformQueries time accounting snapshots are matching ParallelAppendCount 1`] = `
-".---------------------------------------------------------------------------------------------------------------------.
-|                                                 ParallelAppendCount                                                 |
-|---------------------------------------------------------------------------------------------------------------------|
-| #  |                  Label                   | Actual Total Time | Actual Loops | Total Time | Self Time | Virtual |
-|----|------------------------------------------|-------------------|--------------|------------|-----------|---------|
-|  1 | Query                                    |                   |              |   678.7 ms |      0 μs |       x |
-|  2 |   Planning                               |                   |              |     227 μs |    227 μs |       x |
-|  3 |   Execution                              |                   |              |   678.5 ms |  -13.0 ms |       x |
-|  4 |     Nested Loop                          |          675.1 ms |            1 |   691.5 ms |      0 μs |         |
-|  5 |       Nested Loop                        |          675.0 ms |            1 |   691.5 ms |      0 μs |         |
-|  6 |         Gather                           |          210.8 ms |            1 |   223.9 ms |      0 μs |         |
-|  7 |           Parallel Append                |          144.8 ms |            3 |   223.9 ms |      0 μs |         |
-|  8 |             Aggregate                    |          223.9 ms |            1 |   223.9 ms |   95.9 ms |         |
-|  9 |               Seq Scan on foo            |          128.0 ms |            1 |   128.0 ms |  128.0 ms |         |
-| 10 |             Aggregate                    |          210.6 ms |            1 |   210.6 ms |   96.7 ms |         |
-| 11 |               Seq Scan on foo foo_1      |          113.9 ms |            1 |   113.9 ms |  113.9 ms |         |
-| 12 |         Gather                           |          233.8 ms |            2 |   467.6 ms |   16.1 ms |         |
-| 13 |           Parallel Append                |          145.3 ms |            6 |   451.5 ms |      0 μs |         |
-| 14 |             Aggregate                    |          225.7 ms |            2 |   451.5 ms |  193.3 ms |         |
-| 15 |               Seq Scan on foo foo_2      |          129.1 ms |            2 |   258.1 ms |  258.1 ms |         |
-| 16 |             Aggregate                    |          210.0 ms |            2 |   420.1 ms |  193.3 ms |         |
-| 17 |               Seq Scan on foo foo_3      |          113.4 ms |            2 |   226.8 ms |  226.8 ms |         |
-| 18 |       Function Scan on generate_series a |              4 μs |            4 |      16 μs |     16 μs |         |
-'---------------------------------------------------------------------------------------------------------------------'
+".--------------------------------------------------------------------------------------------------------------------------------.
+|                                                      ParallelAppendCount                                                       |
+|--------------------------------------------------------------------------------------------------------------------------------|
+| #  |                        Label                        | Actual Total Time | Actual Loops | Total Time | Self Time | Virtual |
+|----|-----------------------------------------------------|-------------------|--------------|------------|-----------|---------|
+|  1 | Query                                               |                   |              |   652.6 ms |      0 μs |       x |
+|  2 |   Planning                                          |                   |              |     201 μs |    201 μs |       x |
+|  3 |   Execution                                         |                   |              |   652.4 ms | -405.6 ms |       x |
+|  4 |     Nested Loop                                     |          649.3 ms |            1 |      1.1 s |      0 μs |         |
+|  5 |       Nested Loop                                   |          649.3 ms |            1 |      1.1 s |      0 μs |         |
+|  6 |         Gather                                      |          202.4 ms |            1 |   215.4 ms |      0 μs |         |
+|  7 |           Parallel Append                           |          139.2 ms |            3 |   215.4 ms |      0 μs |         |
+|  8 |             Aggregate                               |          215.4 ms |            1 |   111.1 ms |   48.0 ms |         |
+|  9 |               Seq Scan on public.foo                |          122.2 ms |            1 |    63.0 ms |   63.0 ms |         |
+| 10 |             Aggregate                               |          202.2 ms |            1 |   104.3 ms |   48.7 ms |         |
+| 11 |               Seq Scan on public.foo foo_1          |          107.8 ms |            1 |    55.6 ms |   55.6 ms |         |
+| 12 |         Gather                                      |          224.9 ms |            2 |   842.6 ms |      0 μs |         |
+| 13 |           Parallel Append                           |          140.4 ms |            6 |   842.6 ms |      0 μs |         |
+| 14 |             Aggregate                               |          217.4 ms |            2 |   434.9 ms |  187.6 ms |         |
+| 15 |               Seq Scan on public.foo foo_2          |          123.6 ms |            2 |   247.3 ms |  247.3 ms |         |
+| 16 |             Aggregate                               |          203.9 ms |            2 |   407.8 ms |  190.6 ms |         |
+| 17 |               Seq Scan on public.foo foo_3          |          108.6 ms |            2 |   217.2 ms |  217.2 ms |         |
+| 18 |       Function Scan on pg_catalog.generate_series a |              6 μs |            4 |      24 μs |     24 μs |         |
+'--------------------------------------------------------------------------------------------------------------------------------'
 
 .----------------------------------------------------------------------------------------------.
 | # |                                         Warning                                          |
