@@ -2,39 +2,37 @@ import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
   description: `
-TODO
-
-CREATE TABLE foo AS
-SELECT g
-FROM generate_series(1, 1000000) g;
-
-SET min_parallel_table_scan_size='1GB';
+SET force_parallel_mode=true;
+SET parallel_setup_cost=0;
+SET parallel_tuple_cost=0;
 
 EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON)
-SELECT count(*) FROM foo
+SELECT pg_sleep(0.1)
 UNION ALL
-SELECT count(*) FROM foo
+SELECT pg_sleep(0.2)
 UNION ALL
-SELECT count(*) FROM foo
+SELECT pg_sleep(0.3)
 UNION ALL
-SELECT count(*) FROM foo
+SELECT pg_sleep(0.4)
 UNION ALL
-SELECT count(*) FROM foo;
+SELECT pg_sleep(0.5)
+UNION ALL
+SELECT pg_sleep(0.6);
 `,
   queries: [
     {
       "Plan": {
         "Node Type": "Gather",
         "Parallel Aware": false,
-        "Startup Cost": 17925.00,
-        "Total Cost": 51775.56,
-        "Plan Rows": 5,
-        "Plan Width": 8,
-        "Actual Startup Time": 206.552,
-        "Actual Total Time": 430.132,
-        "Actual Rows": 5,
+        "Startup Cost": 0.00,
+        "Total Cost": 0.07,
+        "Plan Rows": 6,
+        "Plan Width": 4,
+        "Actual Startup Time": 101.218,
+        "Actual Total Time": 809.720,
+        "Actual Rows": 6,
         "Actual Loops": 1,
-        "Output": ["(count(*))"],
+        "Output": ["(pg_sleep('0.200000000000000011'::double precision))"],
         "Workers Planned": 2,
         "Workers Launched": 2,
         "Single Copy": false,
@@ -43,268 +41,159 @@ SELECT count(*) FROM foo;
             "Node Type": "Append",
             "Parent Relationship": "Outer",
             "Parallel Aware": true,
-            "Startup Cost": 16925.00,
-            "Total Cost": 50775.06,
+            "Startup Cost": 0.00,
+            "Total Cost": 0.07,
             "Plan Rows": 1,
-            "Plan Width": 8,
-            "Actual Startup Time": 215.877,
-            "Actual Total Time": 349.287,
+            "Plan Width": 4,
+            "Actual Startup Time": 200.959,
+            "Actual Total Time": 702.126,
             "Actual Rows": 2,
             "Actual Loops": 3,
             "Workers": [
               {
                 "Worker Number": 0,
-                "Actual Startup Time": 221.251,
-                "Actual Total Time": 221.252,
-                "Actual Rows": 1,
+                "Actual Startup Time": 301.222,
+                "Actual Total Time": 802.539,
+                "Actual Rows": 2,
                 "Actual Loops": 1
               },
               {
                 "Worker Number": 1,
-                "Actual Startup Time": 220.080,
-                "Actual Total Time": 420.464,
+                "Actual Startup Time": 200.685,
+                "Actual Total Time": 601.231,
                 "Actual Rows": 2,
                 "Actual Loops": 1
               }
             ],
             "Plans": [
               {
-                "Node Type": "Aggregate",
-                "Strategy": "Plain",
-                "Partial Mode": "Simple",
+                "Node Type": "Result",
                 "Parent Relationship": "Member",
                 "Parallel Aware": false,
-                "Startup Cost": 16925.00,
-                "Total Cost": 16925.01,
+                "Startup Cost": 0.00,
+                "Total Cost": 0.01,
                 "Plan Rows": 1,
-                "Plan Width": 8,
-                "Actual Startup Time": 221.248,
-                "Actual Total Time": 221.248,
+                "Plan Width": 4,
+                "Actual Startup Time": 200.680,
+                "Actual Total Time": 200.681,
                 "Actual Rows": 1,
                 "Actual Loops": 1,
-                "Output": ["count(*)"],
+                "Output": ["pg_sleep('0.200000000000000011'::double precision)"],
+                "Workers": [
+                  {
+                    "Worker Number": 1,
+                    "Actual Startup Time": 200.680,
+                    "Actual Total Time": 200.681,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1
+                  }
+                ]
+              },
+              {
+                "Node Type": "Result",
+                "Parent Relationship": "Member",
+                "Parallel Aware": false,
+                "Startup Cost": 0.00,
+                "Total Cost": 0.01,
+                "Plan Rows": 1,
+                "Plan Width": 4,
+                "Actual Startup Time": 301.218,
+                "Actual Total Time": 301.219,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Output": ["pg_sleep('0.299999999999999989'::double precision)"],
                 "Workers": [
                   {
                     "Worker Number": 0,
-                    "Actual Startup Time": 221.248,
-                    "Actual Total Time": 221.248,
+                    "Actual Startup Time": 301.218,
+                    "Actual Total Time": 301.219,
                     "Actual Rows": 1,
                     "Actual Loops": 1
-                  }
-                ],
-                "Plans": [
-                  {
-                    "Node Type": "Seq Scan",
-                    "Parent Relationship": "Outer",
-                    "Parallel Aware": false,
-                    "Relation Name": "foo",
-                    "Schema": "public",
-                    "Alias": "foo",
-                    "Startup Cost": 0.00,
-                    "Total Cost": 14425.00,
-                    "Plan Rows": 1000000,
-                    "Plan Width": 0,
-                    "Actual Startup Time": 0.056,
-                    "Actual Total Time": 125.214,
-                    "Actual Rows": 1000000,
-                    "Actual Loops": 1,
-                    "Output": ["foo.g"],
-                    "Workers": [
-                      {
-                        "Worker Number": 0,
-                        "Actual Startup Time": 0.056,
-                        "Actual Total Time": 125.214,
-                        "Actual Rows": 1000000,
-                        "Actual Loops": 1
-                      }
-                    ]
                   }
                 ]
               },
               {
-                "Node Type": "Aggregate",
-                "Strategy": "Plain",
-                "Partial Mode": "Simple",
+                "Node Type": "Result",
                 "Parent Relationship": "Member",
                 "Parallel Aware": false,
-                "Startup Cost": 16925.00,
-                "Total Cost": 16925.01,
+                "Startup Cost": 0.00,
+                "Total Cost": 0.01,
                 "Plan Rows": 1,
-                "Plan Width": 8,
-                "Actual Startup Time": 220.076,
-                "Actual Total Time": 220.076,
+                "Plan Width": 4,
+                "Actual Startup Time": 400.534,
+                "Actual Total Time": 400.536,
                 "Actual Rows": 1,
                 "Actual Loops": 1,
-                "Output": ["count(*)"],
+                "Output": ["pg_sleep('0.400000000000000022'::double precision)"],
                 "Workers": [
                   {
                     "Worker Number": 1,
-                    "Actual Startup Time": 220.076,
-                    "Actual Total Time": 220.076,
+                    "Actual Startup Time": 400.534,
+                    "Actual Total Time": 400.536,
                     "Actual Rows": 1,
                     "Actual Loops": 1
-                  }
-                ],
-                "Plans": [
-                  {
-                    "Node Type": "Seq Scan",
-                    "Parent Relationship": "Outer",
-                    "Parallel Aware": false,
-                    "Relation Name": "foo",
-                    "Schema": "public",
-                    "Alias": "foo_1",
-                    "Startup Cost": 0.00,
-                    "Total Cost": 14425.00,
-                    "Plan Rows": 1000000,
-                    "Plan Width": 0,
-                    "Actual Startup Time": 0.057,
-                    "Actual Total Time": 125.870,
-                    "Actual Rows": 1000000,
-                    "Actual Loops": 1,
-                    "Output": ["foo_1.g"],
-                    "Workers": [
-                      {
-                        "Worker Number": 1,
-                        "Actual Startup Time": 0.057,
-                        "Actual Total Time": 125.870,
-                        "Actual Rows": 1000000,
-                        "Actual Loops": 1
-                      }
-                    ]
                   }
                 ]
               },
               {
-                "Node Type": "Aggregate",
-                "Strategy": "Plain",
-                "Partial Mode": "Simple",
+                "Node Type": "Result",
                 "Parent Relationship": "Member",
                 "Parallel Aware": false,
-                "Startup Cost": 16925.00,
-                "Total Cost": 16925.01,
+                "Startup Cost": 0.00,
+                "Total Cost": 0.01,
                 "Plan Rows": 1,
-                "Plan Width": 8,
-                "Actual Startup Time": 200.381,
-                "Actual Total Time": 200.381,
+                "Plan Width": 4,
+                "Actual Startup Time": 501.307,
+                "Actual Total Time": 501.308,
                 "Actual Rows": 1,
                 "Actual Loops": 1,
-                "Output": ["count(*)"],
+                "Output": ["pg_sleep('0.5'::double precision)"],
                 "Workers": [
                   {
-                    "Worker Number": 1,
-                    "Actual Startup Time": 200.381,
-                    "Actual Total Time": 200.381,
+                    "Worker Number": 0,
+                    "Actual Startup Time": 501.307,
+                    "Actual Total Time": 501.308,
                     "Actual Rows": 1,
                     "Actual Loops": 1
                   }
-                ],
-                "Plans": [
-                  {
-                    "Node Type": "Seq Scan",
-                    "Parent Relationship": "Outer",
-                    "Parallel Aware": false,
-                    "Relation Name": "foo",
-                    "Schema": "public",
-                    "Alias": "foo_2",
-                    "Startup Cost": 0.00,
-                    "Total Cost": 14425.00,
-                    "Plan Rows": 1000000,
-                    "Plan Width": 0,
-                    "Actual Startup Time": 0.014,
-                    "Actual Total Time": 107.764,
-                    "Actual Rows": 1000000,
-                    "Actual Loops": 1,
-                    "Output": ["foo_2.g"],
-                    "Workers": [
-                      {
-                        "Worker Number": 1,
-                        "Actual Startup Time": 0.014,
-                        "Actual Total Time": 107.764,
-                        "Actual Rows": 1000000,
-                        "Actual Loops": 1
-                      }
-                    ]
-                  }
                 ]
               },
               {
-                "Node Type": "Aggregate",
-                "Strategy": "Plain",
-                "Partial Mode": "Simple",
+                "Node Type": "Result",
                 "Parent Relationship": "Member",
                 "Parallel Aware": false,
-                "Startup Cost": 16925.00,
-                "Total Cost": 16925.01,
+                "Startup Cost": 0.00,
+                "Total Cost": 0.01,
                 "Plan Rows": 1,
-                "Plan Width": 8,
-                "Actual Startup Time": 199.843,
-                "Actual Total Time": 199.843,
+                "Plan Width": 4,
+                "Actual Startup Time": 601.631,
+                "Actual Total Time": 601.632,
                 "Actual Rows": 1,
                 "Actual Loops": 1,
-                "Output": ["count(*)"],
-                "Plans": [
-                  {
-                    "Node Type": "Seq Scan",
-                    "Parent Relationship": "Outer",
-                    "Parallel Aware": false,
-                    "Relation Name": "foo",
-                    "Schema": "public",
-                    "Alias": "foo_3",
-                    "Startup Cost": 0.00,
-                    "Total Cost": 14425.00,
-                    "Plan Rows": 1000000,
-                    "Plan Width": 0,
-                    "Actual Startup Time": 0.015,
-                    "Actual Total Time": 107.734,
-                    "Actual Rows": 1000000,
-                    "Actual Loops": 1,
-                    "Output": ["foo_3.g"]
-                  }
-                ]
+                "Output": ["pg_sleep('0.599999999999999978'::double precision)"]
               },
               {
-                "Node Type": "Aggregate",
-                "Strategy": "Plain",
-                "Partial Mode": "Simple",
+                "Node Type": "Result",
                 "Parent Relationship": "Member",
                 "Parallel Aware": false,
-                "Startup Cost": 16925.00,
-                "Total Cost": 16925.01,
+                "Startup Cost": 0.00,
+                "Total Cost": 0.01,
                 "Plan Rows": 1,
-                "Plan Width": 8,
-                "Actual Startup Time": 206.298,
-                "Actual Total Time": 206.298,
+                "Plan Width": 4,
+                "Actual Startup Time": 100.944,
+                "Actual Total Time": 100.945,
                 "Actual Rows": 1,
                 "Actual Loops": 1,
-                "Output": ["count(*)"],
-                "Plans": [
-                  {
-                    "Node Type": "Seq Scan",
-                    "Parent Relationship": "Outer",
-                    "Parallel Aware": false,
-                    "Relation Name": "foo",
-                    "Schema": "public",
-                    "Alias": "foo_4",
-                    "Startup Cost": 0.00,
-                    "Total Cost": 14425.00,
-                    "Plan Rows": 1000000,
-                    "Plan Width": 0,
-                    "Actual Startup Time": 0.013,
-                    "Actual Total Time": 111.056,
-                    "Actual Rows": 1000000,
-                    "Actual Loops": 1,
-                    "Output": ["foo_4.g"]
-                  }
-                ]
+                "Output": ["pg_sleep('0.100000000000000006'::double precision)"]
               }
             ]
           }
         ]
       },
-      "Planning Time": 0.149,
+      "Planning Time": 0.134,
       "Triggers": [
       ],
-      "Execution Time": 430.247
+      "Execution Time": 809.799
     }
   ]
 };

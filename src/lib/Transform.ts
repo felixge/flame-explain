@@ -167,36 +167,32 @@ function calcChildBoost(n: FNode): FNode {
   return n;
 }
 
-function calcParallelAppendTime(n: FNode, scale: number = 1): FNode {
+function calcParallelAppendTime(
+  n: FNode,
+  gather: FNode | undefined = undefined,
+  scale: number = 1
+): FNode {
+  const ns = n.Source;
+  if ('Node Type' in ns && ns['Node Type'] === 'Gather' && 'Total Time' in n) {
+    gather = n;
+  }
+
   if ('Total Time' in n && scale !== 1) {
     n["Total Time"] *= scale;
   }
 
-  const ns = n.Source;
-  if ('Node Type' in ns
+  if (
+    'Node Type' in ns
     && ns["Node Type"] === 'Append'
-    && ns["Parallel Aware"]) {
-
-    let workerTime: {[k: string]: number} = {};
-    let totalTime = 0;
-    n.Children?.forEach(child => {
-      const cs = child.Source;
-      let id = 'leader'; // leader
-      // TODO: deal with plans that are not VERBOSE
-      if ('Workers' in cs && cs.Workers && cs.Workers.length === 1) {
-        id = cs.Workers[0]["Worker Number"].toString();
-      }
-      if ('Total Time' in child) {
-        workerTime[id] = (workerTime[id] || 0) + child["Total Time"];
-        totalTime += child["Total Time"];
-      }
-    });
-
-    let max = Math.max(...Object.keys(workerTime).map(id => workerTime[id]));
-    scale = max / totalTime;
+    && ns["Parallel Aware"]
+    && gather
+    && 'Total Time' in gather
+  ) {
+    let childTotal = sumChildTotalTime(n);
+    scale = gather["Total Time"] / childTotal;
   }
 
-  n.Children?.forEach(child => calcParallelAppendTime(child, scale));
+  n.Children?.forEach(child => calcParallelAppendTime(child, gather, scale));
   return n;
 }
 
