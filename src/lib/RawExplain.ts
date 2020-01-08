@@ -17,8 +17,6 @@
  * [1] https://github.com/postgres/postgres/blob/REL_12_0/src/backend/commands/explain.c
  */
 
-import {OptionalEmbed} from './Util';
-
 /** Queries defines the JSON array that is produced by EXPLAIN (FORMAT JSON).
  * Each element contains the explanation of one query. In most cases, there is
  * only a single query element, however query rewrite rules can produce multiple
@@ -26,22 +24,54 @@ import {OptionalEmbed} from './Util';
  */
 export type Queries = Array<Query>;
 
-export type Query = OptionalEmbed<{
-  // TODO rename Node to Plan
+export type Query = Partial<{
   "Plan": Node;
-}, QueryAnalyzedFragment>;
-
-export type QueryAnalyzedFragment = {
   "Planning Time": number;
   "Execution Time": number;
   "Triggers": Array<any>;
-}
+}>;
 
+// TODO Describe or group fields below
+export type Node = Partial<
+  CommonFragment
+  & (AggregateFragment | SetOpFragment)
+  & AnalyzedFragment
+  & CTENameFragment
+  & CostFragment
+  & FunctionScanFragment
+  & IndexFragment
+  & JoinFragment
+  & (ModifyTableFragment | ForeignScanFragment)
+  & NamedTupleStoreScanFragment
+  & ResultFragment
+  & TableFunctionScanFragment
+  & TargetRelFragment
+  & TimingFragment
+  & HashFragment
+  & GatherFragment
+>;
+
+type CommonFragment = {
+  "Node Type": NodeType;
+  "Parent Relationship": 'InitPlan' | 'Outer' | 'Inner' | 'Member' | 'Subquery';
+  /** Available starting in PostgreSQL 9.6 and later for parallel query. */
+  "Parallel Aware": boolean;
+  "Subplan Name": string,
+  "Filter": string;
+  "Rows Removed by Filter": number;
+  "Output": string[];
+  "Workers": WorkerFragment[];
+  "Plans": Node[];
+
+  /** Average startup time / per 'Actual Loops' of this node. */
+  "Actual Startup Time": number;
+  /** Average total time / per 'Actual Loops' of this node. */
+  "Actual Total Time": number;
+};
 
 /**
- * NodeType should cover all node types. Last updated for REL_12_0 [1]
- * [1] 
- *  */
+ * NodeType is a list of all Node Type values implemented by PostgreSQL.
+ */
 export type NodeType =
   'Result' |
   'ProjectSet' |
@@ -83,219 +113,169 @@ export type NodeType =
   'Limit' |
   'Hash';
 
-interface NodeCommonFragment {
-  "Parent Relationship"?: 'InitPlan' | 'Outer' | 'Inner' | 'Member' | 'Subquery';
-  /** Available starting in PostgreSQL 9.6 and later. */
-  "Parallel Aware"?: boolean;
-  "Subplan Name"?: string,
-
-  // TODO: what node types can these two be on? any?
-  "Filter"?: string;
-  "Rows Removed by Filter"?: number;
-  "Output"?: string[];
-
-  "Workers"?: Worker[];
-
-  "Plans"?: Node[];
+/**
+ * TargetRelFragment is present when Node Type is "Seq Scan" | "Sample Scan" |
+ * "Index Scan" | "Index Only Scan" | "Bitmap Heap Scan" | "Tid Scan" |
+ * "Foreign Scan" | "Custom Scan" | "ModifyTable".
+ */
+type TargetRelFragment = {
+  "Schema": string;
+  "Relation Name": string;
+  "Alias": string;
 };
 
-type Worker = {
-  "Worker Number": number;
-} & NodeTimingFragment & NodeAnalyzedFragment;
-
-interface NodeCostFragment {
+/**
+ * CostFragment is present when the COSTS option is enabled.
+ */
+type CostFragment = {
   "Startup Cost": number,
   "Total Cost": number,
   "Plan Rows": number,
   "Plan Width": number,
-}
+};
 
-export interface NodeAnalyzedFragment {
+/**
+ * AnalyzedFragment is present when the ANALYZE option is enabled.
+ */
+type AnalyzedFragment = {
   /** Number of rows returned by this node. */
   "Actual Rows": number;
   /** Number of times this node was executed in a loop. Can be 0 if the
    * node was not executed at all. */
   "Actual Loops": number;
-}
+};
 
-export interface NodeTimingFragment {
+/**
+ * TimingFragment is present when the TIMING option is enabled.
+ */
+type TimingFragment = {
   /** Average startup time / per 'Actual Loops' of this node. */
   "Actual Startup Time": number;
   /** Average total time / per 'Actual Loops' of this node. */
   "Actual Total Time": number;
-}
-
-interface NodeTargetRelFragment {
-  "Node Type": (
-    "Seq Scan" |
-    "Sample Scan" |
-    "Index Scan" |
-    "Index Only Scan" |
-    "Bitmap Heap Scan" |
-    "Tid Scan" |
-    "Foreign Scan" |
-    "Custom Scan" |
-    "ModifyTable"
-  );
-  "Schema"?: string;
-  "Relation Name": string;
-  "Alias": string;
-}
-
-type NodeTypeFragment = {"Node Type": NodeType};
-
-// ConditionalNodeTypeFragment returns T & Fragment if T["Node Type"] is
-// assignable to Fragment["Node Type"].
-type ConditionalNodeTypeFragment<
-  T extends NodeTypeFragment,
-  Fragment extends NodeTypeFragment,
-  > = T["Node Type"] extends Fragment["Node Type"]
-  ? T & Fragment
-  : T;
+};
 
 /**
- * Dear type god, what have I done? I hope the answer is that this type
- * intersects with NodeTargetRelFragment if T has a compatible "Node Type",
- * and also optionally intersects all combinations of a bunch of other
- * fragements that can show up for any type of node depending on the EXPLAIN
- * options selected by the user.
+ * CTENameFragment is present when "Node Type" is "CTE Scan" | "WorkTable Scan".
  */
-type NodeWithFragments<T extends NodeTypeFragment> =
-  OptionalEmbed<OptionalEmbed<OptionalEmbed<
-    ConditionalNodeTypeFragment<T, NodeTargetRelFragment> &
-    NodeCommonFragment
-    , NodeCostFragment>, NodeAnalyzedFragment>, NodeTimingFragment>;
+type CTENameFragment = {
+  "CTE Name": string;
+};
 
-type NodeModifyTable = NodeWithFragments<{
-  "Node Type": "ModifyTable";
-  "Operation"?: "Insert" | "Update" | "Delete";
-}>;
-
-type NodeForeignScan = NodeWithFragments<{
-  "Node Type": "Foreign Scan";
-  "Operation"?: "Select" | "Insert" | "Update" | "Delete";
-}>;
-
-type NodeBitmapIndexScan = NodeWithFragments<{
-  "Node Type": "Bitmap Index Scan";
-  "Index Name": string;
-  "Index Cond": string;
-}>;
-
-type NodeIndexScan = NodeWithFragments<{
-  "Node Type": "Index Scan" | "Index Only Scan";
-  "Index Name": string;
-  "Index Cond": string;
-  "Rows Removed by Index Recheck": number;
-  "Scan Direction": "Backward" | "NoMovement" | "Forward" | "?";
-}>;
-
-type NodeJoinFragment = {
+/**
+ * JoinFragment is present when "Node Type" is "Nested Loop" | "Hash Join" |
+ * "Merge Join". Some fields are only present when the VERBOSE option is
+ * enabled.
+ */
+type JoinFragment = {
   "Join Type": "Inner" | "Left" | "Full" | "Right" | "Semi" | "Anti" | "???";
-  "Inner Unique"?: boolean;
-  "Join Filter"?: string;
-  "Rows Removed by Join Filter"?: number;
-}
+  "Inner Unique": boolean;
+  "Join Filter": string;
+  "Rows Removed by Join Filter": number;
 
-type NodeNestedLoop = NodeWithFragments<{
-  "Node Type": "Nested Loop";
-} & NodeJoinFragment>;
-
-type NodeHashJoin = NodeWithFragments<{
-  "Node Type": "Hash Join";
+  // Only available for "Hash Join".
   "Hash Cond": string;
-} & NodeJoinFragment>;
+};
 
-type NodeMergeJoin = NodeWithFragments<{
-  "Node Type": "Merge Join";
-} & NodeJoinFragment>;
+/**
+ * ModifyTableFragment is available when "Node Type" is "ModifyTable".
+ */
+type ModifyTableFragment = {
+  "Operation": "Insert" | "Update" | "Delete";
+};
 
-type NodeAggregate = NodeWithFragments<{
-  "Node Type": "Aggregate";
+/**
+ * ForeignScanFragment is available when "Node Type" is "Foreign Scan".
+ */
+type ForeignScanFragment = {
+  "Operation": "Select" | "Insert" | "Update" | "Delete";
+};
+
+/**
+ * IndexFragment is available when "Node Type" is "Bitmap Index Scan" | "Index
+ * Scan" | "Index Only Scan".
+ */
+type IndexFragment = {
+  "Index Name": string;
+  "Index Cond": string;
+  // Not available for "Bitmap Index Scan".
+  "Rows Removed by Index Recheck": number;
+  // Not available for "Bitmap Index Scan".
+  "Scan Direction": "Backward" | "NoMovement" | "Forward" | "?";
+};
+
+/**
+ * AggregateFragment is available when "Node Type" is "Aggregate".
+ */
+type AggregateFragment = {
   "Strategy": "Plain" | "Sorted" | "Hashed" | "Mixed" | "???";
-  /** Available since PostgreSQL 9.6 and later. */
+  /** Available since PostgreSQL 9.6 and later for parallel query. */
   "Partial Mode"?: "Simple" | "Partial" | "Finalize";
-}>;
+};
 
-type NodeSetOp = NodeWithFragments<{
-  "Node Type": "SetOp";
+/**
+ * SetOpFragment is available when "Node Type" is "SetOp".
+ */
+type SetOpFragment = {
   "Strategy": "Sorted" | "Hashed" | "???";
   "Command": "Intersect" | "Intersect All" | "Except" | "Except All" | "???";
-}>;
+};
 
-type NodeFunctionScan = NodeWithFragments<{
-  "Node Type": "Function Scan";
+/**
+ * FunctionScanFragment is available when "Node Type" is "Function Scan".
+ */
+type FunctionScanFragment = {
   "Function Name": string;
-  "Schema"?: string;
+  "Schema": string;
   "Function Call"?: string;
-}>
+};
 
-type NodeTableFunctionScan = NodeWithFragments<{
-  "Node Type": "Table Function Scan";
+/**
+ * TableFunctionScanFragment is available when "Node Type" is "Table Function
+ * Scan".
+ */
+type TableFunctionScanFragment = {
   "Table Function Name": string;
-}>;
+};
 
-type NodeCTEorWorkTableScan = NodeWithFragments<{
-  "Node Type": "CTE Scan" | "WorkTable Scan";
-  "CTE Name": string;
-}>;
-
-type NodeNamedTuplestoreScan = NodeWithFragments<{
-  "Node Type": "Named Tuplestore Scan";
+/**
+ * NamedTupleStoreScanFragment is available when "Node Type" is "Named
+ * Tuplestore Scan".
+ */
+type NamedTupleStoreScanFragment = {
   "Tuplestore Name": string;
-}>;
+};
 
-type NodeResult = NodeWithFragments<{
-  "Node Type": "Result";
+/**
+ * ResultFragment is available when "Node Type" is "Result".
+ */
+type ResultFragment = {
   "One-Time Filter"?: string;
-}>;
+};
 
-type NodeHash = NodeWithFragments<{
-  "Node Type": "Hash";
+/**
+ * HashFragment is available when "Node Type" is "Hash".
+ */
+type HashFragment = {
+  "One-Time Filter"?: string;
   "Hash Buckets": number;
   "Original Hash Buckets": number;
   "Hash Batches": number;
   "Original Hash Batches": number,
   /** kB */
   "Peak Memory Usage": number,
-}>;
+};
 
-type GatherFragment = OptionalEmbed<{
+/**
+ * GatherFragment is available when "Node Type" is "Gather" | "Gather Merge". 
+ */
+type GatherFragment = {
   "Workers Planned": number;
-}, {
   "Workers Launched": number;
-}>;
-
-type NodeGather = NodeWithFragments<{
-  "Node Type": "Gather";
+  // Only available for "Gather".
   "Single Copy": boolean;
-} & GatherFragment>;
+};
 
-type NodeGatherMerge = NodeWithFragments<{
-  "Node Type": "Gather Merge";
-} & GatherFragment>;
-
-type SpecializedNode =
-  NodeModifyTable |
-  NodeForeignScan |
-  NodeBitmapIndexScan |
-  NodeIndexScan |
-  NodeNestedLoop |
-  NodeHashJoin |
-  NodeMergeJoin |
-  NodeAggregate |
-  NodeSetOp |
-  NodeFunctionScan |
-  NodeTableFunctionScan |
-  NodeCTEorWorkTableScan |
-  NodeNamedTuplestoreScan |
-  NodeResult |
-  NodeHash |
-  NodeGather |
-  NodeGatherMerge;
-
-type MakeUnspecializedNodes<T> = T extends NodeType ? NodeWithFragments<{"Node Type": T}> : never;
-
-type UnspecializedNode = MakeUnspecializedNodes<Exclude<NodeType, SpecializedNode["Node Type"]>>;
-
-export type Node = SpecializedNode | UnspecializedNode;
+type WorkerFragment = {
+  "Worker Number": number;
+} & TimingFragment & AnalyzedFragment;
