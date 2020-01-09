@@ -1,47 +1,41 @@
 /**
- * This file tries to capture the various shapes of PostgreSQL
- * EXPLAIN (FORMAT JSON) output using Typescript's advanced type features. This
- * makes it easier to document/auto-complete which JSON Fields appear together
- * when certain EXPLAIN flags are enabled (e.g. TIMING), and which JSON Fields
- * are unique to certain node types. All supported PostgreSQL releases
- * (i.e. >= 9.4) are covered.
+ * This file tries to capture the various shapes of PostgreSQL EXPLAIN (FORMAT
+ * JSON) output for all supported releases (i.e. >= 9.4).
  *
  * This file is manually derrived from the PostgreSQL source code, and was last
  * updated for PostgreSQL 12.0 [1].
  *
- * TROUBLESHOOTING ADVICE: Typescript may sometimes produce very long and
- * cryptic error messages when trying to assign a value to the Plan type. The
- * best way to debug those is to remove parts from the plan until it passes
- * type checking, which usually allows to identify the true source of the error.
- *
  * [1] https://github.com/postgres/postgres/blob/REL_12_0/src/backend/commands/explain.c
  */
 
-/** Queries defines the JSON array that is produced by EXPLAIN (FORMAT JSON).
+/**
+ * Queries defines the JSON array that is produced by EXPLAIN (FORMAT JSON).
  * Each element contains the explanation of one query. In most cases, there is
  * only a single query element, however query rewrite rules can produce multiple
  * queries.
  */
-export type Queries = Array<Query>;
+export type RawQueries = Array<RawQuery>;
 
-export type Query = Partial<{
-  "Plan": Node;
+export type RawQuery = Partial<{
   "Planning Time": number;
   "Execution Time": number;
   "Triggers": Array<any>;
+  "Plan": RawNode;
 }>;
 
 // TODO Describe or group fields below
-export type Node = Partial<
+export type RawNode = Partial<
   CommonFragment
-  & (AggregateFragment | SetOpFragment)
+  & AggregateFragment
+  & SetOpFragment
   & AnalyzedFragment
   & CTENameFragment
   & CostFragment
   & FunctionScanFragment
   & IndexFragment
   & JoinFragment
-  & (ModifyTableFragment | ForeignScanFragment)
+  & ModifyTableFragment
+  & ForeignScanFragment
   & NamedTupleStoreScanFragment
   & ResultFragment
   & TableFunctionScanFragment
@@ -177,18 +171,24 @@ type JoinFragment = {
   "Hash Cond": string;
 };
 
+type Operation =
+  // When "Node Type" is "ModifyTable"
+  "Insert" | "Update" | "Delete" |
+  // When "Node Type" is "Foreign Scan"
+  "Select" | "Insert" | "Update" | "Delete";
+
 /**
  * ModifyTableFragment is available when "Node Type" is "ModifyTable".
  */
 type ModifyTableFragment = {
-  "Operation": "Insert" | "Update" | "Delete";
+  "Operation": Operation;
 };
 
 /**
  * ForeignScanFragment is available when "Node Type" is "Foreign Scan".
  */
 type ForeignScanFragment = {
-  "Operation": "Select" | "Insert" | "Update" | "Delete";
+  "Operation": Operation;
 };
 
 /**
@@ -204,11 +204,17 @@ type IndexFragment = {
   "Scan Direction": "Backward" | "NoMovement" | "Forward" | "?";
 };
 
+type Strategy =
+  // When "Node Type" is "Aggregate".
+  "Plain" | "Sorted" | "Hashed" | "Mixed" | "???" |
+  // When "Node Type" is "SetOp".
+  "Sorted" | "Hashed" | "???";
+
 /**
  * AggregateFragment is available when "Node Type" is "Aggregate".
  */
 type AggregateFragment = {
-  "Strategy": "Plain" | "Sorted" | "Hashed" | "Mixed" | "???";
+  "Strategy": Strategy;
   /** Available since PostgreSQL 9.6 and later for parallel query. */
   "Partial Mode"?: "Simple" | "Partial" | "Finalize";
 };
@@ -217,7 +223,7 @@ type AggregateFragment = {
  * SetOpFragment is available when "Node Type" is "SetOp".
  */
 type SetOpFragment = {
-  "Strategy": "Sorted" | "Hashed" | "???";
+  "Strategy": Strategy;
   "Command": "Intersect" | "Intersect All" | "Except" | "Except All" | "???";
 };
 

@@ -1,82 +1,153 @@
-import {Query as RQuery, Node as RawNode} from './RawExplain';
-import {OptionalEmbed} from './Util';
+import {
+  RawNode,
+  RawQuery,
+} from './RawExplain';
+import {Disjoint} from './Util';
 
-export type Node = OptionalEmbed<{
-  /**
-   * True if this node was not present as a node in the original EXPLAIN
-   * output, and has been inserted for making the plan more readable.
-   **/
-  'Virtual': boolean,
-  'Label': string,
-  // TODO make optional
-  'Source': RawNode | RQuery | {},
-  'Parent'?: Node,
-  // TODO rename to nodes, also make it required
-  'Children'?: Node[]
-  'CTEParent'?: Node,
-  'CTEScans'?: Node[],
-  'FilterParent'?: Node,
-  'FilterChildren'?: Node[],
-  'Warnings'?: string[],
-  'Root': boolean,
-}, Timing>;
+type Node = Disjoint<
+  Omit<RawQuery, "Plan"> & Omit<RawNode, "Plans">,
+  FlameFragment
+>;
 
-export type Timing = {
-  'Self Time': number,
-  'Total Time': number,
+type FlameFragment = {
+  "ID": string;
+  "Label": string;
+
+  "Root"?: boolean;
+  "Virtual"?: boolean;
+  "Warnings"?: string[];
+  "Self Time"?: number;
+  "Total Time"?: number;
+
+  "Children"?: Node[];
+  'CTEParent'?: Node;
+  'CTEScans'?: Node[];
+  'FilterParent'?: Node;
+  'FilterChildren'?: Node[];
 };
 
-export function query(n: Node, path: Array<string>, i: number = 0): Node {
-  let matches = (n.Children || []).filter((n) => n.Label === path[i]);
-
-  i += 1;
-  if (matches.length === 1) {
-    if (i === path.length) {
-      return matches[0]
-    }
-    return query(matches[0], path, i);
+/**
+ * label attempts to derrive the text node name from a RawNode in the same way
+ * EXPLAIN ANALYZE (FORMAT TEXT) would print it. In some cases the text output
+ * of EXPLAIN contains information that is not contained in the JSON output
+ * (e.g. for Custom Scan), so this function isn't perfect.
+ *
+ * See https://github.com/postgres/postgres/blob/REL_12_0/src/backend/commands/explain.c#L1044
+ */
+export function label(n: RawNode): string {
+  let pname: string;
+  switch (n["Node Type"]) {
+    case 'Aggregate':
+      pname = 'Aggregate ???';
+      switch (n.Strategy) {
+        case 'Plain':
+          pname = 'Aggregate';
+          break;
+        case 'Sorted':
+          pname = 'GroupAggregate';
+          break;
+        case 'Hashed':
+          pname = 'HashAggregate';
+          break;
+        case 'Mixed':
+          pname = 'MixedAggregate';
+          break
+      }
+      if (n["Partial Mode"] && n["Partial Mode"] !== 'Simple') {
+        pname = n["Partial Mode"] + ' ' + pname;
+      }
+      break;
+    case 'Foreign Scan':
+      if (n.Operation) {
+        if (n.Operation === 'Select') {
+          pname = 'Foreign Scan'
+        } else {
+          pname = 'Foreign ' + n.Operation
+        }
+      } else {
+        pname = '???'
+      }
+      break;
+    case 'ModifyTable':
+      if (n.Operation !== undefined) {
+        pname = n.Operation
+      } else {
+        pname = '???'
+      }
+      break;
+    case 'Merge Join':
+      pname = 'Merge';
+      break;
+    case 'Hash Join':
+      pname = 'Hash';
+      break;
+    case 'SetOp':
+      pname = 'SetOp ???';
+      switch (n.Strategy) {
+        case 'Sorted':
+          pname = 'SetOp';
+          break;
+        case 'Hashed':
+          pname = 'HashedSetOp';
+          break;
+      }
+      pname += ' ' + n.Command
+      break;
+    default:
+      pname = n["Node Type"] || '???';
+      break;
   }
-  let pathS = path.slice(0, i).join('->');
-  let candidates = (n.Children || []).map((c) => JSON.stringify(c.Label)).join(', ');
-  throw new Error(`${matches.length} matches for: ${pathS} in: ${candidates}`);
-};
 
-export function findAll(n: Node, match: (n: Node) => boolean): Node[] {
-  const matches: Node[] = [];
-
-  const visit = (n: Node) => {
-    if (match(n)) {
-      matches.push(n);
+  if (n["Join Type"]) {
+    if (n["Join Type"] !== 'Inner') {
+      pname += ' ' + n['Join Type'] + ' Join';
+    } else if (n["Node Type"] !== 'Nested Loop') {
+      pname += ' Join';
     }
-    (n.Children || []).forEach(visit);
-  };
-  visit(n);
+  }
 
-  return matches;
+  if (n["Parallel Aware"]) {
+    pname = 'Parallel ' + pname;
+  }
+
+  if (n["Scan Direction"] !== undefined) {
+    if (n["Scan Direction"] === 'Backward') {
+      pname += ' ' + n["Scan Direction"];
+    }
+    pname += ' using ' + n["Index Name"];
+  } else if (n["Index Name"]) {
+    pname += ' on ' + n["Index Name"];
+  }
+
+  let objectname = '';
+  if (n["Relation Name"] !== undefined) {
+    objectname = n["Relation Name"];
+  } else if (n["Function Name"] !== undefined) {
+    objectname = n["Function Name"];
+  } else if (n["Table Function Name"] !== undefined) {
+    objectname = n["Table Function Name"];
+  } else if (n["CTE Name"] !== undefined) {
+    objectname = n["CTE Name"];
+  } else if (n["Tuplestore Name"] !== undefined) {
+    objectname = n["Tuplestore Name"];
+  }
+
+  if (objectname) {
+    pname += ' on '
+    if (n.Schema !== undefined) {
+      pname += quoteIdentifier(n.Schema) + '.' + quoteIdentifier(objectname);
+    } else {
+      pname += quoteIdentifier(objectname);
+    }
+    if (n.Alias && n.Alias !== objectname) {
+      pname += ' ' + n.Alias;
+    }
+  }
+
+  return pname;
 }
 
-export function findFirst(n: Node, match: (n: Node) => boolean): Node {
-  return findAll(n, match)[0];
-}
-
-/** Recursively evaluates if any numbers in the given node don't "add up". I.e.
- * returns false if a node's children total time exceeds its own time, or a node's
- * self time exceeds its total time.
- * TODO(fg) evaluate this as a per-node warning.
-* */
-export function addsUp(n: Node): boolean {
-  let childTotal = 0;
-  (n.Children || []).forEach(child => {
-    if ('Total Time' in child) {
-      childTotal += child['Total Time'];
-    }
-  });
-
-  if ('Total Time' in n) {
-    if (n['Self Time'] > n['Total Time'] || n['Total Time'] < childTotal || n['Self Time'] != n['Total Time'] - childTotal) {
-      return false;
-    }
-  }
-
-  return !(n.Children || []).some(child => !addsUp(child));
+/** TODO: Implement this! */
+function quoteIdentifier(s: string): string {
+  return s;
 }

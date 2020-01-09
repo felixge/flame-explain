@@ -1,5 +1,12 @@
 export type OptionalEmbed<T, Fragment> = T | (T & Fragment);
 
+// Disjoint returns T1 & T2, or never if the two types share one or more
+// fields. Inspired by:
+// https://spin.atomicobject.com/2019/03/25/disjoint-unions-typescript-conditional-types/
+export type Disjoint<T1, T2> = Extract<keyof T1, keyof T2> extends never
+  ? T1 & T2
+  : never
+
 export function assert(condition: any, msg?: string): asserts condition {
   if (!condition) {
     throw new Error(msg);
