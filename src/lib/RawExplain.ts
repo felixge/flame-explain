@@ -55,7 +55,7 @@ type CommonFragment = {
   "Rows Removed by Filter": number;
   "Output": string[];
   "Workers": WorkerFragment[];
-  "Plans": Node[];
+  "Plans": RawNode[];
 
   /** Average startup time / per 'Actual Loops' of this node. */
   "Actual Startup Time": number;

@@ -1,30 +1,80 @@
-import {
-  RawNode,
-  RawQuery,
-} from './RawExplain';
+import {RawNode, RawQuery, RawQueries} from './RawExplain';
 import {Disjoint} from './Util';
 
-type Node = Disjoint<
+type FlameNode = Disjoint<
   Omit<RawQuery, "Plan"> & Omit<RawNode, "Plans">,
-  FlameFragment
+  Partial<FlameFragment>
 >;
 
 type FlameFragment = {
-  "ID": string;
-  "Label": string;
+  /** Kind captures what kind of node this is. Root nodes have only Children
+  * and no other properties. */
+  "Kind": "Root" | "Query" | "Node";
 
-  "Root"?: boolean;
+  /** ID is a unique identifier present on all nodes except the Root node. */
+  "ID"?: number;
+
+  "Label"?: string;
   "Virtual"?: boolean;
   "Warnings"?: string[];
   "Self Time"?: number;
   "Total Time"?: number;
 
-  "Children"?: Node[];
-  'CTEParent'?: Node;
-  'CTEScans'?: Node[];
-  'FilterParent'?: Node;
-  'FilterChildren'?: Node[];
+
+  /** Children is an array children. */
+  "Children"?: FlameNode[];
+
+  "CTEParent"?: FlameNode;
+  "CTEScans"?: FlameNode[];
+  "FilterParent"?: FlameNode;
+  "FilterChildren"?: FlameNode[];
 };
+
+/**
+ * fromRawQueries converts the given RawQueries into a FlameNode data structure
+ * without modifying its inputs.
+ */
+export function fromRawQueries(rqs: RawQueries): FlameNode {
+  let id = 0;
+  const nextID = () => ++id;
+
+  return {
+    Kind: "Root",
+    Children: rqs.map((rq) => {
+      return fromRawNode(rq.Plan || {}, nextID);
+
+      //let n: FlameNode = {
+      //ID: i++,
+      //Kind: "Query",
+      //Label: "Query" + ((rqs.length > 1)
+      //? ' ' + (i + 1)
+      //: ''),
+      //};
+
+      //n = Object.assign({}, rq, n);
+      //delete (n as any).Plan;
+
+      //if (rq.Plan) {
+      //n.Children = [fromRawNode(rq.Plan)];
+      //}
+      //return n;
+    }),
+  };
+};
+
+function fromRawNode(rn: RawNode, nextID: () => number): FlameNode {
+  let fn: FlameNode = {
+    Kind: "Node",
+    ID: nextID(),
+    Label: label(rn),
+    Children: rn.Plans?.map(rnChild => fromRawNode(rnChild, nextID)),
+  };
+
+  fn = Object.assign({}, rn, fn);
+  delete (fn as RawNode).Plans;
+
+  return fn;
+}
 
 /**
  * label attempts to derrive the text node name from a RawNode in the same way
