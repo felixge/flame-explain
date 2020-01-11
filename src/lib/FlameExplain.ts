@@ -1,76 +1,100 @@
 import {RawNode, RawQuery, RawQueries} from './RawExplain';
 import {Disjoint} from './Util';
 
-type FlameNode = Disjoint<
+export type FlameNode = Disjoint<
   Omit<RawQuery, "Plan"> & Omit<RawNode, "Plans">,
-  Partial<FlameFragment>
+  FlameFragment
 >;
 
 type FlameFragment = {
   /** Kind captures what kind of node this is. Root nodes have only Children
   * and no other properties. */
-  "Kind": "Root" | "Query" | "Node";
+  "Kind": "Root" | "Query" | "Execution" | "Planning" | "Node";
 
   /** ID is a unique identifier present on all nodes except the Root node. */
   "ID"?: number;
 
+  /** Label is a short human-readable description of the node, present for all
+  * nodes except the Root node. */
   "Label"?: string;
-  "Virtual"?: boolean;
-  "Warnings"?: string[];
-  "Self Time"?: number;
-  "Total Time"?: number;
+
+  //"Virtual"?: boolean;
+  //"Warnings"?: string[];
+  //"Self Time"?: number;
+  //"Total Time"?: number;
 
 
   /** Children is an array children. */
   "Children"?: FlameNode[];
 
-  "CTEParent"?: FlameNode;
-  "CTEScans"?: FlameNode[];
-  "FilterParent"?: FlameNode;
-  "FilterChildren"?: FlameNode[];
+  //"CTEParent"?: FlameNode;
+  //"CTEScans"?: FlameNode[];
+  //"FilterParent"?: FlameNode;
+  //"FilterChildren"?: FlameNode[];
+};
+
+export type flameOptions = Partial<{
+  VirtualQueryNodes: boolean,
+}>;
+
+const defaultOptions: flameOptions = {
+  /** VirtualQueryNodes produces a virtual node Query node for each query that
+   * contains virtual nodes 'Execution Time' and 'Planning Time'. */
+  VirtualQueryNodes: true,
 };
 
 /**
  * fromRawQueries converts the given RawQueries into a FlameNode data structure
  * without modifying its inputs.
  */
-export function fromRawQueries(rqs: RawQueries): FlameNode {
+export function fromRawQueries(
+  rqs: RawQueries,
+  opt: flameOptions = defaultOptions,
+): FlameNode {
   let id = 0;
-  const nextID = () => ++id;
+  const nextNode = (fn: FlameNode): FlameNode => Object.assign(fn, {ID: ++id});
 
-  return {
-    Kind: "Root",
-    Children: rqs.map((rq) => {
-      return fromRawNode(rq.Plan || {}, nextID);
+  const root: FlameNode = {Kind: "Root"};
+  rqs.forEach((rq, i) => {
+    let parent = root;
+    if (opt.VirtualQueryNodes) {
+      const query = nextNode({
+        Kind: 'Query',
+        Label: 'Query' + ((rqs.length > 1)
+          ? ' ' + (i + 1)
+          : ''),
+      });
 
-      //let n: FlameNode = {
-      //ID: i++,
-      //Kind: "Query",
-      //Label: "Query" + ((rqs.length > 1)
-      //? ' ' + (i + 1)
-      //: ''),
-      //};
+      parent.Children = (parent.Children || []).concat(query);
+      parent = query;
 
-      //n = Object.assign({}, rq, n);
-      //delete (n as any).Plan;
+      const planning = nextNode({Kind: "Planning", Label: "Planning"});
+      const execution = nextNode({Kind: "Execution", Label: "Execution"});
+      parent.Children = [planning, execution];
 
-      //if (rq.Plan) {
-      //n.Children = [fromRawNode(rq.Plan)];
-      //}
-      //return n;
-    }),
-  };
+      parent = execution;
+    }
+
+    if (rq.Plan) {
+      const firstNode = fromRawNode(rq.Plan || {}, nextNode);
+      parent.Children = (parent.Children || []).concat(firstNode);
+    }
+  });
+
+  return root;
 };
 
-function fromRawNode(rn: RawNode, nextID: () => number): FlameNode {
-  let fn: FlameNode = {
+function fromRawNode(
+  rn: RawNode,
+  nextNode: (fn: FlameNode) => FlameNode
+): FlameNode {
+  let fn = nextNode({
     Kind: "Node",
-    ID: nextID(),
     Label: label(rn),
-    Children: rn.Plans?.map(rnChild => fromRawNode(rnChild, nextID)),
-  };
+  });
 
   fn = Object.assign({}, rn, fn);
+  fn.Children = rn.Plans?.map(rnChild => fromRawNode(rnChild, nextNode));
   delete (fn as RawNode).Plans;
 
   return fn;
