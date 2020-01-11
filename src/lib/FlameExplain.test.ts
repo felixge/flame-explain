@@ -1,6 +1,14 @@
-import {fromRawQueries, label, FlameNode} from './FlameExplain';
+import {
+  fromRawQueries,
+  label,
+  FlameNode,
+  parseSubplanName,
+  parseFilter,
+} from './FlameExplain';
 import NestedLoop from './example_plans/NestedLoop';
 import RewriteTwoQueries from './example_plans/RewriteTwoQueries';
+import OneInitFilter from './example_plans/OneInitFilter';
+import OneInitOneTimeFilter from './example_plans/OneInitOneTimeFilter';
 import examples from './example_plans';
 
 describe('label', () => {
@@ -240,7 +248,7 @@ describe('fromRawQueries', () => {
         .toEqual(Object
           .keys(queries[0].Plan || {})
           .filter(key => key !== 'Plans')
-          .concat(['Children', 'Kind', 'Label', 'ID'])
+          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID'])
           .sort());
       expect(child).not.toBe(queries[0].Plan);
 
@@ -304,7 +312,32 @@ describe('fromRawQueries', () => {
       expect(child2.Kind).toEqual('Query');
       expect(child2.Label).toEqual('Query 2');
     });
+  });
 
+  describe('setFilterRefs', () => {
+    test('OneInitFilter', () => {
+      const {queries} = OneInitFilter;
+      const root = fromRawQueries(queries, {});
+      const filter = root.Children?.[0];
+      const init = filter?.Children?.[0];
+
+      expect(filter?.["Filter"]).toEqual("(g > $0)");
+      expect(init?.["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
+      expect(filter?.["Filter Parent"]).toBe(init);
+      expect(init?.["Filter Children"]?.[0]).toBe(filter);
+    });
+
+    test('OneInitOneTimeFilter', () => {
+      const {queries} = OneInitOneTimeFilter;
+      const root = fromRawQueries(queries, {});
+      const filter = root.Children?.[0];
+      const init = filter?.Children?.[0];
+
+      expect(filter?.["One-Time Filter"]).toEqual("$0");
+      expect(init?.["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
+      expect(filter?.["Filter Parent"]).toBe(init);
+      expect(init?.["Filter Children"]?.[0]).toBe(filter);
+    });
   });
 
   // TODO: It'd be nice to make sure that these properties hold for all
@@ -357,5 +390,39 @@ describe('fromRawQueries', () => {
         });
       }
     });
+
+    describe('Parent is set', () => {
+      for (let key in examples) {
+        test(key, () => {
+          const verify = (fn: FlameNode, parent?: FlameNode) => {
+            if (parent) {
+              expect(fn.Parent).toBe(parent);
+            }
+            fn.Children?.map(c => verify(c, fn));
+          }
+          verify(fromRawQueries(examples[key].queries));
+        });
+      }
+    });
   });
+});
+
+test('parseSubplanName', () => {
+  expect(parseSubplanName("InitPlan 1 (returns $0)")).toEqual({
+    ID: 1,
+    Type: "InitPlan",
+    Returns: [0],
+  });
+  expect(parseSubplanName("SubPlan 2 (returns $1,$2,$3)")).toEqual({
+    ID: 2,
+    Type: "SubPlan",
+    Returns: [1, 2, 3],
+  });
+});
+
+test('parseFilter', () => {
+  expect(parseFilter('')).toEqual([]);
+  expect(parseFilter('g = $0')).toEqual([0]);
+  expect(parseFilter('g < $2 AND g > $4')).toEqual([2, 4]);
+  expect(parseFilter('a < $2 AND b > $2 OR $5 = 1')).toEqual([2, 2, 5]);
 });

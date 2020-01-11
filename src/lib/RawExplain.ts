@@ -47,7 +47,39 @@ export type RawNode = Partial<
 
 type CommonFragment = {
   "Node Type": NodeType;
-  "Parent Relationship": 'InitPlan' | 'Outer' | 'Inner' | 'Member' | 'Subquery';
+
+  /**
+   * "Parent Relationship" is available for all plan nodes except the root
+   * node. It gives some hints on how this node is referenced and executed by
+   * its parent node.
+   *
+   * - InitPlan: An initplan is a sub-SELECT that only needs to be executed
+   * once because it has no dependency on the immediately surrounding query
+   * level [1].
+   * - Outer: An Outer (aka left) node is the primary child node executed by a
+   * parent node. Usually in order to combine it with results from an Inner
+   * node if present.
+   * - Inner: The Inner (aka right) is a secondary child node that is executed
+   * by a parent node that combines it with an Outer node. E.g. a NestedLoop
+   * will execute the Inner node for every row produced by the Outer node.
+   * - Member: Is a child node used by parent nodes that can execute more than
+   * two nodes. E.g. an Append node that's used for UNION queries can have many
+   * Member nodes.
+   * - Subquery: This relationship is used whenever the parent node is a
+   * "Subquery Scan". I'm not sure what kind of queries produce this.
+   * - SubPlan: A SubPlan is a sub-SELECT that is executed for every execution
+   * of its parent node because of references to other parts of the query.
+   *
+   * [1] https://www.postgresql.org/message-id/4572.1280671706%40sss.pgh.pa.us
+   */
+  "Parent Relationship": (
+    'InitPlan' |
+    'Outer' |
+    'Inner' |
+    'Member' |
+    'Subquery' |
+    'SubPlan'
+  );
   /** Available starting in PostgreSQL 9.6 and later for parallel query. */
   "Parallel Aware": boolean;
   "Subplan Name": string,

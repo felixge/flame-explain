@@ -18,14 +18,21 @@ type FlameFragment = {
   * nodes except the Root node. */
   "Label"?: string;
 
+  /** Parent points to the parent node, which simplifies some of the transform
+   * algorithms. Present for all nodes except the Root node. */
+  "Parent"?: FlameNode;
+  /** Children is an array children. */
+  "Children"?: FlameNode[];
+
+  "Filter Parent"?: FlameNode;
+  "Filter Children"?: FlameNode[];
+
   //"Virtual"?: boolean;
   //"Warnings"?: string[];
   //"Self Time"?: number;
   //"Total Time"?: number;
 
 
-  /** Children is an array children. */
-  "Children"?: FlameNode[];
 
   //"CTEParent"?: FlameNode;
   //"CTEScans"?: FlameNode[];
@@ -79,7 +86,11 @@ export function fromRawQueries(
       const firstNode = fromRawNode(rq.Plan || {}, nextNode);
       parent.Children = (parent.Children || []).concat(firstNode);
     }
+
+    setFilterRefs(parent);
   });
+
+  setParents(root);
 
   return root;
 };
@@ -94,10 +105,103 @@ function fromRawNode(
   });
 
   fn = Object.assign({}, rn, fn);
-  fn.Children = rn.Plans?.map(rnChild => fromRawNode(rnChild, nextNode));
+  fn.Children = rn.Plans?.map(child => fromRawNode(child, nextNode));
   delete (fn as RawNode).Plans;
 
   return fn;
+}
+
+/** setParents sets the Parent field of all nodes. */
+function setParents(fn: FlameNode, parent?: FlameNode): FlameNode {
+  if (parent) {
+    fn.Parent = parent;
+  }
+  fn.Children?.forEach(c => setParents(c, fn));
+  return fn;
+}
+
+/** setFilterRefs sets the "Filter Parent" and "Filter Children" references
+* for this plan.*/
+function setFilterRefs(fn: FlameNode, root?: FlameNode): FlameNode {
+  root = root || fn;
+  fn.Children?.forEach(c => setFilterRefs(c, root));
+
+  if (!fn["Subplan Name"]) {
+    return fn;
+  }
+
+  const sp = parseSubplanName(fn["Subplan Name"]);
+  if (!sp) {
+    return fn;
+  }
+
+  // Subplan IDs (contained in Subplan Name) are unique across the whole query
+  // [1] so we visit all nodes from the root node to look for nodes that
+  // reference this node in a filter condition.
+  // [1] https://github.com/postgres/postgres/blob/REL_12_1/src/backend/optimizer/plan/subselect.c#L540
+  const visit = (fn2: FlameNode) => {
+    fn2.Children?.forEach(visit);
+
+    const filters = [fn2["One-Time Filter"], fn2.Filter];
+    // isRef is true if fn2 has filter that references fn's "Subplan Name".
+    const isRef = filters.some(f => {
+      let refs = f
+        ? parseFilter(f)
+        : [];
+      return refs.some(ref => sp.Returns.includes(ref));
+    });
+
+    if (isRef) {
+      fn2["Filter Parent"] = fn;
+      fn["Filter Children"] = (fn["Filter Children"] || []).concat(fn2);
+    }
+  }
+  visit(root);
+
+  return fn;
+}
+
+
+/**
+ * parseSubplanName parse the given "Subplan Name" string, see [1][2].
+ *
+ * [1] https://github.com/postgres/postgres/blob/REL_12_1/src/backend/optimizer/plan/subselect.c#L2909
+ * [2] https://github.com/postgres/postgres/blob/REL_12_1/src/backend/optimizer/plan/subselect.c#L556-L572
+ */
+export function parseSubplanName(name: string): subplanName | undefined {
+  const m = name.match(/^([^ ]+) (\d+) \(returns ([^)]+)\)$/);
+  if (!m) {
+    return;
+  }
+
+  const returns = m[3].split(',').map(dollarID => {
+    return parseInt(dollarID.substr(1), 10);
+  });
+
+  return {
+    Type: m[1],
+    ID: parseInt(m[2], 10),
+    Returns: returns,
+  };
+}
+
+type subplanName = {
+  Type: string;
+  ID: number;
+  Returns: number[];
+};
+
+
+/**
+ * parseFilter parses a filter expression as found in "Filter" or "One-Time
+ * Filter" and returns a list of all plan id references.
+ *
+ * TODO: The function won't work correctly if the filter contains identifiers
+ * that look like plan id references, but fixing this would require complicated
+ * parsing.
+ */
+export function parseFilter(filter: string): number[] {
+  return (filter.match(/\$\d+/g) || []).map(ref => parseInt(ref.substr(1), 10));
 }
 
 /**
