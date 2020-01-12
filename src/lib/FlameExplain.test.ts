@@ -311,13 +311,15 @@ describe('fromRawQueries', () => {
       const {queries} = RewriteTwoQueries;
       const root = fromRawQueries(queries, opt);
 
-      expect(root.Children?.length).toEqual(2);
+      expect(root.Children?.length).toEqual(1);
+      const [queriesNode] = root.Children;
+      expect(queriesNode.Kind).toEqual('Queries');
+      expect(queriesNode.Label).toEqual('Queries');
 
-      const child1 = (root.Children || [])[0];
+      expect(queriesNode.Children?.length).toEqual(2);
+      const [child1, child2] = queriesNode.Children;
       expect(child1.Kind).toEqual('Query');
       expect(child1.Label).toEqual('Query 1');
-
-      const child2 = (root.Children || [])[1];
       expect(child2.Kind).toEqual('Query');
       expect(child2.Label).toEqual('Query 2');
     });

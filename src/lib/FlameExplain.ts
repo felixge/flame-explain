@@ -9,7 +9,7 @@ export type FlameNode = Disjoint<
 type FlameFragment = {
   /** Kind captures what kind of node this is. Root nodes have only Children
   * and no other properties. */
-  "Kind": "Root" | "Query" | "Planning" | "Execution" | "Node";
+  "Kind": "Root" | "Queries" | "Query" | "Planning" | "Execution" | "Node";
   /** ID is a unique identifier present on all nodes except the Root node. */
   "ID"?: number;
   /** Label is a short human-readable description of the node, present for all
@@ -60,9 +60,21 @@ export function fromRawQueries(
   opt: flameOptions = defaultOptions,
 ): FlameNode {
   const root: FlameNode = {Kind: "Root"};
-  rqs.filter(rq => rq.Plan).forEach((rq, i) => {
+  rqs = rqs.filter(rq => rq.Plan);
+
+  let queryRoot = root;
+  if (opt.VirtualQueryNodes && rqs.length > 1) {
+    queryRoot = {
+      Kind: 'Queries',
+      Label: 'Queries',
+      Parent: root,
+    }
+    root.Children = [queryRoot];
+  }
+
+  rqs.forEach((rq, i) => {
     let query: FlameNode | undefined;
-    let parent = root;
+    let parent = queryRoot;
     if (opt.VirtualQueryNodes) {
       query = {
         Kind: 'Query',
@@ -70,7 +82,7 @@ export function fromRawQueries(
           ? ' ' + (i + 1)
           : ''),
       };
-      root.Children = (root.Children || []).concat(query);
+      parent.Children = (parent.Children || []).concat(query);
 
       const planning: FlameNode = {Kind: "Planning", Label: "Planning"};
       if (rq["Planning Time"]) {
@@ -87,7 +99,7 @@ export function fromRawQueries(
     const fn = fromRawNode(rq.Plan || {});
     parent.Children = (parent.Children || []).concat(fn);
 
-    setParents(query || fn, root);
+    setParents(query || fn, queryRoot);
     setFilterRefs(fn);
     setCTERefs(fn);
   });
