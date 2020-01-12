@@ -9,7 +9,7 @@ export type FlameNode = Disjoint<
 type FlameFragment = {
   /** Kind captures what kind of node this is. Root nodes have only Children
   * and no other properties. */
-  "Kind": "Root" | "Query" | "Execution" | "Planning" | "Node";
+  "Kind": "Root" | "Query" | "Planning" | "Execution" | "Node";
 
   /** ID is a unique identifier present on all nodes except the Root node. */
   "ID"?: number;
@@ -24,20 +24,21 @@ type FlameFragment = {
   /** Children is an array children. */
   "Children"?: FlameNode[];
 
+  /** If this node has a "Filter" or "One-Time Filter" references another
+  * node in the plan, then this node is referenced here. */
   "Filter Parent"?: FlameNode;
+  /** Similar to "Filter Parent" above, this array references all nodes that
+   * reference this node in one of their filters. */
   "Filter Children"?: FlameNode[];
+
+
+  "CTE Node"?: FlameNode;
+  "CTE Scans"?: FlameNode[];
 
   //"Virtual"?: boolean;
   //"Warnings"?: string[];
   //"Self Time"?: number;
   //"Total Time"?: number;
-
-
-
-  //"CTEParent"?: FlameNode;
-  //"CTEScans"?: FlameNode[];
-  //"FilterParent"?: FlameNode;
-  //"FilterChildren"?: FlameNode[];
 };
 
 export type flameOptions = Partial<{
@@ -64,33 +65,31 @@ export function fromRawQueries(
   const root: FlameNode = {Kind: "Root"};
   rqs.forEach((rq, i) => {
     let parent = root;
+    let query: FlameNode | undefined;
     if (opt.VirtualQueryNodes) {
-      const query = nextNode({
+      query = nextNode({
         Kind: 'Query',
         Label: 'Query' + ((rqs.length > 1)
           ? ' ' + (i + 1)
           : ''),
       });
 
-      parent.Children = (parent.Children || []).concat(query);
-      parent = query;
-
       const planning = nextNode({Kind: "Planning", Label: "Planning"});
       const execution = nextNode({Kind: "Execution", Label: "Execution"});
-      parent.Children = [planning, execution];
-
+      root.Children = (root.Children || []).concat(query);
+      query.Children = [planning, execution];
       parent = execution;
     }
 
     if (rq.Plan) {
-      const firstNode = fromRawNode(rq.Plan || {}, nextNode);
-      parent.Children = (parent.Children || []).concat(firstNode);
+      const fn = fromRawNode(rq.Plan || {}, nextNode);
+      parent.Children = (parent.Children || []).concat(fn);
+
+      setParents(query || fn, root);
+      setFilterRefs(fn);
+      setCTERefs(fn);
     }
-
-    setFilterRefs(parent);
   });
-
-  setParents(root);
 
   return root;
 };
@@ -112,27 +111,24 @@ function fromRawNode(
 }
 
 /** setParents sets the Parent field of all nodes. */
-function setParents(fn: FlameNode, parent?: FlameNode): FlameNode {
-  if (parent) {
-    fn.Parent = parent;
-  }
+function setParents(fn: FlameNode, parent: FlameNode) {
+  fn.Parent = parent;
   fn.Children?.forEach(c => setParents(c, fn));
-  return fn;
 }
 
 /** setFilterRefs sets the "Filter Parent" and "Filter Children" references
 * for this plan.*/
-function setFilterRefs(fn: FlameNode, root?: FlameNode): FlameNode {
+function setFilterRefs(fn: FlameNode, root?: FlameNode) {
   root = root || fn;
   fn.Children?.forEach(c => setFilterRefs(c, root));
 
   if (!fn["Subplan Name"]) {
-    return fn;
+    return;
   }
 
   const sp = parseSubplanName(fn["Subplan Name"]);
   if (!sp) {
-    return fn;
+    return;
   }
 
   // Subplan IDs (contained in Subplan Name) are unique across the whole query
@@ -158,7 +154,30 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode): FlameNode {
   }
   visit(root);
 
-  return fn;
+  return;
+}
+
+function setCTERefs(fn: FlameNode) {
+  fn.Children?.forEach(setCTERefs);
+
+  if (fn["Node Type"] !== "CTE Scan") {
+    return;
+  }
+
+  let parent: FlameNode | undefined = fn;
+  while (parent) {
+    const cteNode = parent.Children?.find(child =>
+      child["Parent Relationship"] === "InitPlan" &&
+      child["Subplan Name"] === 'CTE ' + fn["CTE Name"])
+
+    if (cteNode) {
+      fn["CTE Node"] = cteNode;
+      cteNode["CTE Scans"] = (cteNode["CTE Scans"] || []).concat(fn);
+      return;
+    }
+
+    parent = parent.Parent;
+  };
 }
 
 

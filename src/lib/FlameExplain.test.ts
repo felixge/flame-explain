@@ -9,6 +9,8 @@ import NestedLoop from './example_plans/NestedLoop';
 import RewriteTwoQueries from './example_plans/RewriteTwoQueries';
 import OneInitFilter from './example_plans/OneInitFilter';
 import OneInitOneTimeFilter from './example_plans/OneInitOneTimeFilter';
+import CTENameDupe from './example_plans/CTENameDupe';
+import CTESimple from './example_plans/CTESimple';
 import examples from './example_plans';
 
 describe('label', () => {
@@ -282,9 +284,10 @@ describe('fromRawQueries', () => {
   });
 
   describe('opt = {VirtualQueryNodes: true}', () => {
+    const opt = {VirtualQueryNodes: true};
     test('NestedLoop', () => {
       const {queries} = NestedLoop;
-      const root = fromRawQueries(queries, {VirtualQueryNodes: true});
+      const root = fromRawQueries(queries, opt);
       expect(root.Children?.length).toEqual(1);
       const [c1] = root.Children;
       expect(c1.Kind).toEqual('Query');
@@ -300,7 +303,7 @@ describe('fromRawQueries', () => {
 
     test('RewriteTwoQueries', () => {
       const {queries} = RewriteTwoQueries;
-      const root = fromRawQueries(queries, {VirtualQueryNodes: true});
+      const root = fromRawQueries(queries, opt);
 
       expect(root.Children?.length).toEqual(2);
 
@@ -337,6 +340,43 @@ describe('fromRawQueries', () => {
       expect(init?.["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
       expect(filter?.["Filter Parent"]).toBe(init);
       expect(init?.["Filter Children"]?.[0]).toBe(filter);
+    });
+  });
+
+  describe('setCTERefs', () => {
+    test('CTESimple', () => {
+      const {queries} = CTESimple;
+      const root = fromRawQueries(queries, {});
+      const [cteScan] = root.Children;
+      const [cte] = cteScan.Children;
+
+      expect(cteScan["CTE Node"]).toBe(cte);
+      expect(cte['CTE Scans']).toEqual([cteScan]);
+    });
+
+    test('CTENameDupe', () => {
+      const {queries} = CTENameDupe;
+      const root = fromRawQueries(queries, {});
+
+      const [append] = root.Children;
+      const [innerLoopA, cteB, outerLoop1, outerLoop2] = append.Children;
+      const [innerA, innerAScan1, innerAScan2] = innerLoopA.Children;
+
+      expect(innerAScan1["CTE Node"]).toBe(innerA);
+      expect(innerAScan2["CTE Node"]).toBe(innerA);
+      expect(innerA["CTE Scans"]).toEqual([innerAScan1, innerAScan2]);
+
+      let aScans: FlameNode[] = [];
+      let bScans: FlameNode[] = [];
+      [outerLoop1, outerLoop2].forEach(loop => {
+        const [scanA, scanB] = loop.Children;
+        expect(scanA["CTE Node"]).toBe(innerLoopA);
+        expect(scanB["CTE Node"]).toBe(cteB);
+        aScans.push(scanA);
+        bScans.push(scanB);
+      });
+      expect(innerLoopA["CTE Scans"]).toEqual(aScans);
+      expect(cteB["CTE Scans"]).toEqual(bScans);
     });
   });
 
