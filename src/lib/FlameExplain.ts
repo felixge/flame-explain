@@ -54,8 +54,9 @@ export function fromRawQueries(
   opt: flameOptions = defaultOptions,
 ): FlameNode {
   const root: FlameNode = {Kind: "Root"};
-  const children = rqs.filter(rq => rq.Plan).map((rq, i) => {
+  rqs.filter(rq => rq.Plan).forEach((rq, i) => {
     let query: FlameNode | undefined;
+    let parent = root;
     if (opt.VirtualQueryNodes) {
       query = {
         Kind: 'Query',
@@ -63,25 +64,21 @@ export function fromRawQueries(
           ? ' ' + (i + 1)
           : ''),
       };
+      root.Children = (root.Children || []).concat(query);
 
       const planning: FlameNode = {Kind: "Planning", Label: "Planning"};
       const execution: FlameNode = {Kind: "Execution", Label: "Execution"};
       query.Children = [planning, execution];
+      parent = execution;
     }
 
     const fn = fromRawNode(rq.Plan || {});
-    query = query || fn;
+    parent.Children = (parent.Children || []).concat(fn);
 
-    setParents(query, root);
+    setParents(query || fn, root);
     setFilterRefs(fn);
     setCTERefs(fn);
-
-    return query;
   });
-
-  if (children.length > 0) {
-    root.Children = children;
-  }
 
   setIDs(root);
 

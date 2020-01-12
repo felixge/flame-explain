@@ -300,6 +300,9 @@ describe('fromRawQueries', () => {
       expect(cc1.Label).toEqual("Planning");
       expect(cc2.Kind).toEqual("Execution");
       expect(cc2.Label).toEqual("Execution");
+
+      const [loop] = cc2?.Children;
+      expect(loop.Label).toEqual("Nested Loop");
     });
 
     test('RewriteTwoQueries', () => {
