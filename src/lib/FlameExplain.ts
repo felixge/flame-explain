@@ -39,16 +39,26 @@ type FlameFragment = {
   "Total Time"?: number;
   /** Self Time is like Total Time, but excludes time spent in child nodes. */
   "Self Time"?: number;
+  /** Warnings contains a list of problems encountered while transforming the
+  * data.*/
+  "Warnings"?: [];
+
+  /** TODO: remove */
+  "Virtual"?: boolean;
 };
 
 export type flameOptions = Partial<{
   VirtualQueryNodes: boolean,
+  // TODO: remove
+  VirtualField: boolean;
 }>;
 
 const defaultOptions: flameOptions = {
   /** VirtualQueryNodes produces a virtual node Query node for each query that
    * contains virtual nodes 'Execution Time' and 'Planning Time'. */
   VirtualQueryNodes: true,
+
+  VirtualField: false,
 };
 
 /**
@@ -107,6 +117,9 @@ export function fromRawQueries(
   setIDs(root);
   setTotalTime(root);
   setSelfTime(root);
+  if (opt.VirtualField) {
+    setVirtual(root);
+  }
 
   return root;
 };
@@ -246,6 +259,11 @@ function setSelfTime(fn: FlameNode) {
     }
   });
   fn["Self Time"] = fn["Total Time"] - childTotal;
+}
+
+function setVirtual(fn: FlameNode) {
+  fn.Children?.forEach(setVirtual);
+  fn.Virtual = fn.Kind !== 'Node';
 }
 
 function setIDs(root: FlameNode) {

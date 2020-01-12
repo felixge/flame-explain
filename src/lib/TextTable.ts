@@ -1,25 +1,12 @@
-import {Node as FNode} from './FlameExplain';
+import {FlameNode} from './FlameExplain';
 import {formatDuration} from './Util';
 // @ts-ignore no type definitions
 import AsciiTable from 'ascii-table';
 
-export type Column = keyof Row;
-
-export type Row = {
-  '#': string,
-  'Actual Loops': string,
-  'Actual Rows': string,
-  'Actual Total Time': string,
-  'Label': string,
-  'Node Type': string,
-  'Self Time': string,
-  'Total Time': string,
-  'Virtual': string,
-  'Source': FNode,
-};
+export type Column = keyof FlameNode;
 
 export function textTable(
-  n: FNode,
+  fn: FlameNode,
   {columns = [], title = ''}: {
     columns: Column[],
     title?: string
@@ -27,7 +14,12 @@ export function textTable(
 ): string {
   let table = new AsciiTable(title);
   let warnTable = new AsciiTable();
-  table.setHeading(...columns);
+  table.setHeading(...columns.map(c => {
+    if (c === 'ID') {
+      return '#';
+    }
+    return c;
+  }));
   warnTable.setHeading('#', 'Warning');
 
   columns.forEach((col, i) => {
@@ -36,25 +28,20 @@ export function textTable(
     }
   });
 
-  let rowNum = 1;
   let warnCount = 0;
-  const visit = (n: FNode, depth = 0) => {
-    if (!n.Root) {
-      const row = toRow(n, {depth: depth, rowNum: rowNum});
-      const colVals = columns.map(c => row[c]);
-      table.addRow(...colVals);
-      n.Warnings?.forEach(warning => {
-        warnTable.addRow(rowNum, warning);
+  const visit = (fn: FlameNode, depth = 0) => {
+    if (fn.Kind !== 'Root') {
+      const vals = columns.map(c => flameString(fn, c, {depth}));
+      table.addRow(...vals);
+      fn.Warnings?.forEach(warning => {
+        warnTable.addRow(fn.ID, warning);
         warnCount += 1;
       });
-
-      rowNum++;
-      depth++;
     }
 
-    (n.Children || []).forEach(child => visit(child, depth));
+    fn.Children?.forEach(child => visit(child, depth + 1));
   }
-  visit(n);
+  visit(fn);
 
   let out = table.toString();
   if (warnCount > 0) {
@@ -63,70 +50,108 @@ export function textTable(
   return out;
 }
 
-type extractOptions = {
-  rowNum?: number,
-  depth?: number,
+type flameStringOptions = {
+  depth?: number;
 };
 
-export function toRow(n: FNode, o?: extractOptions): Row {
-  return {
-    '#': o?.rowNum?.toString() || '',
-    'Actual Loops': ('Actual Loops' in n.Source)
-      ? n.Source["Actual Loops"].toString()
-      : '',
-    'Actual Rows': ('Actual Rows' in n.Source)
-      ? n.Source["Actual Rows"].toString()
-      : '',
-    'Actual Total Time': ('Actual Total Time' in n.Source)
-      ? formatDuration(n.Source["Actual Total Time"])
-      : '',
-    'Label': '  '.repeat(o?.depth || 0) + n.Label,
-    'Node Type': ('Node Type' in n.Source)
-      ? n.Source["Node Type"]
-      : '',
-    'Self Time': ('Self Time' in n)
-      ? formatDuration(n["Self Time"])
-      : '',
-    'Source': n,
-    'Total Time': ('Total Time' in n)
-      ? formatDuration(n["Total Time"])
-      : '',
-    'Virtual': (n.Virtual)
-      ? 'x'
-      : '',
-  };
+function flameString(fn: FlameNode, col: Column, opt: flameStringOptions): string {
+  if (fn[col] === undefined) {
+    return '';
+  }
+
+  let val = '';
+  switch (col) {
+    case 'Actual Total Time':
+    case 'Actual Startup Time':
+    case 'Total Time':
+    case 'Self Time':
+    case 'Execution Time':
+    case 'Planning Time':
+      val = formatDuration(fn[col] as number);
+      break;
+    default:
+      let colVal = fn[col];
+      if (typeof colVal === 'boolean') {
+        val = colVal ? 'x' : '';
+      } else if (typeof colVal === 'string' || typeof colVal === 'number') {
+        val = colVal.toString();
+      } else {
+        val = 'flameString: ' + typeof colVal + ' not supported yet';
+      }
+      break;
+  }
+
+  if (col === 'Label' && opt.depth !== undefined) {
+    val = '  '.repeat(opt.depth - 1) + val;
+  }
+
+  return val;
 }
 
-type path = '*' | '**' | string;
+//type extractOptions = {
+  //rowNum?: number,
+  //depth?: number,
+//};
 
-export function queryAll(n: FNode, ...path: path[]): Row[] {
-  const rows: Row[] = [];
-  const visit = (n: FNode, path: string[]) => {
-    if (path.length === 0) {
-      return;
-    }
+//export function toRow(n: FNode, o?: extractOptions): Row {
+  //return {
+    //'#': o?.rowNum?.toString() || '',
+    //'Actual Loops': ('Actual Loops' in n.Source)
+      //? n.Source["Actual Loops"].toString()
+      //: '',
+    //'Actual Rows': ('Actual Rows' in n.Source)
+      //? n.Source["Actual Rows"].toString()
+      //: '',
+    //'Actual Total Time': ('Actual Total Time' in n.Source)
+      //? formatDuration(n.Source["Actual Total Time"])
+      //: '',
+    //'Label': '  '.repeat(o?.depth || 0) + n.Label,
+    //'Node Type': ('Node Type' in n.Source)
+      //? n.Source["Node Type"]
+      //: '',
+    //'Self Time': ('Self Time' in n)
+      //? formatDuration(n["Self Time"])
+      //: '',
+    //'Source': n,
+    //'Total Time': ('Total Time' in n)
+      //? formatDuration(n["Total Time"])
+      //: '',
+    //'Virtual': (n.Virtual)
+      //? 'x'
+      //: '',
+  //};
+//}
 
-    if (path[0] === n.Label || path[0] === '*') {
-      path = path.slice(1);
-    } else if (path[0] === '**' && path[1] === n.Label) {
-      path = path.slice(2);
-    } else if (path[0] === '**') {
-    } else {
-      return;
-    }
+//type path = '*' | '**' | string;
 
-    if (path.length === 0) {
-      rows.push(toRow(n));
-      return;
-    }
+//export function queryAll(n: FNode, ...path: path[]): Row[] {
+  //const rows: Row[] = [];
+  //const visit = (n: FNode, path: string[]) => {
+    //if (path.length === 0) {
+      //return;
+    //}
 
-    (n.Children || []).forEach(child => visit(child, path));
-  };
-  (n.Children || []).forEach(child => visit(child, path))
+    //if (path[0] === n.Label || path[0] === '*') {
+      //path = path.slice(1);
+    //} else if (path[0] === '**' && path[1] === n.Label) {
+      //path = path.slice(2);
+    //} else if (path[0] === '**') {
+    //} else {
+      //return;
+    //}
 
-  return rows;
-};
+    //if (path.length === 0) {
+      //rows.push(toRow(n));
+      //return;
+    //}
 
-export function queryFirst(n: FNode, ...path: string[]): Row {
-  return queryAll(n, ...path)[0];
-};
+    //(n.Children || []).forEach(child => visit(child, path));
+  //};
+  //(n.Children || []).forEach(child => visit(child, path))
+
+  //return rows;
+//};
+
+//export function queryFirst(n: FNode, ...path: string[]): Row {
+  //return queryAll(n, ...path)[0];
+//};
