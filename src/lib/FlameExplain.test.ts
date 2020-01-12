@@ -241,7 +241,9 @@ describe('fromRawQueries', () => {
     test('NestedLoop', () => {
       const {queries} = NestedLoop;
       const root = fromRawQueries(queries, {});
-      expect(Object.keys(root).sort()).toEqual(['Children', 'Kind']);
+      expect(Object.keys(root).sort()).toEqual(
+        ['Children', 'Kind', 'Self Time', 'Total Time']
+      );
 
       expect(root.Children?.length).toEqual(1);
       const child = (root.Children || [])[0];
@@ -251,7 +253,7 @@ describe('fromRawQueries', () => {
         .toEqual(Object
           .keys(queries[0].Plan || {})
           .filter(key => key !== 'Plans')
-          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID'])
+          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID', 'Self Time', 'Total Time'])
           .sort());
       expect(child).not.toBe(queries[0].Plan);
 
@@ -457,6 +459,26 @@ describe('fromRawQueries', () => {
               expect(fn.Parent).toBe(parent);
             }
             fn.Children?.map(c => verify(c, fn));
+          }
+          verify(fromRawQueries(examples[key].queries));
+        });
+      }
+    });
+
+    describe('Total Time and Self Time is set', () => {
+      for (let key in examples) {
+        test(key, () => {
+          const verify = (fn: FlameNode) => {
+            fn.Children?.forEach(verify);
+            if (fn.Kind === 'Root') {
+              return;
+            }
+
+            if (typeof fn["Total Time"] !== 'number') {
+              console.log(fn);
+            }
+            expect(typeof fn["Total Time"]).toEqual("number");
+            expect(typeof fn["Self Time"]).toEqual("number");
           }
           verify(fromRawQueries(examples[key].queries));
         });

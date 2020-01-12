@@ -33,6 +33,12 @@ type FlameFragment = {
   /** If this node is a CTE InitPlan, then all CTE Scan nodes that use it are
   * referenced here. */
   "CTE Scans"?: FlameNode[];
+  /** Total Time is derived from "Actual Total Time" and attempts to represent
+   * the total amount of wall clock time that can be attributed to this node
+  * as well as its children. */
+  "Total Time"?: number;
+  /** Self Time is like Total Time, but excludes time spent in child nodes. */
+  "Self Time"?: number;
 };
 
 export type flameOptions = Partial<{
@@ -67,7 +73,13 @@ export function fromRawQueries(
       root.Children = (root.Children || []).concat(query);
 
       const planning: FlameNode = {Kind: "Planning", Label: "Planning"};
+      if (rq["Planning Time"]) {
+        planning["Planning Time"] = rq["Planning Time"];
+      }
       const execution: FlameNode = {Kind: "Execution", Label: "Execution"};
+      if (rq["Execution Time"]) {
+        execution["Execution Time"] = rq["Execution Time"];
+      }
       query.Children = [planning, execution];
       parent = execution;
     }
@@ -81,6 +93,8 @@ export function fromRawQueries(
   });
 
   setIDs(root);
+  setTotalTime(root);
+  setSelfTime(root);
 
   return root;
 };
@@ -166,6 +180,60 @@ function setCTERefs(fn: FlameNode) {
 
     parent = parent.Parent;
   };
+}
+
+function setTotalTime(fn: FlameNode) {
+  fn.Children?.forEach(setTotalTime);
+
+  switch (fn.Kind) {
+    case "Node":
+      if (typeof fn["Actual Total Time"] === 'number') {
+        fn["Total Time"] = fn["Actual Total Time"];
+      }
+      break;
+    case "Execution":
+      if (typeof fn["Execution Time"] === 'number') {
+        fn["Total Time"] = fn["Execution Time"];
+      }
+      break;
+    case "Planning":
+      if (typeof fn["Planning Time"] === 'number') {
+        fn["Total Time"] = fn["Planning Time"];
+      }
+      break;
+    default:
+      let total: number | undefined = undefined;
+      fn.Children?.forEach(child => {
+        if (typeof child["Total Time"] === 'number') {
+          total = (total || 0) + child["Total Time"];
+        }
+      });
+
+      if (total !== undefined) {
+        fn["Total Time"] = total;
+      }
+      break;
+  }
+
+  if (fn["Total Time"] !== undefined) {
+    fn["Self Time"] = 0;
+  }
+}
+
+function setSelfTime(fn: FlameNode) {
+  fn.Children?.forEach(setTotalTime);
+
+  if (fn["Total Time"] === undefined) {
+    return;
+  }
+
+  let childTotal: number = 0;
+  fn.Children?.forEach(child => {
+    if (typeof child["Total Time"] === 'number') {
+      childTotal += child["Total Time"];
+    }
+  });
+  fn["Self Time"] = fn["Total Time"] - childTotal;
 }
 
 function setIDs(root: FlameNode) {
