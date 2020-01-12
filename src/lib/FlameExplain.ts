@@ -26,10 +26,10 @@ type FlameFragment = {
 
   /** If this node has a "Filter" or "One-Time Filter" references another
   * node in the plan, then this node is referenced here. */
-  "Filter Parent"?: FlameNode;
-  /** Similar to "Filter Parent" above, this array references all nodes that
+  "Filter Node"?: FlameNode;
+  /** Similar to "Filter Node" above, this array references all nodes that
    * reference this node in one of their filters. */
-  "Filter Children"?: FlameNode[];
+  "Filter Refs"?: FlameNode[];
 
 
   "CTE Node"?: FlameNode;
@@ -59,52 +59,49 @@ export function fromRawQueries(
   rqs: RawQueries,
   opt: flameOptions = defaultOptions,
 ): FlameNode {
-  let id = 0;
-  const nextNode = (fn: FlameNode): FlameNode => Object.assign(fn, {ID: ++id});
-
   const root: FlameNode = {Kind: "Root"};
-  rqs.forEach((rq, i) => {
-    let parent = root;
+  const children = rqs.filter(rq => rq.Plan).map((rq, i) => {
     let query: FlameNode | undefined;
     if (opt.VirtualQueryNodes) {
-      query = nextNode({
+      query = {
         Kind: 'Query',
         Label: 'Query' + ((rqs.length > 1)
           ? ' ' + (i + 1)
           : ''),
-      });
+      };
 
-      const planning = nextNode({Kind: "Planning", Label: "Planning"});
-      const execution = nextNode({Kind: "Execution", Label: "Execution"});
-      root.Children = (root.Children || []).concat(query);
+      const planning: FlameNode = {Kind: "Planning", Label: "Planning"};
+      const execution: FlameNode = {Kind: "Execution", Label: "Execution"};
       query.Children = [planning, execution];
-      parent = execution;
     }
 
-    if (rq.Plan) {
-      const fn = fromRawNode(rq.Plan || {}, nextNode);
-      parent.Children = (parent.Children || []).concat(fn);
+    const fn = fromRawNode(rq.Plan || {});
+    query = query || fn;
 
-      setParents(query || fn, root);
-      setFilterRefs(fn);
-      setCTERefs(fn);
-    }
+    setParents(query, root);
+    setFilterRefs(fn);
+    setCTERefs(fn);
+
+    return query;
   });
+
+  if (children.length > 0) {
+    root.Children = children;
+  }
+
+  setIDs(root);
 
   return root;
 };
 
-function fromRawNode(
-  rn: RawNode,
-  nextNode: (fn: FlameNode) => FlameNode
-): FlameNode {
-  let fn = nextNode({
+function fromRawNode(rn: RawNode): FlameNode {
+  let fn: FlameNode = {
     Kind: "Node",
     Label: label(rn),
-  });
+  };
 
   fn = Object.assign({}, rn, fn);
-  fn.Children = rn.Plans?.map(child => fromRawNode(child, nextNode));
+  fn.Children = rn.Plans?.map(child => fromRawNode(child));
   delete (fn as RawNode).Plans;
 
   return fn;
@@ -116,7 +113,7 @@ function setParents(fn: FlameNode, parent: FlameNode) {
   fn.Children?.forEach(c => setParents(c, fn));
 }
 
-/** setFilterRefs sets the "Filter Parent" and "Filter Children" references
+/** setFilterRefs sets the "Filter Node" and "Filter Refs" references
 * for this plan.*/
 function setFilterRefs(fn: FlameNode, root?: FlameNode) {
   root = root || fn;
@@ -148,8 +145,8 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode) {
     });
 
     if (isRef) {
-      fn2["Filter Parent"] = fn;
-      fn["Filter Children"] = (fn["Filter Children"] || []).concat(fn2);
+      fn2["Filter Node"] = fn;
+      fn["Filter Refs"] = (fn["Filter Refs"] || []).concat(fn2);
     }
   }
   visit(root);
@@ -178,6 +175,15 @@ function setCTERefs(fn: FlameNode) {
 
     parent = parent.Parent;
   };
+}
+
+function setIDs(root: FlameNode) {
+  let id = 0;
+  const visit = (fn: FlameNode) => {
+    fn.ID = ++id;
+    fn.Children?.forEach(visit);
+  }
+  root.Children?.forEach(visit);
 }
 
 
@@ -209,7 +215,6 @@ type subplanName = {
   ID: number;
   Returns: number[];
 };
-
 
 /**
  * parseFilter parses a filter expression as found in "Filter" or "One-Time

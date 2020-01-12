@@ -326,8 +326,8 @@ describe('fromRawQueries', () => {
 
       expect(filter?.["Filter"]).toEqual("(g > $0)");
       expect(init?.["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
-      expect(filter?.["Filter Parent"]).toBe(init);
-      expect(init?.["Filter Children"]?.[0]).toBe(filter);
+      expect(filter?.["Filter Node"]).toBe(init);
+      expect(init?.["Filter Refs"]?.[0]).toBe(filter);
     });
 
     test('OneInitOneTimeFilter', () => {
@@ -338,8 +338,8 @@ describe('fromRawQueries', () => {
 
       expect(filter?.["One-Time Filter"]).toEqual("$0");
       expect(init?.["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
-      expect(filter?.["Filter Parent"]).toBe(init);
-      expect(init?.["Filter Children"]?.[0]).toBe(filter);
+      expect(filter?.["Filter Node"]).toBe(init);
+      expect(init?.["Filter Refs"]?.[0]).toBe(filter);
     });
   });
 
