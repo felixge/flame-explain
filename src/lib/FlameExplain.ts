@@ -117,7 +117,7 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode) {
     return;
   }
 
-  const sp = parseSubplanName(fn["Subplan Name"]);
+  const sp = parseNumberedSubplanName(fn["Subplan Name"]);
   if (!sp) {
     return;
   }
@@ -182,12 +182,14 @@ function setIDs(root: FlameNode) {
 
 
 /**
- * parseSubplanName parse the given "Subplan Name" string, see [1][2].
+ * parseNumberedSubplanName parse the given "Subplan Name" string, see [1][2]
+ *
+ * Example Input: "InitPlan 1 (returns $0)"
  *
  * [1] https://github.com/postgres/postgres/blob/REL_12_1/src/backend/optimizer/plan/subselect.c#L2909
  * [2] https://github.com/postgres/postgres/blob/REL_12_1/src/backend/optimizer/plan/subselect.c#L556-L572
  */
-export function parseSubplanName(name: string): subplanName | undefined {
+export function parseNumberedSubplanName(name: string): subplanName | undefined {
   const m = name.match(/^([^ ]+) (\d+) \(returns ([^)]+)\)$/);
   if (!m) {
     return;

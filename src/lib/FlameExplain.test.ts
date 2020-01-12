@@ -2,7 +2,7 @@ import {
   fromRawQueries,
   label,
   FlameNode,
-  parseSubplanName,
+  parseNumberedSubplanName,
   parseFilter,
 } from './FlameExplain';
 import NestedLoop from './example_plans/NestedLoop';
@@ -462,13 +462,13 @@ describe('fromRawQueries', () => {
   });
 });
 
-test('parseSubplanName', () => {
-  expect(parseSubplanName("InitPlan 1 (returns $0)")).toEqual({
+test('parseNumberedSubplanName', () => {
+  expect(parseNumberedSubplanName("InitPlan 1 (returns $0)")).toEqual({
     ID: 1,
     Type: "InitPlan",
     Returns: [0],
   });
-  expect(parseSubplanName("SubPlan 2 (returns $1,$2,$3)")).toEqual({
+  expect(parseNumberedSubplanName("SubPlan 2 (returns $1,$2,$3)")).toEqual({
     ID: 2,
     Type: "SubPlan",
     Returns: [1, 2, 3],
