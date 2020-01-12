@@ -10,35 +10,29 @@ type FlameFragment = {
   /** Kind captures what kind of node this is. Root nodes have only Children
   * and no other properties. */
   "Kind": "Root" | "Query" | "Planning" | "Execution" | "Node";
-
   /** ID is a unique identifier present on all nodes except the Root node. */
   "ID"?: number;
-
   /** Label is a short human-readable description of the node, present for all
-  * nodes except the Root node. */
+  * nodes except the Root node. For Kind=Node the label attempts to be identical
+  * to what EXPLAIN (ANALYZE, FORMAT TEXT) would print. */
   "Label"?: string;
-
   /** Parent points to the parent node, which simplifies some of the transform
    * algorithms. Present for all nodes except the Root node. */
   "Parent"?: FlameNode;
   /** Children is an array children. */
   "Children"?: FlameNode[];
-
-  /** If this node has a "Filter" or "One-Time Filter" references another
-  * node in the plan, then this node is referenced here. */
-  "Filter Node"?: FlameNode;
+  /** If this node has a "Filter" or "One-Time Filter" that references other
+   * nodes in the plan, then they are referenced here. */
+  "Filter Nodes"?: FlameNode[];
   /** Similar to "Filter Node" above, this array references all nodes that
    * reference this node in one of their filters. */
   "Filter Refs"?: FlameNode[];
-
-
+  /** If this node is a "CTE Scan", then the CTE InitPlan that is being scanned
+   * is referenced here. */
   "CTE Node"?: FlameNode;
+  /** If this node is a CTE InitPlan, then all CTE Scan nodes that use it are
+  * referenced here. */
   "CTE Scans"?: FlameNode[];
-
-  //"Virtual"?: boolean;
-  //"Warnings"?: string[];
-  //"Self Time"?: number;
-  //"Total Time"?: number;
 };
 
 export type flameOptions = Partial<{
@@ -145,7 +139,7 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode) {
     });
 
     if (isRef) {
-      fn2["Filter Node"] = fn;
+      fn2["Filter Nodes"] = (fn2["Filter Nodes"] || []).concat(fn);
       fn["Filter Refs"] = (fn["Filter Refs"] || []).concat(fn2);
     }
   }

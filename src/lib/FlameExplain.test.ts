@@ -9,6 +9,7 @@ import NestedLoop from './example_plans/NestedLoop';
 import RewriteTwoQueries from './example_plans/RewriteTwoQueries';
 import OneInitFilter from './example_plans/OneInitFilter';
 import OneInitOneTimeFilter from './example_plans/OneInitOneTimeFilter';
+import TwoOneTimeFilter from './example_plans/TwoOneTimeFilter';
 import CTENameDupe from './example_plans/CTENameDupe';
 import CTESimple from './example_plans/CTESimple';
 import examples from './example_plans';
@@ -321,25 +322,39 @@ describe('fromRawQueries', () => {
     test('OneInitFilter', () => {
       const {queries} = OneInitFilter;
       const root = fromRawQueries(queries, {});
-      const filter = root.Children?.[0];
-      const init = filter?.Children?.[0];
+      const [filter] = root.Children;
+      const [init] = filter.Children;
 
-      expect(filter?.["Filter"]).toEqual("(g > $0)");
-      expect(init?.["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
-      expect(filter?.["Filter Node"]).toBe(init);
-      expect(init?.["Filter Refs"]?.[0]).toBe(filter);
+      expect(filter["Filter"]).toEqual("(g > $0)");
+      expect(init["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
+      expect(filter["Filter Nodes"]).toEqual([init]);
+      expect(init["Filter Refs"]).toEqual([filter]);
     });
 
     test('OneInitOneTimeFilter', () => {
       const {queries} = OneInitOneTimeFilter;
       const root = fromRawQueries(queries, {});
-      const filter = root.Children?.[0];
-      const init = filter?.Children?.[0];
+      const [filter] = root.Children;
+      const [init] = filter.Children;
 
-      expect(filter?.["One-Time Filter"]).toEqual("$0");
-      expect(init?.["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
-      expect(filter?.["Filter Node"]).toBe(init);
-      expect(init?.["Filter Refs"]?.[0]).toBe(filter);
+      expect(filter["One-Time Filter"]).toEqual("$0");
+      expect(init["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
+      expect(filter["Filter Nodes"]).toEqual([init]);
+      expect(init["Filter Refs"]).toEqual([filter]);
+    });
+
+    test('TwoOneTimeFilter', () => {
+      const {queries} = TwoOneTimeFilter;
+      const root = fromRawQueries(queries, {});
+      const [filter] = root.Children;
+      const [init1, init2] = filter.Children;
+
+      expect(filter["One-Time Filter"]).toEqual("($0 AND $1)");
+      expect(init1["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
+      expect(init2["Subplan Name"]).toEqual("InitPlan 2 (returns $1)");
+      expect(init1["Filter Refs"]).toEqual([filter]);
+      expect(init2["Filter Refs"]).toEqual([filter]);
+      expect(filter["Filter Nodes"]).toEqual([init1, init2]);
     });
   });
 
