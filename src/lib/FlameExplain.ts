@@ -125,6 +125,7 @@ export function fromRawQueries(
   setTotalTime(root);
   calcParallelAppendTime(root)
   calcActualLoops(root);
+  calcChildBoost(root);
   setSelfTime(root);
   if (opt.VirtualField) {
     setVirtual(root);
@@ -271,6 +272,26 @@ function calcActualLoops(fn: FlameNode, gather: FlameNode | undefined = undefine
 
   fn["Total Time"] *= loops;
 };
+
+function calcChildBoost(fn: FlameNode) {
+  fn.Children?.forEach(calcChildBoost);
+
+  // Due to looped node rounding errors, and in some other cases, our total
+  // time above may be smaller than the sum of child node total time. It seems
+  // reasonable to adjust for that by making this node's total time to be as
+  // big as the sum of its child nodes in this case. However, we don't adjust
+  // nodes above and including the 'Execution' node as we trust it more than
+  // this heuristic.
+  if (typeof fn["Total Time"] !== 'number' ||
+    !(fn.Kind === 'Node' || fn.Kind === 'Subplan')) {
+    return;
+  }
+
+  const childTotal = sumChildTotalTime(fn);
+  if (childTotal > fn["Total Time"]) {
+    fn["Total Time"] = childTotal;
+  }
+}
 
 // TODO(fg) can this be combined with gather logic from calcActualLoops
 function calcParallelAppendTime(
