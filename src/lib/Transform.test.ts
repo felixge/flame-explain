@@ -8,6 +8,7 @@ describe('transformQueries', () => {
       test(name, () => {
         const root = fromRawQueries(examplePlans[name].queries, {
           VirtualQueryNodes: true,
+          VirtualSubplanNodes: true,
           VirtualField: true,
         });
         const columns: Column[] = [

@@ -9,7 +9,7 @@ export type FlameNode = Disjoint<
 type FlameFragment = {
   /** Kind captures what kind of node this is. Root nodes have only Children
   * and no other properties. */
-  "Kind": "Root" | "Queries" | "Query" | "Planning" | "Execution" | "Node";
+  "Kind": "Root" | "Queries" | "Query" | "Planning" | "Execution" | "Node" | "Subplan";
   /** ID is a unique identifier present on all nodes except the Root node. */
   "ID"?: number;
   /** Label is a short human-readable description of the node, present for all
@@ -48,15 +48,19 @@ type FlameFragment = {
 };
 
 export type flameOptions = Partial<{
-  VirtualQueryNodes: boolean,
+  /** VirtualQueryNodes produces a virtual node Query node for each query that
+   * contains virtual nodes 'Execution Time' and 'Planning Time'. */
+  VirtualQueryNodes: boolean;
+  /** VirtualSubplanNodes produces virtual nodes for every node that has a
+   * "Subplan Name". */
+  VirtualSubplanNodes: boolean;
   // TODO: remove
   VirtualField: boolean;
 }>;
 
 const defaultOptions: flameOptions = {
-  /** VirtualQueryNodes produces a virtual node Query node for each query that
-   * contains virtual nodes 'Execution Time' and 'Planning Time'. */
   VirtualQueryNodes: true,
+  VirtualSubplanNodes: true,
 
   VirtualField: false,
 };
@@ -69,7 +73,7 @@ export function fromRawQueries(
   rqs: RawQueries,
   opt: flameOptions = defaultOptions,
 ): FlameNode {
-  const root: FlameNode = {Kind: "Root"};
+  let root: FlameNode = {Kind: "Root"};
   rqs = rqs.filter(rq => rq.Plan);
 
   let queryRoot = root;
@@ -114,8 +118,12 @@ export function fromRawQueries(
     setCTERefs(fn);
   });
 
+  if (opt.VirtualSubplanNodes) {
+    root = createVirtualSubplanNodes(root);
+  }
   setIDs(root);
   setTotalTime(root);
+  applyActualLoops(root);
   setSelfTime(root);
   if (opt.VirtualField) {
     setVirtual(root);
@@ -245,10 +253,19 @@ function setTotalTime(fn: FlameNode) {
   }
 }
 
-function setSelfTime(fn: FlameNode) {
-  fn.Children?.forEach(setTotalTime);
+function applyActualLoops(fn: FlameNode) {
+  fn.Children?.forEach(applyActualLoops);
 
-  if (fn["Total Time"] === undefined) {
+  if (typeof fn["Total Time"] === 'number'
+    && typeof fn["Actual Loops"] === 'number') {
+    fn["Total Time"] *= fn["Actual Loops"];
+  }
+};
+
+function setSelfTime(fn: FlameNode) {
+  fn.Children?.forEach(setSelfTime);
+
+  if (typeof fn["Total Time"] !== 'number') {
     return;
   }
 
@@ -273,6 +290,30 @@ function setIDs(root: FlameNode) {
     fn.Children?.forEach(visit);
   }
   root.Children?.forEach(visit);
+}
+
+
+function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
+  if (fn.Children) {
+    fn.Children = fn.Children.map(createVirtualSubplanNodes);
+  }
+
+  if (!fn["Subplan Name"]) {
+    return fn;
+  }
+
+  const sn: FlameNode = {
+    Kind: "Subplan",
+    Label: fn["Subplan Name"],
+    Children: [fn],
+
+    // TODO(fg) remove those two?
+    "Actual Total Time": fn["Actual Total Time"],
+    "Actual Loops": fn["Actual Loops"],
+  };
+  fn.Parent = sn;
+
+  return sn;
 }
 
 
