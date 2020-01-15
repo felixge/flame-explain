@@ -123,7 +123,8 @@ export function fromRawQueries(
   }
   setIDs(root);
   setTotalTime(root);
-  applyActualLoops(root);
+  calcParallelAppendTime(root)
+  calcActualLoops(root);
   setSelfTime(root);
   if (opt.VirtualField) {
     setVirtual(root);
@@ -253,14 +254,59 @@ function setTotalTime(fn: FlameNode) {
   }
 }
 
-function applyActualLoops(fn: FlameNode) {
-  fn.Children?.forEach(applyActualLoops);
-
-  if (typeof fn["Total Time"] === 'number'
-    && typeof fn["Actual Loops"] === 'number') {
-    fn["Total Time"] *= fn["Actual Loops"];
+// TODO(fg) can the gather related logic be separated?
+function calcActualLoops(fn: FlameNode, gather: FlameNode | undefined = undefined) {
+  if (fn["Node Type"] === 'Gather' && fn["Actual Loops"]) {
+    gather = fn;
   }
+
+  fn.Children?.forEach(child => calcActualLoops(child, gather));
+
+  let loops = fn["Actual Loops"];
+  if (typeof loops !== 'number' || typeof fn["Total Time"] !== 'number') {
+    return;
+  } else if (typeof gather?.["Actual Loops"] === 'number') {
+    loops = gather["Actual Loops"];
+  }
+
+  fn["Total Time"] *= loops;
 };
+
+// TODO(fg) can this be combined with gather logic from calcActualLoops
+function calcParallelAppendTime(
+  fn: FlameNode,
+  gather: FlameNode | undefined = undefined,
+  scale: number = 1,
+) {
+  if (fn["Node Type"] === 'Gather' && typeof fn["Total Time"] === 'number') {
+    gather = fn;
+  }
+
+  if (typeof fn["Total Time"] === 'number' && scale !== 1) {
+    fn["Total Time"] *= scale;
+  }
+
+  if (
+    fn["Node Type"] === 'Append'
+    && fn["Parallel Aware"]
+    && typeof gather?.["Total Time"] === 'number'
+  ) {
+    scale = gather["Total Time"] / sumChildTotalTime(fn);
+  }
+
+  fn.Children?.forEach(child => calcParallelAppendTime(child, gather, scale));
+};
+
+
+function sumChildTotalTime(fn: FlameNode): number {
+  let childTotal = 0;
+  fn.Children?.forEach(child => {
+    if (typeof child["Total Time"] === 'number') {
+      childTotal += child['Total Time'];
+    }
+  });
+  return childTotal;
+}
 
 function setSelfTime(fn: FlameNode) {
   fn.Children?.forEach(setSelfTime);
