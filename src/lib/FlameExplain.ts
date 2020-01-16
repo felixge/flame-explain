@@ -73,7 +73,7 @@ export function fromRawQueries(
   rqs: RawQueries,
   opt: flameOptions = defaultOptions,
 ): FlameNode {
-  let root: FlameNode = {Kind: "Root"};
+  const root: FlameNode = {Kind: "Root"};
   rqs = rqs.filter(rq => rq.Plan);
 
   let queryRoot = root;
@@ -113,23 +113,27 @@ export function fromRawQueries(
     const fn = fromRawNode(rq.Plan || {});
     parent.Children = (parent.Children || []).concat(fn);
 
+    /* These must be applied on a per-query basis, the other transforms
+    * can be done on the root node below. */
     setParents(query || fn, queryRoot);
     setFilterRefs(fn);
     setCTERefs(fn);
   });
 
-  if (opt.VirtualSubplanNodes) {
-    root = createVirtualSubplanNodes(root);
-  }
-  setIDs(root);
   setTotalTime(root);
+  calcFilterTime(root);
+  calcCTETime(root);
   calcParallelAppendTime(root)
   calcActualLoops(root);
   calcChildBoost(root);
   setSelfTime(root);
+  if (opt.VirtualSubplanNodes) {
+    createVirtualSubplanNodes(root);
+  }
   if (opt.VirtualField) {
     setVirtual(root);
   }
+  setIDs(root);
 
   return root;
 };
@@ -287,10 +291,82 @@ function calcChildBoost(fn: FlameNode) {
     return;
   }
 
-  const childTotal = sumChildTotalTime(fn);
+  const childTotal = sumTotalTime(fn.Children);
   if (childTotal > fn["Total Time"]) {
     fn["Total Time"] = childTotal;
   }
+}
+
+function calcFilterTime(fn: FlameNode): FlameNode {
+  fn.Children?.forEach(calcFilterTime);
+
+  if (!(typeof fn["Total Time"] === 'number' && fn["Filter Refs"])) {
+    return fn;
+  }
+
+  let initTime = fn["Total Time"];
+  let childCount = fn['Filter Refs'].length;
+  fn['Filter Refs'].forEach(child => {
+    if (typeof child["Total Time"] !== 'number') {
+      return
+    }
+    const delta = initTime / childCount;
+
+    let p: FlameNode | undefined = child;
+    while (p) {
+      if (p.Children?.find(pc => pc === fn)) {
+        return;
+      }
+
+      if (typeof p["Total Time"] === 'number') {
+        p["Total Time"] -= delta;
+      }
+      p = p.Parent;
+    }
+  });
+
+  return fn;
+}
+
+function calcCTETime(fn: FlameNode) {
+  fn.Children?.forEach(calcCTETime);
+
+  // Return early unless n is a CTE parent node.
+  if (!(typeof fn["Total Time"] === 'number' && fn["CTE Scans"])) {
+    return;
+  }
+
+  let initTime = fn["Total Time"];
+  let scanTime = sumTotalTime(fn["CTE Scans"]);
+
+  fn["CTE Scans"].forEach(scan => {
+    if (typeof scan["Total Time"] !== 'number') {
+      return;
+    }
+
+    // Sometimes the CTE Scan is a child of the CTE Node, in this case we
+    // must not apply our fancy calculation below. See CTESimple for an
+    // example.
+    if (scan["CTE Node"]?.Parent === scan) {
+      return;
+    }
+
+    let before = scan["Total Time"];
+    scan["Total Time"] *= (1 - 1 / scanTime * initTime);
+    let delta = before - scan["Total Time"];
+
+    let p = scan.Parent;
+    while (p) {
+      if (p.Children?.find(pc => pc === fn)) {
+        return;
+      }
+
+      if (typeof p["Total Time"] === 'number') {
+        p["Total Time"] -= delta;
+      }
+      p = p.Parent;
+    }
+  });
 }
 
 // TODO(fg) can this be combined with gather logic from calcActualLoops
@@ -312,21 +388,20 @@ function calcParallelAppendTime(
     && fn["Parallel Aware"]
     && typeof gather?.["Total Time"] === 'number'
   ) {
-    scale = gather["Total Time"] / sumChildTotalTime(fn);
+    scale = gather["Total Time"] / sumTotalTime(fn.Children);
   }
 
   fn.Children?.forEach(child => calcParallelAppendTime(child, gather, scale));
 };
 
-
-function sumChildTotalTime(fn: FlameNode): number {
-  let childTotal = 0;
-  fn.Children?.forEach(child => {
-    if (typeof child["Total Time"] === 'number') {
-      childTotal += child['Total Time'];
+function sumTotalTime(nodes?: FlameNode[]): number {
+  let total = 0;
+  nodes?.forEach(fn => {
+    if (typeof fn["Total Time"] === 'number') {
+      total += fn['Total Time'];
     }
   });
-  return childTotal;
+  return total;
 }
 
 function setSelfTime(fn: FlameNode) {
@@ -336,13 +411,7 @@ function setSelfTime(fn: FlameNode) {
     return;
   }
 
-  let childTotal: number = 0;
-  fn.Children?.forEach(child => {
-    if (typeof child["Total Time"] === 'number') {
-      childTotal += child["Total Time"];
-    }
-  });
-  fn["Self Time"] = fn["Total Time"] - childTotal;
+  fn["Self Time"] = fn["Total Time"] - sumTotalTime(fn.Children);
 }
 
 function setVirtual(fn: FlameNode) {
@@ -378,6 +447,13 @@ function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
     "Actual Total Time": fn["Actual Total Time"],
     "Actual Loops": fn["Actual Loops"],
   };
+  if (fn.Parent) {
+    sn.Parent = fn.Parent;
+  }
+  if (typeof fn["Total Time"] === 'number') {
+    sn["Total Time"] = fn["Total Time"];
+    sn["Self Time"] = 0;
+  }
   fn.Parent = sn;
 
   return sn;
