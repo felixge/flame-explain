@@ -15,9 +15,6 @@ export function textTable(
   let table = new AsciiTable(title);
   let warnTable = new AsciiTable();
   table.setHeading(...columns.map(c => {
-    if (c === 'ID') {
-      return '#';
-    }
     return c;
   }));
   warnTable.setHeading('#', 'Warning');
