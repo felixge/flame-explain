@@ -430,10 +430,6 @@ function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
     Kind: "Subplan",
     Label: fn["Subplan Name"],
     Children: [fn],
-
-    // TODO(fg) remove those two?
-    "Actual Total Time": fn["Actual Total Time"],
-    "Actual Loops": fn["Actual Loops"],
   };
   if (fn.Parent) {
     sn.Parent = fn.Parent;

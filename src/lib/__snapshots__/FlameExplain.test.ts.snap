@@ -10,7 +10,7 @@ exports[`fromRawQueries example snapshots are matching CTESimple 1`] = `
 | 2 |   Planning          |                   |              |      51 μs |     51 μs |
 | 3 |   Execution         |                   |              |   102.2 ms |     19 μs |
 | 4 |     CTE Scan on foo |          102.2 ms |            1 |   102.2 ms |      7 μs |
-| 5 |       CTE foo       |          102.2 ms |            1 |   102.2 ms |      0 μs |
+| 5 |       CTE foo       |                   |              |   102.2 ms |      0 μs |
 | 6 |         Result      |          102.2 ms |            1 |   102.2 ms |  102.2 ms |
 '-------------------------------------------------------------------------------------'"
 `;
@@ -25,12 +25,12 @@ exports[`fromRawQueries example snapshots are matching CTESleepUnion 1`] = `
 |  2 |   Planning                    |                   |              |     307 μs |    307 μs |
 |  3 |   Execution                   |                   |              |   302.8 ms |    152 μs |
 |  4 |     Limit                     |          302.7 ms |            1 |   302.7 ms |      5 μs |
-|  5 |       CTE foo                 |          302.6 ms |            1 |   302.6 ms |      0 μs |
+|  5 |       CTE foo                 |                   |              |   302.6 ms |      0 μs |
 |  6 |         Append                |          302.6 ms |            1 |   302.6 ms |      4 μs |
 |  7 |           Result              |          101.1 ms |            1 |   101.1 ms |  101.1 ms |
 |  8 |           Result              |          201.5 ms |            1 |   201.5 ms |  201.5 ms |
 |  9 |           Result              |              0 μs |            0 |       0 μs |      0 μs |
-| 10 |       InitPlan 2 (returns $1) |          101.1 ms |            1 |       7 μs |      0 μs |
+| 10 |       InitPlan 2 (returns $1) |                   |              |       7 μs |      0 μs |
 | 11 |         CTE Scan on foo foo_1 |          101.1 ms |            1 |       7 μs |      7 μs |
 | 12 |       Result                  |          302.7 ms |            1 |      60 μs |     47 μs |
 | 13 |         CTE Scan on foo       |          201.5 ms |            1 |      13 μs |     13 μs |
