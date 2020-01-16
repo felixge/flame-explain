@@ -13,6 +13,7 @@ import TwoOneTimeFilter from './example_plans/TwoOneTimeFilter';
 import CTENameDupe from './example_plans/CTENameDupe';
 import CTESimple from './example_plans/CTESimple';
 import examples from './example_plans';
+import {textTable, Column} from './TextTable';
 
 describe('label', () => {
   test('Result', () => {
@@ -486,6 +487,29 @@ describe('fromRawQueries', () => {
         });
       }
     });
+  });
+
+  describe('example snapshots are matching', () => {
+    for (let name in examples) {
+      test(name, () => {
+        const root = fromRawQueries(examples[name].queries, {
+          VirtualQueryNodes: true,
+          VirtualSubplanNodes: true,
+          VirtualField: true,
+        });
+        const columns: Column[] = [
+          'ID',
+          'Label',
+          'Actual Total Time',
+          'Actual Loops',
+          'Total Time',
+          'Self Time',
+          'Virtual',
+        ];
+        const table = textTable(root, {title: name, columns: columns});
+        expect(table).toMatchSnapshot();
+      });
+    }
   });
 });
 

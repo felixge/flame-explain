@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`transformQueries time accounting snapshots are matching CTESimple 1`] = `
+exports[`fromRawQueries example snapshots are matching CTESimple 1`] = `
 ".-----------------------------------------------------------------------------------------------.
 |                                           CTESimple                                           |
 |-----------------------------------------------------------------------------------------------|
@@ -15,7 +15,7 @@ exports[`transformQueries time accounting snapshots are matching CTESimple 1`] =
 '-----------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching CTESleepUnion 1`] = `
+exports[`fromRawQueries example snapshots are matching CTESleepUnion 1`] = `
 ".----------------------------------------------------------------------------------------------------------.
 |                                              CTESleepUnion                                               |
 |----------------------------------------------------------------------------------------------------------|
@@ -37,7 +37,7 @@ exports[`transformQueries time accounting snapshots are matching CTESleepUnion 1
 '----------------------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching NestedLoop 1`] = `
+exports[`fromRawQueries example snapshots are matching NestedLoop 1`] = `
 ".--------------------------------------------------------------------------------------------------------------------.
 |                                                     NestedLoop                                                     |
 |--------------------------------------------------------------------------------------------------------------------|
@@ -52,7 +52,7 @@ exports[`transformQueries time accounting snapshots are matching NestedLoop 1`] 
 '--------------------------------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching PGIndexes 1`] = `
+exports[`fromRawQueries example snapshots are matching PGIndexes 1`] = `
 ".----------------------------------------------------------------------------------------------------------------------------------------.
 |                                                               PGIndexes                                                                |
 |----------------------------------------------------------------------------------------------------------------------------------------|
@@ -76,7 +76,7 @@ exports[`transformQueries time accounting snapshots are matching PGIndexes 1`] =
 '----------------------------------------------------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching ParallelAppend 1`] = `
+exports[`fromRawQueries example snapshots are matching ParallelAppend 1`] = `
 ".--------------------------------------------------------------------------------------------------.
 |                                          ParallelAppend                                          |
 |--------------------------------------------------------------------------------------------------|
@@ -96,7 +96,7 @@ exports[`transformQueries time accounting snapshots are matching ParallelAppend 
 '--------------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching ParallelAppendCount 1`] = `
+exports[`fromRawQueries example snapshots are matching ParallelAppendCount 1`] = `
 ".--------------------------------------------------------------------------------------------------------------------------------.
 |                                                      ParallelAppendCount                                                       |
 |--------------------------------------------------------------------------------------------------------------------------------|
@@ -123,7 +123,7 @@ exports[`transformQueries time accounting snapshots are matching ParallelAppendC
 '--------------------------------------------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching ParallelCount 1`] = `
+exports[`fromRawQueries example snapshots are matching ParallelCount 1`] = `
 ".--------------------------------------------------------------------------------------------------------------.
 |                                                ParallelCount                                                 |
 |--------------------------------------------------------------------------------------------------------------|
@@ -139,7 +139,7 @@ exports[`transformQueries time accounting snapshots are matching ParallelCount 1
 '--------------------------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching ParallelCountAppend 1`] = `
+exports[`fromRawQueries example snapshots are matching ParallelCountAppend 1`] = `
 ".---------------------------------------------------------------------------------------------------------------------------.
 |                                                    ParallelCountAppend                                                    |
 |---------------------------------------------------------------------------------------------------------------------------|
@@ -172,7 +172,7 @@ exports[`transformQueries time accounting snapshots are matching ParallelCountAp
 '---------------------------------------------------------------------------------------------------------------------------'"
 `;
 
-exports[`transformQueries time accounting snapshots are matching RewriteTwoQueries 1`] = `
+exports[`fromRawQueries example snapshots are matching RewriteTwoQueries 1`] = `
 ".---------------------------------------------------------------------------------------------------------------------.
 |                                                  RewriteTwoQueries                                                  |
 |---------------------------------------------------------------------------------------------------------------------|
