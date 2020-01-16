@@ -54,15 +54,11 @@ export type flameOptions = Partial<{
   /** VirtualSubplanNodes produces virtual nodes for every node that has a
    * "Subplan Name". */
   VirtualSubplanNodes: boolean;
-  // TODO: remove
-  VirtualField: boolean;
 }>;
 
 const defaultOptions: flameOptions = {
   VirtualQueryNodes: true,
   VirtualSubplanNodes: true,
-
-  VirtualField: false,
 };
 
 /**
@@ -129,9 +125,6 @@ export function fromRawQueries(
   setSelfTime(root);
   if (opt.VirtualSubplanNodes) {
     createVirtualSubplanNodes(root);
-  }
-  if (opt.VirtualField) {
-    setVirtual(root);
   }
   setIDs(root);
 
@@ -412,11 +405,6 @@ function setSelfTime(fn: FlameNode) {
   }
 
   fn["Self Time"] = fn["Total Time"] - sumTotalTime(fn.Children);
-}
-
-function setVirtual(fn: FlameNode) {
-  fn.Children?.forEach(setVirtual);
-  fn.Virtual = fn.Kind !== 'Node';
 }
 
 function setIDs(root: FlameNode) {

@@ -495,7 +495,6 @@ describe('fromRawQueries', () => {
         const root = fromRawQueries(examples[name].queries, {
           VirtualQueryNodes: true,
           VirtualSubplanNodes: true,
-          VirtualField: true,
         });
         const columns: Column[] = [
           'ID',
@@ -504,7 +503,6 @@ describe('fromRawQueries', () => {
           'Actual Loops',
           'Total Time',
           'Self Time',
-          'Virtual',
         ];
         const table = textTable(root, {title: name, columns: columns});
         expect(table).toMatchSnapshot();
