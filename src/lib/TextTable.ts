@@ -28,7 +28,7 @@ export function textTable(
   let warnCount = 0;
   const visit = (fn: FlameNode, depth = 0) => {
     if (fn.Kind !== 'Root') {
-      const vals = columns.map(c => flameString(fn, c, {depth}));
+      const vals = columns.map(c => columnText(fn, c, {depth}));
       table.addRow(...vals);
       fn.Warnings?.forEach(warning => {
         warnTable.addRow(fn.ID, warning);
@@ -51,7 +51,7 @@ type flameStringOptions = {
   depth?: number;
 };
 
-function flameString(fn: FlameNode, col: Column, opt: flameStringOptions): string {
+export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions = {}): string {
   if (fn[col] === undefined) {
     return '';
   }
