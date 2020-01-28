@@ -39,6 +39,8 @@ type FlameFragment = {
   "Total Time"?: number;
   /** Self Time is like Total Time, but excludes time spent in child nodes. */
   "Self Time"?: number;
+  "Self Time %"?: number;
+  "Self Time %%"?: number;
   /** Warnings contains a list of problems encountered while transforming the
   * data.*/
   "Warnings"?: [];
@@ -126,6 +128,7 @@ export function fromRawQueries(
   if (opt.VirtualSubplanNodes) {
     createVirtualSubplanNodes(root);
   }
+  setSelfTimePercent(root);
   setIDs(root);
 
   return root;
@@ -406,6 +409,29 @@ function setSelfTime(fn: FlameNode) {
 
   fn["Self Time"] = fn["Total Time"] - sumTotalTime(fn.Children);
 }
+
+function setSelfTimePercent(root: FlameNode) {
+  let maxSelfTime = 0;
+  const findMax = (fn: FlameNode) => {
+    if (typeof fn["Self Time"] === 'number') {
+      maxSelfTime = Math.max(fn["Self Time"], maxSelfTime);
+    }
+    fn.Children?.forEach(findMax);
+  }
+  findMax(root);
+
+  const assign = (fn: FlameNode) => {
+    if (typeof fn["Self Time"] === 'number') {
+      if (typeof root["Total Time"] === 'number') {
+        fn["Self Time %"] = fn["Self Time"] / root["Total Time"];
+      }
+      fn["Self Time %%"] = fn["Self Time"] / maxSelfTime;
+    }
+    fn.Children?.forEach(assign);
+  };
+  assign(root);
+}
+
 
 function setIDs(root: FlameNode) {
   let id = 0;

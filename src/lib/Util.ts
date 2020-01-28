@@ -32,3 +32,9 @@ export function formatDuration(ms: number): string {
     return sign + (abs / usec).toFixed(0) + ' μs';
   }
 }
+
+export function formatPercent(f: number): string {
+  return (isNaN(f))
+    ? '-'
+    : (f * 100).toFixed(2) + '%';
+}

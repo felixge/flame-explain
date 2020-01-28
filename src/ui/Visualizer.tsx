@@ -22,6 +22,7 @@ const defaultSettings: SettingsState = {
     'Actual Total Time',
     'Total Time',
     'Self Time',
+    'Self Time %',
   ],
 };
 

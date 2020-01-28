@@ -1,5 +1,5 @@
 import {FlameNode} from './FlameExplain';
-import {formatDuration} from './Util';
+import {formatDuration, formatPercent} from './Util';
 // @ts-ignore no type definitions
 import AsciiTable from 'ascii-table';
 
@@ -58,6 +58,9 @@ export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions =
 
   let val = '';
   switch (col) {
+    case 'Self Time %':
+      val = formatPercent(fn[col] || 0);
+      break;
     case 'Actual Total Time':
     case 'Actual Startup Time':
     case 'Total Time':
