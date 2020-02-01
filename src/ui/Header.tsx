@@ -37,7 +37,7 @@ export default function Header() {
               FlameExplain
         </h1>
             <h2 className="subtitle">
-              The next generation PostgreSQL EXPLAIN visualizer that <Link to="/about" className="has-text-warning">actually works</Link>.
+              The next generation PostgreSQL EXPLAIN visualizer that <Link to="/about" className="has-text-warning">gets the numbers right</Link>.
         </h2>
           </div>
 
