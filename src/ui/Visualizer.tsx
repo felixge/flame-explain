@@ -10,6 +10,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faWrench as iconSettings} from '@fortawesome/free-solid-svg-icons';
 import {useLocalStorage} from './LocalStorage';
 import {Gist} from './Gist';
+import {useKeyboardShortcuts} from './KeyboardShortcuts';
 
 
 interface Props {
@@ -54,33 +55,27 @@ export default function Visualizer(p: Props) {
     setSettings({...settings, ...{Visible: !settings.Visible}});
   };
 
-
-  React.useEffect(() => {
-    const listener = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case 'i':
-          history.push('/visualize/input' + history.location.search);
-          break
-        case 't':
-          history.push('/visualize/treetable' + history.location.search);
-          break
-        case 'f':
-          history.push('/visualize/flamegraph' + history.location.search);
-          break
-        case 'n':
-          history.push('/visualize/networkgraph' + history.location.search);
-          break
-        case 'h':
-          history.push('/visualize/share' + history.location.search);
-          break
-        case 's':
-          toggleSettings();
-          break
-      }
-    };
-    document.addEventListener('keyup', listener);
-
-    return () => document.removeEventListener('keyup', listener);
+  useKeyboardShortcuts((key: string) => {
+    switch (key) {
+      case 'i':
+        history.push('/visualize/input' + history.location.search);
+        break
+      case 't':
+        history.push('/visualize/treetable' + history.location.search);
+        break
+      case 'f':
+        history.push('/visualize/flamegraph' + history.location.search);
+        break
+      case 'n':
+        history.push('/visualize/networkgraph' + history.location.search);
+        break
+      case 'h':
+        history.push('/visualize/share' + history.location.search);
+        break
+      case 's':
+        toggleSettings();
+        break
+    }
   });
 
   const match = useRouteMatch<{tab: string}>('/visualize/:tab');

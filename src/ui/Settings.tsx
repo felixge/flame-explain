@@ -1,6 +1,7 @@
 import React from 'react';
 import {FlameNode, FlameKey, FlameKeyDesc, FlameKeyDescs} from '../lib/FlameExplain';
 import ReactMarkdown from 'react-markdown';
+import {useKeyboardShortcuts} from './KeyboardShortcuts';
 
 type Props = {
   settings: SettingsState;
@@ -71,15 +72,10 @@ export default function Settings(p: Props) {
     p.onChange(newSettings);
   };
 
-  React.useEffect(() => {
-    const listener = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === 'Escape') {
-        clickClose();
-      }
-    };
-    document.addEventListener('keyup', listener);
-
-    return () => document.removeEventListener('keyup', listener);
+  useKeyboardShortcuts((key: string) => {
+    if (key === 'Enter' || key === 'Escape') {
+      clickClose();
+    }
   });
 
   if (!p.settings.Visible) {
