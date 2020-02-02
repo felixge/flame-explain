@@ -82,7 +82,11 @@ export default function Settings(p: Props) {
     return () => document.removeEventListener('keyup', listener);
   });
 
-  return <div className={'modal' + (p.settings.Visible ? ' is-active' : '')}>
+  if (!p.settings.Visible) {
+    return null;
+  }
+
+  return <div className="modal is-active">
     <div className="modal-background"></div>
     <div className="modal-card">
       <header className="modal-card-head">

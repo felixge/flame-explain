@@ -9,7 +9,7 @@ import {useRouteMatch, Redirect} from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faWrench as iconSettings} from '@fortawesome/free-solid-svg-icons';
 import {useLocalStorage} from './LocalStorage';
-import {loadGist} from './Gist';
+import {Gist} from './Gist';
 
 
 interface Props {
@@ -32,27 +32,14 @@ const defaultSettings: SettingsState = {
 
 export default function Visualizer(p: Props) {
   const history = useHistory();
-  const [planText, setPlanText] = useLocalStorage('planText', p.planText || '');
+  let [planText, setPlanText] = useLocalStorage('planText', p.planText || '');
   const [settings, setSettings] = React.useState(defaultSettings);
-  const [gistNotice, setGistNotice] = React.useState();
 
   const q = new URLSearchParams(history.location.search);
-  loadGist(q.get('gist'))
-    .then(gist => {
-      if (gist) {
-        setPlanText(gist.planText);
-        if (gist.expires) {
-          const remain = ((gist.expires - Date.now()) / 1000).toFixed(0);
-          setGistNotice(<div className="notification is-warning">
-            <button onClick={() => setGistNotice(undefined)} className="delete"></button>
-            {`To avoid GitHub rate limiting, this gist was read from local storage cache. It can be refreshed in ${remain} second(s).`}
-          </div>);
-        }
-      }
-    })
-    .catch(err => {
-      setGistNotice(<div className="notification is-danger">{err + ''}</div>);
-    });
+  const [gistPlanText, gistNotice] = Gist(q.get('gist'));
+  if (gistPlanText) {
+    planText = gistPlanText;
+  }
 
   let rootNode: FlameNode | undefined = undefined;
   let errorText: string | null = null;
