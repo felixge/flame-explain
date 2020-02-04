@@ -12,6 +12,15 @@ import {useLocalStorage} from './LocalStorage';
 import {Gist} from './Gist';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
 
+type InputState = {
+  plan: string;
+  sql: string;
+};
+
+type VisualizerState = {
+  Input: InputState;
+  Settings: SettingsState;
+};
 
 interface Props {
   planText?: string,
@@ -33,8 +42,24 @@ const defaultSettings: SettingsState = {
 
 export default function Visualizer(p: Props) {
   const history = useHistory();
-  let [planText, setPlanText] = useLocalStorage('planText', p.planText || '');
-  const [settings, setSettings] = React.useState(defaultSettings);
+
+  const defaultState: VisualizerState = {
+    Input: {plan: p.planText || '', sql: ''},
+    Settings: defaultSettings,
+  };
+
+  const [state, setState] = useLocalStorage('visualizer', defaultState);
+  let planText = state.Input.plan;
+  const setPlanText = (text: string) => {
+    setState({...state, ...{Input: {...state.Input, ...{plan: text}}}});
+  };
+  const settings = state.Settings;
+  const setSettings = (s: SettingsState) => {
+    setState({...state, ...{Settings: s}});
+  };
+  const toggleSettings = () => {
+    setSettings({...settings, ...{Visible: !settings.Visible}});
+  };
 
   const q = new URLSearchParams(history.location.search);
   const [gistPlanText, gistNotice] = Gist(q.get('gist'));
@@ -51,9 +76,6 @@ export default function Visualizer(p: Props) {
     errorText = e + '';
   }
 
-  const toggleSettings = () => {
-    setSettings({...settings, ...{Visible: !settings.Visible}});
-  };
 
   useKeyboardShortcuts((key: string) => {
     switch (key) {
@@ -117,7 +139,7 @@ export default function Visualizer(p: Props) {
   };
 
   return <section className="section">
-    <Settings onChange={onSettingsChange} settings={{...settings, ...{Root: rootNode}}} />
+    <Settings onChange={onSettingsChange} settings={settings} root={rootNode} />
     <div className="container">
       {gistNotice}
       <div className="tabs is-toggle">

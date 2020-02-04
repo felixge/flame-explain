@@ -6,18 +6,18 @@ import {useKeyboardShortcuts} from './KeyboardShortcuts';
 type Props = {
   settings: SettingsState;
   onChange: (s: SettingsState) => void;
+  root?: FlameNode;
 };
 
 export type SettingsState = {
   Visible: boolean,
   SelectedKeys: Array<FlameKey>,
-  Root?: FlameNode,
 };
 
 export default function Settings(p: Props) {
   let descs = FlameKeyDescs;
-  if (p.settings.Root) {
-    descs = descs.concat(flameKeys(p.settings.Root)
+  if (p.root) {
+    descs = descs.concat(flameKeys(p.root)
       .filter(key => !descs.find(desc => desc.Key === key))
       .map((key): FlameKeyDesc => ({
         Key: key,
