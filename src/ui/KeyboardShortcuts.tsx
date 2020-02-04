@@ -6,7 +6,7 @@ export function useKeyboardShortcuts(cb: callback) {
   React.useEffect(() => {
     const listener = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLTextAreaElement
-        || e.target instanceof HTMLInputElement
+        || (e.target instanceof HTMLInputElement && e.target.type !== 'checkbox')
         || e.target instanceof HTMLSelectElement) {
         return;
       }
