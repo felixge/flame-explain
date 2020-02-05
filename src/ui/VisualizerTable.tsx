@@ -1,13 +1,13 @@
 import React from 'react';
 import {FlameNode, FlameKey} from '../lib/FlameExplain';
 import {columnText} from '../lib/TextTable';
-import {SettingsState} from './Settings';
+import {PreferencesState} from './Preferences';
 import {interpolateReds} from 'd3-scale-chromatic';
 import {default as invert, RgbArray} from 'invert-color';
 
 interface Props {
   root: FlameNode;
-  settings: SettingsState;
+  settings: PreferencesState;
 }
 
 export default function VisualizerTable(p: Props) {

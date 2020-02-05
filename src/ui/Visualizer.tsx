@@ -1,33 +1,29 @@
 import React from 'react';
-import VisualizerInput from './VisualizerInput';
+import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
-import VisualizerShare from './VisualizerShare';
-import {SettingsState, default as Settings} from './Settings';
+import {default as VisualizerShare} from './VisualizerShare';
+import {PreferencesState, default as Preferences} from './Preferences';
 import {FlameNode, fromRawQueries} from '../lib/FlameExplain';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faWrench as iconSettings} from '@fortawesome/free-solid-svg-icons';
+import {faWrench as iconPreferences, faShareAlt as iconShare} from '@fortawesome/free-solid-svg-icons';
 import {useLocalStorage} from './LocalStorage';
 import {Gist} from './Gist';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
 
-type InputState = {
-  plan: string;
-  sql: string;
-};
 
 type VisualizerState = {
-  Input: InputState;
-  Settings: SettingsState;
+  input: InputState;
+  modal: 'Preferences' | 'Share' | null;
+  preferences: PreferencesState;
 };
 
 interface Props {
   planText?: string,
 }
 
-const defaultSettings: SettingsState = {
-  Visible: false,
+const defaultPreferences: PreferencesState = {
   SelectedKeys: [
     'ID',
     'Label',
@@ -44,21 +40,20 @@ export default function Visualizer(p: Props) {
   const history = useHistory();
 
   const defaultState: VisualizerState = {
-    Input: {plan: p.planText || '', sql: ''},
-    Settings: defaultSettings,
+    input: {plan: p.planText || '', sql: ''},
+    preferences: defaultPreferences,
+    modal: null,
   };
 
   const [state, setState] = useLocalStorage('visualizer', defaultState);
-  let planText = state.Input.plan;
-  const setPlanText = (text: string) => {
-    setState({...state, ...{Input: {...state.Input, ...{plan: text}}}});
+  let planText = state.input.plan;
+  const settings = state.preferences;
+  const setPreferences = (s: PreferencesState) => {
+    setState({...state, ...{preferences: s}});
   };
-  const settings = state.Settings;
-  const setSettings = (s: SettingsState) => {
-    setState({...state, ...{Settings: s}});
-  };
-  const toggleSettings = () => {
-    setSettings({...settings, ...{Visible: !settings.Visible}});
+  const toggleModal = (modal: typeof state.modal) => {
+    const m = state.modal === modal ? null : modal;
+    setState({...state, ...{modal: m}});
   };
 
   const q = new URLSearchParams(history.location.search);
@@ -79,6 +74,10 @@ export default function Visualizer(p: Props) {
 
   useKeyboardShortcuts((key: string) => {
     switch (key) {
+      case 'Enter':
+      case 'Escape':
+        setState({...state, ...{modal: null}});
+        break;
       case 'i':
         history.push('/visualize/input' + history.location.search);
         break
@@ -91,11 +90,12 @@ export default function Visualizer(p: Props) {
       case 'n':
         history.push('/visualize/networkgraph' + history.location.search);
         break
-      case 'h':
-        history.push('/visualize/share' + history.location.search);
-        break
       case 's':
-        toggleSettings();
+        toggleModal('Share');
+        break
+      case ',':
+      case 'p':
+        toggleModal('Preferences');
         break
     }
   });
@@ -110,10 +110,10 @@ export default function Visualizer(p: Props) {
     case 'input':
       tab = <VisualizerInput
         errorText={errorText}
-        planText={planText}
-        onChange={(text) => {
+        input={state.input}
+        onChange={(input) => {
           history.push('/visualize/input');
-          setPlanText(text);
+          setState({...state, ...{input: input}});
         }
         }
       />;
@@ -124,22 +124,21 @@ export default function Visualizer(p: Props) {
       }
       tab = <VisualizerTable settings={settings} root={rootNode} />;
       break;
-    case 'share':
-      if (!rootNode) {
-        return <Redirect to="/" />;
-      }
-      tab = <VisualizerShare planText={planText} />;
+    case 'flamegraph':
       break;
-    //default:
-    //return <Redirect to="/" />;
+    case 'networkgraph':
+      break;
+    default:
+      return <Redirect to="/" />;
   }
 
-  const onSettingsChange = (newSettings: SettingsState) => {
-    setSettings(newSettings);
+  const onPreferencesChange = (newPreferences: PreferencesState) => {
+    setPreferences(newPreferences);
   };
 
   return <section className="section">
-    <Settings onChange={onSettingsChange} settings={settings} root={rootNode} />
+    <Preferences onChange={onPreferencesChange} visible={state.modal === 'Preferences'} settings={settings} root={rootNode} />
+    <VisualizerShare planText={planText} visible={state.modal === 'Share'} />
     <div className="container">
       {gistNotice}
       <div className="tabs is-toggle">
@@ -156,16 +155,21 @@ export default function Visualizer(p: Props) {
           <li className={match.params.tab === 'networkgraph' ? 'is-active' : ''}>
             <Link to={"/visualize/networkgraph" + history.location.search}><u>N</u>etwork Graph</Link>
           </li>
-          <li className={match.params.tab === 'share' ? 'is-active' : ''}>
-            <Link to={"/visualize/share" + history.location.search}>S<u>h</u>are</Link>
-          </li>
         </ul>
-        <button onClick={toggleSettings} className="button is-rounded is-warning">
-          <span className="icon is-small">
-            <FontAwesomeIcon icon={iconSettings} />
-          </span>
-          <span><u>S</u>ettings</span>
-        </button>
+        <div className="buttons has-addons">
+          <button onClick={() => toggleModal('Preferences')} className="button">
+            <span className="icon is-small">
+              <FontAwesomeIcon icon={iconPreferences} />
+            </span>
+            <span><u>P</u>references</span>
+          </button>
+          <button onClick={() => toggleModal('Share')} className="button">
+            <span className="icon is-small">
+              <FontAwesomeIcon icon={iconShare} />
+            </span>
+            <span><u>S</u>hare</span>
+          </button>
+        </div>
       </div>
       {tab}
     </div>

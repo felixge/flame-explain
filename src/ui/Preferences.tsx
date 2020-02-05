@@ -4,17 +4,17 @@ import ReactMarkdown from 'react-markdown';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
 
 type Props = {
-  settings: SettingsState;
-  onChange: (s: SettingsState) => void;
+  visible: boolean;
+  settings: PreferencesState;
+  onChange: (s: PreferencesState) => void;
   root?: FlameNode;
 };
 
-export type SettingsState = {
-  Visible: boolean,
+export type PreferencesState = {
   SelectedKeys: Array<FlameKey>,
 };
 
-export default function Settings(p: Props) {
+export default function Preferences(p: Props) {
   let descs = FlameKeyDescs;
   if (p.root) {
     descs = descs.concat(flameKeys(p.root)
@@ -28,7 +28,7 @@ export default function Settings(p: Props) {
 
   const rows = descs.map(desc => {
     const toggleCheckbox = (val: boolean) => {
-      const newSettings: SettingsState = {
+      const newPreferences: PreferencesState = {
         ...p.settings,
         ...{
           SelectedKeys: [desc.Key]
@@ -41,7 +41,7 @@ export default function Settings(p: Props) {
             }),
         }
       };
-      p.onChange(newSettings);
+      p.onChange(newPreferences);
     };
 
     return <tr
@@ -68,8 +68,8 @@ export default function Settings(p: Props) {
   });
 
   const clickClose = () => {
-    const newSettings: SettingsState = {...p.settings, ...{Visible: false}};
-    p.onChange(newSettings);
+    //const newPreferences: PreferencesState = {...p.settings, ...{Visible: false}};
+    //p.onChange(newPreferences);
   };
 
   useKeyboardShortcuts((key: string) => {
@@ -78,7 +78,7 @@ export default function Settings(p: Props) {
     }
   });
 
-  if (!p.settings.Visible) {
+  if (!p.visible) {
     return null;
   }
 
@@ -86,7 +86,8 @@ export default function Settings(p: Props) {
     <div className="modal-background"></div>
     <div className="modal-card">
       <header className="modal-card-head">
-        <p className="modal-card-title">Settings</p>
+        <p className="modal-card-title">Preferences</p>
+        <button className="delete" aria-label="close"></button>
       </header>
       <section className="modal-card-body">
         <div className="tabs is-toggle">
@@ -114,9 +115,6 @@ export default function Settings(p: Props) {
           </tbody>
         </table>
       </section>
-      <footer className="modal-card-foot" style={{justifyContent: 'flex-end'}}>
-        <button onClick={clickClose} className="button is-success"><u>S</u>ave changes</button>
-      </footer>
     </div>
   </div>
 };

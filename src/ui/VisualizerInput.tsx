@@ -7,15 +7,20 @@ for (let name in examplePlans) {
   plans[name] = JSON.stringify(examplePlans[name].queries, null, 2);
 }
 
+export type InputState = {
+  plan: string;
+  sql: string;
+};
+
 interface Props {
   errorText: string | null,
-  planText: string,
-  onChange: (planText: string) => void;
+  input: InputState,
+  onChange: (output: InputState) => void;
 }
 
 export default function VisualizerInput(p: Props) {
   let errorDiv: JSX.Element | null = null;
-  if (p.planText && p.errorText !== null) {
+  if (p.input.plan && p.errorText !== null) {
     errorDiv = <div className="notification is-danger">{p.errorText}</div>;
   }
 
@@ -28,7 +33,7 @@ export default function VisualizerInput(p: Props) {
   let selectedPlan = '';
   let description = '';
   for (const key in plans) {
-    if (p.planText === plans[key]) {
+    if (p.input.plan === plans[key]) {
       selectedPlan = key;
       description = examplePlans[key].description;
       break;
@@ -48,7 +53,7 @@ export default function VisualizerInput(p: Props) {
       <div className="field">
         <div className="select">
           <select value={selectedPlan} onChange={e => {
-            p.onChange(plans[e.target.value] || '');
+            p.onChange({...p.input, ...{plan: plans[e.target.value] || ''}});
           }}>
             <option value="">Paste your own Plan</option>
             {
@@ -62,7 +67,12 @@ export default function VisualizerInput(p: Props) {
       {description !== '' ? <div className="content"><pre>{description.trim()}</pre></div> : null}
       <div className="field">
         <p className="control">
-          <textarea onChange={e => p.onChange(e.target.value)} value={p.planText} className="textarea is-family-monospace" placeholder="Paste your JSON Query Plan here." rows={15}></textarea>
+          <textarea onChange={e => p.onChange({...p.input, ...{plan: e.target.value}})} value={p.input.plan} className="textarea is-family-monospace" placeholder="Paste your JSON Query Plan here." rows={15}></textarea>
+        </p>
+      </div>
+      <div className="field">
+        <p className="control">
+          <textarea onChange={e => p.onChange({...p.input, ...{sql: e.target.value}})} value={p.input.sql} className="textarea is-family-monospace" placeholder="(Optional) Paste the SQL for Your Plan" rows={15}></textarea>
         </p>
       </div>
       <div className="field is-pulled-right">
@@ -70,7 +80,7 @@ export default function VisualizerInput(p: Props) {
           <Link
             onClick={handleSubmit}
             className="button is-success"
-            to="/visualize/table"
+            to="/visualize/treetable"
             //@ts-ignore TODO: figure out why I'm getting a type error here
             disabled={p.errorText !== null}
           >
