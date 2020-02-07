@@ -1,7 +1,7 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
+  sql: `
 EXPLAIN (ANALYZE, FORMAT JSON)
 SELECT 1
 WHERE EXISTS (SELECT 1);

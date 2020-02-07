@@ -1,9 +1,7 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-A simple count(*) query that uses a parallel sequential scan.
-
+  sql: `/** A simple count(*) query that uses a parallel sequential scan. */
 CREATE TABLE foo AS
 SELECT g
 FROM generate_series(1, 10000000) g;

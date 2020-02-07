@@ -13,8 +13,8 @@ import ParallelCountAppend from './ParallelCountAppend';
 import RewriteTwoQueries from './RewriteTwoQueries';
 
 export type ExamplePlan = {
-  description: string,
   queries: RawQueries,
+  sql: string,
 };
 
 const Plans: {[key: string]: ExamplePlan} = {
@@ -27,6 +27,10 @@ const Plans: {[key: string]: ExamplePlan} = {
   ParallelCount,
   ParallelCountAppend,
   RewriteTwoQueries,
+};
+
+for (const plan of Object.values(Plans)) {
+  plan.sql = (plan.sql || '').trim();
 }
 
 export default Plans;

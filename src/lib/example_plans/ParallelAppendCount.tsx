@@ -1,13 +1,12 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-This query is constructed to produce a looped Gather node which has an
+  sql: `
+/** This query is constructed to produce a looped Gather node which has an
 "Actual Loops" value that also applies to all of its child nodes. The child
 nodes themselves have their own "Actual Loops" value that always seems to equal
 the number of workers + 1, but which seems to have no impact on calculating the
-node's total time.
-
+node's total time. */
 CREATE TABLE foo AS
 SELECT g
 FROM generate_series(1, 1000000) g;

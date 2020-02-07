@@ -1,7 +1,7 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
+  sql: `
 EXPLAIN (ANALYZE, FORMAT JSON)
 SELECT *
 FROM generate_series(1, 10) g

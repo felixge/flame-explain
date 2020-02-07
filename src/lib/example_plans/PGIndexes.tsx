@@ -1,11 +1,11 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-This is a rather straight-forward plan, but the looped Materialize node suffers
+  sql: `
+/** This is a rather straight-forward plan, but the looped Materialize node suffers
 from rounding issues, causing minor explain accounting issues that FlameExplain
-fixes.
-
+fixes. */
+EXPLAIN (ANALYZE, FORMAT JSON)
 SELECT * FROM pg_indexes;
 `,
   queries: [

@@ -1,12 +1,11 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-A trivial nested loop plan. FlameExplain correctly accounts for the
+  sql: `
+/** A trivial nested loop plan. FlameExplain correctly accounts for the
 "Actual Total Time" in the looped node to be the average time per loop. It
 also highlights the high cost of query planning relative to the execution of
-this plan.
-
+this plan. */
 EXPLAIN (ANALYZE, FORMAT JSON)
 SELECT *
 FROM generate_series(1, 10) a

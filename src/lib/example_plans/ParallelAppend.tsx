@@ -1,11 +1,10 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-SET force_parallel_mode=true;
+  sql: `
+/** SET force_parallel_mode=true;
 SET parallel_setup_cost=0;
-SET parallel_tuple_cost=0;
-
+SET parallel_tuple_cost=0; */
 EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON)
 SELECT pg_sleep(0.1)
 UNION ALL

@@ -1,19 +1,18 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-The query below does two scans on the CTE foo. The first is triggered by the
+  sql: `
+/** The query below does two scans on the CTE foo. The first is triggered by the
 EXIST predicate and only reads the first row and pays the pg_sleep(0.1) cost.
 The second scan comes from the main query, which also reads row one, but
 doesn't pay the sleep cost again, since the tuple has already been stored in
-memory.  However, the second scan has to pay the cost of pg_sleep(0.2).
+memory. However, the second scan has to pay the cost of pg_sleep(0.2).
 pg_sleep(0.3) is never executed because the main query has a limit of 2.
 
 This causes EXPLAIN ANALYZE to produce an output where a lot of the numbers
 don't add up due to including the costs of the CTE InitPlan and Filter InitPlan
 more than once. FlameExplain is currently the only tool that can correctly
-adjust such a plan to make sense.
-
+adjust such a plan to make sense. */
 EXPLAIN (ANALYZE, FORMAT JSON)
 WITH foo AS (
     SELECT 1 as i, pg_sleep(0.1)

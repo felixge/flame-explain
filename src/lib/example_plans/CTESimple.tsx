@@ -1,19 +1,18 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-A very simple CTE query executed with PG <= 11. Starting with version 12,
+  sql: `
+/** A very simple CTE query executed with PG <= 11. Starting with version 12,
 PostgreSQL automatically inlines CTEs that are referenced only once.
 
 What's interesting about this query is that the CTE Scan is the parent node
-for its own InitPlan, which is usually not the case in more realistic queries.
-
+for its own InitPlan, which is usually not the case in more realistic queries. */
 EXPLAIN (ANALYZE, FORMAT JSON)
 WITH foo AS (
 	SELECT pg_sleep(0.1)
 )
 SELECT * FROM foo;
-`,
+`.trim(),
   queries: [
     {
       "Plan": {

@@ -1,13 +1,12 @@
 import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
-  description: `
-Perhaps a bit exotic, but EXPLAIN ANALYZE may return multiple query plans when
+  sql: `
+/** Perhaps a bit exotic, but EXPLAIN ANALYZE may return multiple query plans when
 a rewrite ALSO rule is involved as shown below.
 
 FlameExplain seems to be the only tool that can handle plans having multiple
-queries.
-
+queries. */
 CREATE TABLE foo(id int);
 CREATE TABLE bar(id int);
 
