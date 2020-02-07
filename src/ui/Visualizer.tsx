@@ -11,6 +11,7 @@ import {faWrench as iconPreferences, faShareAlt as iconShare} from '@fortawesome
 import {useLocalStorage} from './LocalStorage';
 import {Gist} from './Gist';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
+import Highlight from './Highlight';
 
 
 type VisualizerState = {
@@ -114,15 +115,19 @@ export default function Visualizer(p: Props) {
         onChange={(input) => {
           history.push('/visualize/input');
           setState({...state, ...{input: input}});
-        }
-        }
+        }}
       />;
       break;
     case 'treetable':
       if (!rootNode) {
         return <Redirect to="/" />;
       }
-      tab = <VisualizerTable settings={settings} root={rootNode} />;
+      tab = <div>
+        <div className="content">
+          <Highlight language="sql" source={state.input.sql} />
+        </div>
+        <VisualizerTable settings={settings} root={rootNode} />
+      </div>
       break;
     case 'flamegraph':
       break;

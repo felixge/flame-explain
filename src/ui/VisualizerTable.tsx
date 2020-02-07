@@ -21,14 +21,16 @@ export default function VisualizerTable(p: Props) {
         if (col === 'Label') {
           colVal = '\u00a0'.repeat((depth - 1) * 2) + colVal;
         }
-        let fg = '';
-        let bg = '';
+        let color = '';
+        let backgroundColor = '';
         const percent = fn[(col + ' %%' as FlameKey)];
         if (typeof percent === 'number') {
-          [fg, bg] = colorPair(percent);
+          [color, backgroundColor] = colorPair(percent);
         }
 
-        return <td key={col} style={{color: fg, backgroundColor: bg}}>{colVal}</td>;
+        const textAlign = typeof fn[col] === 'number' ? 'right' : 'left';
+
+        return <td key={col} style={{textAlign, color, backgroundColor}}>{colVal}</td>;
       });
       rows.push(<tr key={fn.ID}>{colVals}</tr>);
     }

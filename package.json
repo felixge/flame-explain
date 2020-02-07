@@ -11,6 +11,7 @@
     "@types/dagre-d3": "^0.4.39",
     "@types/jest": "24.0.20",
     "@types/node": "12.11.7",
+    "@types/prismjs": "^1.16.0",
     "@types/react": "16.9.11",
     "@types/react-dom": "16.9.3",
     "@types/react-router-dom": "^5.1.1",
@@ -26,12 +27,14 @@
     "fetch-jsonp": "^1.1.3",
     "invert-color": "^2.0.0",
     "node-sass": "^4.13.0",
+    "prismjs": "^1.19.0",
     "react": "^16.11.0",
     "react-clipboard.js": "^2.0.16",
     "react-dom": "^16.11.0",
     "react-markdown": "^4.3.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.3.0",
+    "react-simple-code-editor": "^0.11.0",
     "typescript": "^3.7.2"
   },
   "scripts": {
