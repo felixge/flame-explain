@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import examplePlans from '../lib/example_plans';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
@@ -34,20 +34,15 @@ interface Props {
 }
 
 export default function VisualizerInput(p: Props) {
+  const history = useHistory();
   let errorDiv: JSX.Element | null = null;
   if (p.input.plan && p.errorText !== null) {
     errorDiv = <div className="notification is-danger">{p.errorText}</div>;
   }
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
-    if (p.errorText !== null) {
-      e.preventDefault();
-    }
-  };
-
   let selectedPlan = '';
   for (const key in plans) {
-    if (p.input.plan === plans[key]) {
+    if (p.input.plan === plans[key] && p.input.sql === examplePlans[key].sql) {
       selectedPlan = key;
       break;
     }
@@ -59,49 +54,72 @@ export default function VisualizerInput(p: Props) {
       <div className="field content">
         <p>
           Prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
-          , execute it, paste the resulting JSON below and then hit <strong><span role="img" aria-label="flame">🔥</span>&nbsp;Explain</strong>.
+          , execute it, paste the resulting JSON below.
         </p>
-        <p>Or pick a sample plan from the drop down:</p>
       </div>
       <div className="field is-grouped">
-        <p className="control select">
-          <select value={selectedPlan} onChange={e => {
-            let input: InputState = {plan: '', sql: ''};
-            const plan = examplePlans[e.target.value];
-            if (plan) {
-              input = {
-                plan: JSON.stringify(plan.queries, null, 2),
-                sql: plan.sql || '',
-              };
-            }
-            p.onChange({...p.input, ...input});
-          }}>
-            <option value="">Paste your own Plan</option>
-            {
-              Object.keys(plans).map(plan => {
-                return <option value={plan} key={plan}>{plan}</option>
-              })
-            }
-          </select>
-        </p>
-        <p className="control">
-          <Link
-            onClick={handleSubmit}
-            className="button is-success"
-            to="/visualize/treetable"
-            //@ts-ignore TODO: figure out why I'm getting a type error here
-            disabled={p.errorText !== null}
-          >
-            <span role="img" aria-label="flame">🔥</span>&nbsp;Explain
-      </Link>
-        </p>
+        <div className="control">
+          <div className="select">
+            <select value={selectedPlan} onChange={e => {
+              let input: InputState = {plan: '', sql: ''};
+              const plan = examplePlans[e.target.value];
+              if (plan) {
+                input = {
+                  plan: JSON.stringify(plan.queries, null, 2),
+                  sql: plan.sql || '',
+                };
+              }
+              p.onChange({...p.input, ...input});
+            }}>
+              <option value="">Paste your own Plan</option>
+              {
+                Object.keys(plans).map(plan => {
+                  return <option value={plan} key={plan}>{plan}</option>
+                })
+              }
+            </select>
+          </div>
+        </div>
+        <div className="control">
+          <button
+            className="button is-warning"
+            disabled={!p.input.plan && !p.input.sql}
+            onClick={() => {p.onChange({sql: '', plan: ''})}}
+          >Reset</button>
+        </div>
       </div>
       <div className="field is-pulled-right">
       </div>
       <div className="columns">
         <div className="column">
           <Editor
+            value={p.input.sql}
+            onValueChange={code => p.onChange({...p.input, ...{sql: code}})}
+            highlight={code => Prism.highlight(code, Prism.languages.sql, 'sql')}
+            padding={10}
+            preClassName="language-sql"
+            placeholder={`
+(Optional) Paste your SQL Query here, e.g.:
+
+EXPLAIN (ANALYZE, FORMAT JSON)
+SELECT *
+FROM generate_series(1, 10000);
+`.trim()}
+            style={{
+              fontFamily: '"Fira code", "Fira Mono", monospace',
+              fontSize: 12,
+              minHeight: '276px',
+            }}
+          />
+        </div>
+        <div className="column">
+          <Editor
             value={p.input.plan}
+            onPaste={(e) => {
+              const data = e.clipboardData.getData('text');
+              p.onChange({...p.input, ...{plan: data}});
+              history.push('/visualize/treetable' + history.location.search);
+            }}
             onValueChange={code => p.onChange({...p.input, ...{plan: code}})}
             highlight={code => Prism.highlight(code, Prism.languages.js, 'js')}
             padding={10}
@@ -134,27 +152,6 @@ export default function VisualizerInput(p: Props) {
               fontFamily: '"Fira code", "Fira Mono", monospace',
               fontSize: 12,
               minHeight: '320px',
-            }}
-          />
-        </div>
-        <div className="column">
-          <Editor
-            value={p.input.sql}
-            onValueChange={code => p.onChange({...p.input, ...{sql: code}})}
-            highlight={code => Prism.highlight(code, Prism.languages.sql, 'sql')}
-            padding={10}
-            preClassName="language-sql"
-            placeholder={`
-Paste your SQL Query here, e.g.:
-
-EXPLAIN (ANALYZE, FORMAT JSON)
-SELECT *
-FROM generate_series(1, 10000);
-`.trim()}
-            style={{
-              fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: 12,
-              minHeight: '276px',
             }}
           />
         </div>
