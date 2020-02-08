@@ -123,7 +123,7 @@ FROM generate_series(1, 10000);
             onValueChange={code => p.onChange({...p.input, ...{plan: code}})}
             highlight={code => Prism.highlight(code, Prism.languages.js, 'js')}
             padding={10}
-            placeholder={`Paste your JSON Plan here, e.g.:
+            placeholder={`Paste your JSON Plan or Share JSON here, e.g.:
 
 [
   {

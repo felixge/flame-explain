@@ -14,7 +14,7 @@ import {useKeyboardShortcuts} from './KeyboardShortcuts';
 import Highlight from './Highlight';
 
 
-type VisualizerState = {
+export type VisualizerState = {
   input: InputState;
   modal: 'Preferences' | 'Share' | null;
   preferences: PreferencesState;
@@ -67,7 +67,11 @@ export default function Visualizer(p: Props) {
   let errorText: string | null = null;
   try {
     let data = JSON.parse(planText);
-    rootNode = fromRawQueries(data);
+    if (typeof data === 'object' && 'flameExplain' in data) {
+      setState(data);
+    } else {
+      rootNode = fromRawQueries(data);
+    }
   } catch (e) {
     errorText = e + '';
   }
@@ -143,7 +147,7 @@ export default function Visualizer(p: Props) {
 
   return <section className="section">
     <Preferences onChange={onPreferencesChange} visible={state.modal === 'Preferences'} settings={settings} root={rootNode} />
-    <VisualizerShare planText={planText} visible={state.modal === 'Share'} />
+    <VisualizerShare state={state} visible={state.modal === 'Share'} />
     <div className="container">
       {gistNotice}
       <div className="tabs is-toggle">

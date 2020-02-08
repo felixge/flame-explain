@@ -1,12 +1,13 @@
 import React from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCopy, faPaste} from '@fortawesome/free-solid-svg-icons';
+import {VisualizerState} from './Visualizer';
 import Clipboard from 'react-clipboard.js';
 import * as clipboard from 'clipboard-polyfill';
 
 type Props = {
   visible: boolean;
-  planText?: string;
+  state: VisualizerState;
 };
 
 export default function VisualizerShare(p: Props) {
@@ -34,6 +35,14 @@ export default function VisualizerShare(p: Props) {
     return null;
   }
 
+  let shareJSON = {
+    ...{flameExplain: 'This JSON can be pasted on flame-explain.com.'},
+    ...p.state,
+  };
+  delete shareJSON.modal;
+  const shareText = JSON.stringify(shareJSON, null, '  ');
+  console.log(shareText);
+
   return <div className="modal is-active">
     <div className="modal-background"></div>
     <div className="modal-card">
@@ -45,15 +54,15 @@ export default function VisualizerShare(p: Props) {
         <div className="content">
           <p>
             FlameExplain runs exclusively in your browser and never sends your plan
-            information to another server.
+            information to a server.
     </p>
           <p>
-            However, you can share your plans as URL via GitHub Gists by following
+            However, you can share your plans as URL via GitHub Gists follow
             the steps below:
     </p>
 
           <p>
-            <Clipboard className="button is-info" data-clipboard-text={p.planText}>
+            <Clipboard className="button is-info" data-clipboard-text={shareText}>
               <span>1. Copy JSON Plan</span>
               <span className="icon is-small">
                 <FontAwesomeIcon icon={faCopy} />
