@@ -1,7 +1,9 @@
 import React from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {FlameNode, FlameKey, FlameKeyDesc, FlameKeyDescs} from '../lib/FlameExplain';
 import ReactMarkdown from 'react-markdown';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
+import {faWrench} from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
   visible: boolean;
@@ -84,8 +86,11 @@ export default function Preferences(p: Props) {
 
   return <div className="modal is-active">
     <div className="modal-background"></div>
-    <div className="modal-card">
+    <div className="modal-card" style={{width: '90%'}}>
       <header className="modal-card-head">
+        <span className="icon">
+          <FontAwesomeIcon icon={faWrench} />
+        </span>
         <p className="modal-card-title">Preferences</p>
         <button className="delete" aria-label="close"></button>
       </header>

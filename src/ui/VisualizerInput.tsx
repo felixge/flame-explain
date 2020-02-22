@@ -85,7 +85,9 @@ export default function VisualizerInput(p: Props) {
             className="button is-warning"
             disabled={!p.input.plan && !p.input.sql}
             onClick={() => {p.onChange({sql: '', plan: ''})}}
-          >Reset</button>
+          >
+            <span><u>R</u>eset</span>
+          </button>
         </div>
       </div>
       <div className="field is-pulled-right">

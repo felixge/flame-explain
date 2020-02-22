@@ -5,19 +5,18 @@ const cacheDuration = 180 * 1000;
 
 // debugDelay can be increased e.g. 5000 to simulate 5s loading time, it's only
 // meant for debugging.
-const debugDelay = 0;
+const debugDelay = 1000;
 
 type gistHookState = null | 'loading' | Result;
 
-export const useGist = (id: string | null): gistHookState => {
-  const [gist, setGist] = React.useState<gistHookState>((id === null)
+export const useGist = (id: string): gistHookState => {
+  const [gist, setGist] = React.useState<gistHookState>((!id)
     ? null
     : 'loading'
   );
 
   React.useEffect(() => {
-    if (id === null) {
-      setGist(null);
+    if (!id) {
       return;
     }
 
@@ -53,7 +52,8 @@ export const useGist = (id: string | null): gistHookState => {
       });
 
   }, [id]);
-  return gist;
+
+  return id ? gist : null;
 };
 
 const loadFromCacheOrGithub = async (id: string) => {
@@ -102,8 +102,15 @@ type cacheEntry = {
   response: githubResponse;
 };
 
-export function Gist(id: string | null): [string | undefined, JSX.Element[]] {
+export function Gist(id: string): [string | undefined, JSX.Element[]] {
   const gist = useGist(id);
+  if (gist === 'loading') {
+    console.log('gist=loading')
+  } else if (gist === null) {
+    console.log('gist=null')
+  } else {
+    console.log('gist=<data>')
+  }
   const [hideNotice, setHideNotice] = React.useState(false);
 
   let planText: string | undefined = undefined;
@@ -112,11 +119,11 @@ export function Gist(id: string | null): [string | undefined, JSX.Element[]] {
   const gistLink = <a href={'https://gist.github.com/' + id}>{id}</a>;
 
   if (gist === 'loading') {
+    planText = '[]';
     notices.push(
       <progress key="gist-loading" className="progress is-warning" max="100">
       </progress>
     );
-    planText = '[]';
   } else if (gist) {
     let cacheNotice = '';
     if (gist.expires) {
@@ -126,12 +133,12 @@ export function Gist(id: string | null): [string | undefined, JSX.Element[]] {
     }
 
     if (gist.error) {
-      planText = '[]';
       notices.push(<div key="gist-error" className="notification is-danger">
         Failed to load Gist {gistLink} from GitHub: {gist.error.message + '.'}
         {cacheNotice}
       </div>);
     } else if (!hideNotice) {
+      planText = gist.planText;
       notices.push(<div key="gist-info" className="notification is-success">
         Showing Gist {gistLink} from GitHub.{cacheNotice}
         <button onClick={() => setHideNotice(true)} className="delete"></button>

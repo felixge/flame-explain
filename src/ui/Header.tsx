@@ -33,9 +33,7 @@ export default function Header() {
       <section className="hero is-info is-bold">
         <div className="hero-body">
           <div className="container">
-            <h1 className="title">
-              FlameExplain
-        </h1>
+            <h1 className="title">FlameExplain</h1>
             <h2 className="subtitle">
               The next generation PostgreSQL EXPLAIN visualizer that <Link to="/about" className="has-text-warning">gets the numbers right</Link>.
         </h2>

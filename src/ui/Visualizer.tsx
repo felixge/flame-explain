@@ -2,7 +2,10 @@ import React from 'react';
 import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
-import {default as VisualizerShare} from './VisualizerShare';
+import {
+  default as VisualizerShare,
+  SharingState,
+} from './VisualizerShare';
 import {PreferencesState, default as Preferences} from './Preferences';
 import {FlameNode, fromRawQueries} from '../lib/FlameExplain';
 import {useRouteMatch, Redirect} from "react-router-dom";
@@ -18,6 +21,8 @@ export type VisualizerState = {
   input: InputState;
   modal: 'Preferences' | 'Share' | null;
   preferences: PreferencesState;
+  share: SharingState;
+  gist: string;
 };
 
 interface Props {
@@ -44,10 +49,11 @@ export default function Visualizer(p: Props) {
     input: {plan: p.planText || '', sql: ''},
     preferences: defaultPreferences,
     modal: null,
+    share: {tab: 'json'},
+    gist: '',
   };
 
-  const [state, setState] = useLocalStorage('visualizer', defaultState);
-  let planText = state.input.plan;
+  let [state, setState] = useLocalStorage('visualizer', defaultState);
   const settings = state.preferences;
   const setPreferences = (s: PreferencesState) => {
     setState({...state, ...{preferences: s}});
@@ -58,24 +64,27 @@ export default function Visualizer(p: Props) {
   };
 
   const q = new URLSearchParams(history.location.search);
-  const [gistPlanText, gistNotice] = Gist(q.get('gist'));
-  if (gistPlanText) {
-    planText = gistPlanText;
+  const [gistContent, gistNotice] = Gist(q.get('gist') || '');
+  //console.log('?gist=' + q.get('gist'), 'gist.length = ' + (gistContent || '').length);
+  if (gistContent && gistContent !== state.input.plan) {
+    let newState: Partial<VisualizerState> = {
+      input: {plan: gistContent, sql: ''},
+    };
+    setState({...state, ...newState});
   }
 
   let rootNode: FlameNode | undefined = undefined;
   let errorText: string | null = null;
   try {
-    let data = JSON.parse(planText);
+    let data = JSON.parse(state.input.plan);
     if (typeof data === 'object' && 'flameExplain' in data) {
-      setState(data);
-    } else {
-      rootNode = fromRawQueries(data);
+      state = data;
+      data = JSON.parse(state.input.plan);
     }
+    rootNode = fromRawQueries(data);
   } catch (e) {
     errorText = e + '';
   }
-
 
   useKeyboardShortcuts((key: string) => {
     switch (key) {
@@ -145,9 +154,13 @@ export default function Visualizer(p: Props) {
     setPreferences(newPreferences);
   };
 
+  const onShareChange = (share: SharingState) => {
+    setState({...state, ...{share}});
+  };
+
   return <section className="section">
     <Preferences onChange={onPreferencesChange} visible={state.modal === 'Preferences'} settings={settings} root={rootNode} />
-    <VisualizerShare state={state} visible={state.modal === 'Share'} />
+    <VisualizerShare onChange={onShareChange} state={state} visible={state.modal === 'Share'} />
     <div className="container">
       {gistNotice}
       <div className="tabs is-toggle">
