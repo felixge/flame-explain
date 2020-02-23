@@ -66,6 +66,9 @@ export default function VisualizerInput(p: Props) {
           Prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
           , execute it, paste the resulting JSON below.
         </p>
+        <p>
+          FlameExplain runs in your browser and never sends your data to another computer.
+        </p>
       </div>
       <div className="field is-grouped">
         <div className="control">
