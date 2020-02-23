@@ -12,7 +12,7 @@ import {useRouteMatch, Redirect} from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faWrench as iconPreferences, faShareAlt as iconShare} from '@fortawesome/free-solid-svg-icons';
 import {useLocalStorage} from './LocalStorage';
-import {Gist} from './Gist';
+import {useGist, GistNotice} from './Gist';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
 import Highlight from './Highlight';
 
@@ -52,7 +52,6 @@ export default function Visualizer(p: Props) {
   };
 
   let [state, setState] = useLocalStorage('visualizer', defaultState);
-  let [gistState, setGistState] = React.useState('');
 
   const settings = state.preferences;
   const setPreferences = (s: PreferencesState) => {
@@ -64,13 +63,18 @@ export default function Visualizer(p: Props) {
   };
 
   const q = new URLSearchParams(history.location.search);
-  const [gistContent, gistNotice] = Gist(q.get('gist') || '');
-  if (gistContent && gistContent !== gistState) {
+  const gist = useGist(q.get('gist') || '');
+  let [prevGist, setPrevGist] = React.useState<typeof gist>(null);
+  if (gist && prevGist !== gist) {
+    const plan = (gist === 'loading')
+      ? '[]'
+      : gist.planText || '[]';
+
     let newState: Partial<VisualizerState> = {
-      input: {plan: gistContent, sql: ''},
+      input: {plan: plan, sql: ''},
     };
     setState(state => ({...state, ...newState}));
-    setGistState(gistContent);
+    setPrevGist(gist);
   }
 
   let rootNode: FlameNode | undefined = undefined;
@@ -84,7 +88,6 @@ export default function Visualizer(p: Props) {
     }
     rootNode = fromRawQueries(data);
   } catch (e) {
-    console.log(e);
     errorText = e + '';
   }
 
@@ -176,7 +179,7 @@ export default function Visualizer(p: Props) {
       visible={state.modal === 'Share'}
     />
     <div className="container">
-      {gistNotice}
+      <GistNotice gist={gist} />
       <div className="tabs is-toggle">
         <ul>
           <li className={match.params.tab === 'input' ? 'is-active' : ''}>

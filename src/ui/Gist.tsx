@@ -104,44 +104,6 @@ type cacheEntry = {
   response: githubResponse;
 };
 
-export function Gist(id: string): [string | undefined, JSX.Element[]] {
-  const gist = useGist(id);
-  const [hideNotice, setHideNotice] = React.useState(false);
-
-  let planText: string | undefined = undefined;
-  let notices: JSX.Element[] = [];
-
-  const gistLink = <a href={'https://gist.github.com/' + id}>{id}</a>;
-
-  if (gist === 'loading') {
-    notices.push(
-      <progress key="gist-loading" className="progress is-warning" max="100">
-      </progress>
-    );
-  } else if (gist) {
-    let cacheNotice = '';
-    if (gist.expires) {
-      const remain = ((gist.expires - Date.now()) / 1000).toFixed(0);
-      cacheNotice = ` To avoid API rate limiting, this response will remain ` +
-        `cached for ${remain} second(s).`;
-    }
-
-    if (gist.error) {
-      notices.push(<div key="gist-error" className="notification is-danger">
-        Failed to load Gist {gistLink} from GitHub: {gist.error.message + '.'}
-        {cacheNotice}
-      </div>);
-    } else if (!hideNotice) {
-      planText = gist.planText;
-      notices.push(<div key="gist-info" className="notification is-success">
-        Showing Gist {gistLink} from GitHub.{cacheNotice}
-        <button onClick={() => setHideNotice(true)} className="delete"></button>
-      </div>);
-    }
-  }
-  return [planText, notices];
-}
-
 type Props = {
   gist: ReturnType<typeof useGist>,
 };
@@ -151,7 +113,7 @@ export function GistNotice(p: Props) {
 
   const {gist} = p;
   if (gist === null) {
-    return;
+    return null;
   }
 
   if (gist === 'loading') {
@@ -182,4 +144,5 @@ export function GistNotice(p: Props) {
       <button onClick={() => setHideNotice(true)} className="delete"></button>
     </div>;
   }
+  return null;
 }
