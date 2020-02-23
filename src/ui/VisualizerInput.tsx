@@ -7,6 +7,7 @@ import Prism from 'prismjs';
 import 'prismjs/plugins/custom-class/prism-custom-class';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
+import {useKeyboardShortcuts} from './KeyboardShortcuts';
 
 // Can't import the theme from prismjs module directly because we need to hack
 // it with prefixes, see below.
@@ -47,6 +48,15 @@ export default function VisualizerInput(p: Props) {
       break;
     }
   }
+
+
+  useKeyboardShortcuts((key: string) => {
+    switch (key) {
+      case 'r':
+        p.onChange({sql: '', plan: ''})
+        break
+    }
+  });
 
   return (
     <div>

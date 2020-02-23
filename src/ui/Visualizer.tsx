@@ -22,7 +22,6 @@ export type VisualizerState = {
   modal: 'Preferences' | 'Share' | null;
   preferences: PreferencesState;
   share: SharingState;
-  gist: string;
 };
 
 interface Props {
@@ -50,39 +49,42 @@ export default function Visualizer(p: Props) {
     preferences: defaultPreferences,
     modal: null,
     share: {tab: 'json'},
-    gist: '',
   };
 
   let [state, setState] = useLocalStorage('visualizer', defaultState);
+  let [gistState, setGistState] = React.useState('');
+
   const settings = state.preferences;
   const setPreferences = (s: PreferencesState) => {
-    setState({...state, ...{preferences: s}});
+    setState(state => ({...state, ...{preferences: s}}));
   };
   const toggleModal = (modal: typeof state.modal) => {
     const m = state.modal === modal ? null : modal;
-    setState({...state, ...{modal: m}});
+    setState(state => ({...state, ...{modal: m}}));
   };
 
   const q = new URLSearchParams(history.location.search);
   const [gistContent, gistNotice] = Gist(q.get('gist') || '');
-  //console.log('?gist=' + q.get('gist'), 'gist.length = ' + (gistContent || '').length);
-  if (gistContent && gistContent !== state.input.plan) {
+  if (gistContent && gistContent !== gistState) {
     let newState: Partial<VisualizerState> = {
       input: {plan: gistContent, sql: ''},
     };
-    setState({...state, ...newState});
+    setState(state => ({...state, ...newState}));
+    setGistState(gistContent);
   }
 
   let rootNode: FlameNode | undefined = undefined;
   let errorText: string | null = null;
   try {
-    let data = JSON.parse(state.input.plan);
+    let data = JSON.parse(state.input.plan || '[]');
     if (typeof data === 'object' && 'flameExplain' in data) {
-      state = data;
-      data = JSON.parse(state.input.plan);
+      const {input, preferences} = JSON.parse(state.input.plan);
+      setState(state => ({...state, ...{input, preferences}}));
+      data = [];
     }
     rootNode = fromRawQueries(data);
   } catch (e) {
+    console.log(e);
     errorText = e + '';
   }
 
@@ -90,7 +92,7 @@ export default function Visualizer(p: Props) {
     switch (key) {
       case 'Enter':
       case 'Escape':
-        setState({...state, ...{modal: null}});
+        setState(state => ({...state, ...{modal: null}}));
         break;
       case 'i':
         history.push('/visualize/input' + history.location.search);
@@ -127,7 +129,7 @@ export default function Visualizer(p: Props) {
         input={state.input}
         onChange={(input) => {
           history.push('/visualize/input');
-          setState({...state, ...{input: input}});
+          setState(state => ({...state, ...{input: input}}));
         }}
       />;
       break;
@@ -155,12 +157,24 @@ export default function Visualizer(p: Props) {
   };
 
   const onShareChange = (share: SharingState) => {
-    setState({...state, ...{share}});
+    setState(state => ({...state, ...{share}}));
   };
 
+
   return <section className="section">
-    <Preferences onChange={onPreferencesChange} visible={state.modal === 'Preferences'} settings={settings} root={rootNode} />
-    <VisualizerShare onChange={onShareChange} state={state} visible={state.modal === 'Share'} />
+    <Preferences
+      onClose={() => toggleModal('Preferences')}
+      onChange={onPreferencesChange}
+      visible={state.modal === 'Preferences'}
+      settings={settings}
+      root={rootNode}
+    />
+    <VisualizerShare
+      onClose={() => toggleModal('Share')}
+      onChange={onShareChange}
+      state={state}
+      visible={state.modal === 'Share'}
+    />
     <div className="container">
       {gistNotice}
       <div className="tabs is-toggle">

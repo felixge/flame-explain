@@ -9,6 +9,7 @@ type Props = {
   visible: boolean;
   settings: PreferencesState;
   onChange: (s: PreferencesState) => void;
+  onClose: () => void;
   root?: FlameNode;
 };
 
@@ -92,7 +93,7 @@ export default function Preferences(p: Props) {
           <FontAwesomeIcon icon={faWrench} />
         </span>
         <p className="modal-card-title">Preferences</p>
-        <button className="delete" aria-label="close"></button>
+        <button className="delete" aria-label="close" onClick={p.onClose}></button>
       </header>
       <section className="modal-card-body">
         <div className="tabs is-toggle">

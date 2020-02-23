@@ -21,11 +21,12 @@ type Props = {
   visible: boolean;
   state: VisualizerState;
   onChange: (s: SharingState) => void;
+  onClose: () => void;
 };
 
 type ShareJSON = {
   flameExplain: string,
-} & Pick<VisualizerState, 'preferences' | 'input' | 'share'>;
+} & Pick<VisualizerState, 'preferences' | 'input'>;
 
 export default function VisualizerShare(p: Props) {
   const {tab} = p.state.share;
@@ -155,7 +156,7 @@ export default function VisualizerShare(p: Props) {
           <FontAwesomeIcon icon={faShareAlt} />
         </span>
         <p className="modal-card-title">Share</p>
-        <button className="delete" aria-label="close"></button>
+        <button className="delete" aria-label="close" onClick={p.onClose}></button>
       </header>
       <section className="modal-card-body">
         <div className="tabs is-toggle is-fullwidth">
@@ -197,7 +198,7 @@ export default function VisualizerShare(p: Props) {
 
 function stateToShareText(s: VisualizerState): string {
   const flameExplain = 'Go to flame-explain.com and paste this JSON in the Input tab.';
-  const {input, preferences, share} = s;
-  const shareJSON: ShareJSON = {flameExplain, input, preferences, share};
+  const {input, preferences} = s;
+  const shareJSON: ShareJSON = {flameExplain, input, preferences};
   return JSON.stringify(shareJSON, null, '  ');
 }
