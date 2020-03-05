@@ -2,6 +2,7 @@ import React from 'react';
 import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
+import VisualizerFlamegraph from './VisualizerFlamegraph';
 import {
   default as VisualizerShare,
   SharingState,
@@ -148,6 +149,15 @@ export default function Visualizer(p: Props) {
       </div>
       break;
     case 'flamegraph':
+      if (!rootNode) {
+        return <Redirect to="/" />;
+      }
+      tab = <div>
+        <div className="content">
+          <Highlight language="sql" source={state.input.sql} />
+        </div>
+        <VisualizerFlamegraph settings={settings} root={rootNode} />
+      </div>
       break;
     case 'networkgraph':
       break;
