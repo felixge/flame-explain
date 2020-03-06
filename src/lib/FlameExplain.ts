@@ -39,6 +39,7 @@ type FlameFragment = {
   "Total Time"?: number;
   /** Self Time is like Total Time, but excludes time spent in child nodes. */
   "Self Time"?: number;
+  /** Self Time % */
   "Self Time %"?: number;
   "Self Time %%"?: number;
   /** Warnings contains a list of problems encountered while transforming the
@@ -642,37 +643,32 @@ function quoteIdentifier(s: string): string {
 export type FlameKey = keyof FlameNode;
 
 export type FlameKeyDesc = {
-  Key: FlameKey;
   ShortKey?: string;
   Source?: 'PostgreSQL' | 'FlameExplain';
-  Unit?: 'millisecond' | 'row';
+  Unit?: 'millisecond' | 'row' | 'percent';
   Description?: string;
 };
 
-export const FlameKeyDescs: FlameKeyDesc[] = [
-  {
-    Key: 'ID',
+export const flameKeyDescs: {[K in FlameKey]?: FlameKeyDesc} = {
+  'ID': {
     Source: 'FlameExplain',
     ShortKey: '#',
     Description: `
 A unique sequential identifier that FlameExplain assigns to all nodes in the
 query, including virtual nodes created by FlameExplain itself. It has no deeper
-meaning and is primarely useful to refer to FlameExplain output in discussions.
-`,
+meaning and is primarely useful to refer to FlameExplain output in
+discussions.`,
   },
 
-  {
-    Key: 'Label',
+  'Label': {
     Source: 'FlameExplain',
     Description: `
 A short human readable label derrived from various PostgreSQL fields such as
 \`Node Type\`, \`Relation Name\`, \`Alias\` etc. It attempts to be identical
-to the node labels produced by \`EXPLAIN (ANALYZE, FORMAT TEXT)\`.
-`,
+to the node labels produced by \`EXPLAIN (ANALYZE, FORMAT TEXT)\`.`,
   },
 
-  {
-    Key: 'Node Type',
+  'Node Type': {
     Source: 'PostgreSQL',
     Description: `
 The type of the PostgreSQL query plan node. As of version 12, PostgreSQL
@@ -689,8 +685,7 @@ Function Scan\`, \`Values Scan\`, \`CTE Scan\`, \`Named Tuplestore Scan\`,
 `,
   },
 
-  {
-    Key: 'Plan Rows',
+  'Plan Rows': {
     Source: 'PostgreSQL',
     ShortKey: 'P. Rows',
     Unit: 'row',
@@ -699,21 +694,19 @@ The number of rows the query planner expected this node to produce. This value
 is a key input into how the query planner picks a query plan, and a big
 mismatch mismatch with \`Actual Rows\` will often result in sub-optimal plan.
 Figuring out the root cause (e.g. stale statistics) and fixing it (e.g. by
-running VACUUM) can often produce great performance improvements.
-`,
-  }, {
-    Key: 'Actual Rows',
+running VACUUM) can often produce great performance improvements.`,
+  },
+
+  'Actual Rows': {
     Source: 'PostgreSQL',
     ShortKey: 'A. Rows',
     Unit: 'row',
     Description: `
 The actual number of rows the executor produced for this node. See
-\`Plan Rows\` for more information.
-`,
+\`Plan Rows\` for more information.`,
   },
 
-  {
-    Key: 'Actual Total Time',
+  'Actual Total Time': {
     Source: 'PostgreSQL',
     ShortKey: 'A.T. Time',
     Unit: 'millisecond',
@@ -721,23 +714,19 @@ The actual number of rows the executor produced for this node. See
 The total amount of time PostgreSQL spent on executing this node. For looped
 nodes, this is value is the average time per loop. When InitPlans or parallel
 queries are involved the sum of the node's children \`Actual Total Time\` might
-exceed the parents node \`Actual Total Time\`. 
-`,
+exceed the parents node \`Actual Total Time\`.`,
   },
 
-  {
-    Key: 'Actual Startup Time',
+  'Actual Startup Time': {
     Source: 'PostgreSQL',
     ShortKey: 'A.S. Time',
     Unit: 'millisecond',
     Description: `
 The amount of time it took PostgreSQL to produce the first row for this node. For looped
-nodes, this is value is the average startup time per loop.
-`,
+nodes, this is value is the average startup time per loop.`,
   },
 
-  {
-    Key: 'Total Time',
+  'Total Time': {
     Source: 'FlameExplain',
     ShortKey: 'T. Time',
     Unit: 'millisecond',
@@ -747,19 +736,34 @@ value is adjusted for loops, parallel queries, filters and CTEs so that it
 represents the wall clock time exclusively attributable to this node and its
 children. There should be no cases where the sum of a node's children
 \`Total Time\` exceeds the parent node's \`Total Time\`. If you find such a
-case, please report it as a bug.
-`,
+case, please report it as a bug.`,
   },
 
-  {
-    Key: 'Self Time',
+  'Self Time': {
     Source: 'FlameExplain',
     ShortKey: 'S. Time',
     Unit: 'millisecond',
     Description: `
 The wall clock time spent on executing this node, while excluding the time
 spent on child nodes. Thanks to FlameExplain's advanced adjustments, this value
-should never be negative. See \`Total Time\`.
-`,
+should never be negative. See \`Total Time\`.`,
   },
-];
+
+  'Self Time %': {
+    Source: 'FlameExplain',
+    ShortKey: 'S. Time %',
+    Unit: 'percent',
+    Description: `
+The \`Self Time\` of this node divided by the \`Total Time\` of the root node.`,
+  },
+
+  'Self Time %%': {
+    Source: 'FlameExplain',
+    ShortKey: 'S. Time %%',
+    Unit: 'percent',
+    Description: `
+The \`Self Time\` of this node divided by \`Self Time\` of the node with the
+highest \`Self Time\`. This is used to color highlight the self time of the
+node in the table view.`,
+  },
+}

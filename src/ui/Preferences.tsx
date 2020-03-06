@@ -1,6 +1,6 @@
 import React from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {FlameNode, FlameKey, FlameKeyDesc, FlameKeyDescs} from '../lib/FlameExplain';
+import {FlameNode, FlameKey, flameKeyDescs} from '../lib/FlameExplain';
 import ReactMarkdown from 'react-markdown';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
 import {faWrench} from '@fortawesome/free-solid-svg-icons';
@@ -18,39 +18,39 @@ export type PreferencesState = {
 };
 
 export default function Preferences(p: Props) {
-  let descs = FlameKeyDescs;
+  let allKeys = Object.keys(flameKeyDescs)
+    .map(key => key as keyof typeof flameKeyDescs);
+
   if (p.root) {
-    descs = descs.concat(flameKeys(p.root)
-      .filter(key => !descs.find(desc => desc.Key === key))
-      .map((key): FlameKeyDesc => ({
-        Key: key,
-        Description: 'This field has not been documented yet.',
-      })));
+    flameKeys(p.root).forEach(key => {
+      if (!flameKeyDescs[key]) {
+        allKeys.push(key);
+      }
+    });
   }
 
-
-  const rows = descs.map(desc => {
+  const rows = allKeys.map(currentKey => {
     const toggleCheckbox = (val: boolean) => {
+      const newKeys = allKeys.filter(key => {
+        return (key === currentKey)
+          ? val
+          : p.settings.SelectedKeys.includes(key);
+      });
       const newPreferences: PreferencesState = {
         ...p.settings,
-        ...{
-          SelectedKeys: [desc.Key]
-            .concat(p.settings.SelectedKeys)
-            .filter(key => key !== desc.Key || val === true)
-            .sort((a: FlameKey, b: FlameKey) => {
-              const ai = descs.findIndex(desc => desc.Key === a);
-              const bi = descs.findIndex(desc => desc.Key === b);
-              return ai - bi;
-            }),
-        }
+        ...{SelectedKeys: newKeys}
       };
       p.onChange(newPreferences);
     };
 
+    const desc = flameKeyDescs[currentKey] || {
+      Description: 'This field has not been documented yet.'
+    };
+
     return <tr
-      key={desc.Key}
+      key={currentKey}
       onClick={() => {
-        toggleCheckbox(!p.settings.SelectedKeys.includes(desc.Key));
+        toggleCheckbox(!p.settings.SelectedKeys.includes(currentKey));
       }}
     >
       <td>
@@ -60,10 +60,10 @@ export default function Preferences(p: Props) {
             toggleCheckbox(e.target.checked);
             e.stopPropagation();
           }}
-          checked={p.settings.SelectedKeys.includes(desc.Key)}
+          checked={p.settings.SelectedKeys.includes(currentKey)}
         />
       </td>
-      <td style={{whiteSpace: 'nowrap'}}><code>{desc.Key}</code></td>
+      <td style={{whiteSpace: 'nowrap'}}><code>{currentKey}</code></td>
       <td>{desc.Source}</td>
       <td>{desc.Unit}</td>
       <td><ReactMarkdown source={desc.Description} /></td>
