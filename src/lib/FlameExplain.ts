@@ -1,4 +1,10 @@
-import {RawNode, RawQuery, RawQueries} from './RawExplain';
+import {
+  RawNode,
+  RawQuery,
+  RawQueries,
+  nodeTypes,
+  postgresVersion
+} from './RawExplain';
 import {Disjoint} from './Util';
 
 export type FlameNode = Disjoint<
@@ -671,17 +677,8 @@ to the node labels produced by \`EXPLAIN (ANALYZE, FORMAT TEXT)\`.`,
   'Node Type': {
     Source: 'PostgreSQL',
     Description: `
-The type of the PostgreSQL query plan node. As of version 12, PostgreSQL
-currently implements 39 different node types:
-\`Result\`, \`ProjectSet\`, \`ModifyTable\`, \`Append\`, \`Merge Append\`,
-\`Recursive Union\`, \`BitmapAnd\`, \`BitmapOr\`, \`Nested Loop\`, \`Merge
-Join\`, \`Hash Join\`, \`Seq Scan\`, \`Sample Scan\`, \`Gather\`, \`Gather
-Merge\`, \`Index Scan\`, \`Index Only Scan\`, \`Bitmap Index Scan\`, \`Bitmap
-Heap Scan\`, \`Tid Scan\`, \`Subquery Scan\`, \`Function Scan\`, \`Table
-Function Scan\`, \`Values Scan\`, \`CTE Scan\`, \`Named Tuplestore Scan\`,
-\`WorkTable Scan\`, \`Foreign Scan\`, \`Custom Scan\`, \`Materialize\`,
-\`Sort\`, \`Group\`, \`Aggregate\`, \`WindowAgg\`, \`Unique\`, \`SetOp\`,
-\`LockRows\`, \`Limit\`, \`Hash\`.
+The type of the PostgreSQL query plan node. As of version ${postgresVersion}, PostgreSQL
+currently implements ${nodeTypes.length} different node types: ${nodeTypes.map(t => '`' + t + '`').join(', ')}.
 `,
   },
 

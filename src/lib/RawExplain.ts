@@ -7,6 +7,7 @@
  *
  * [1] https://github.com/postgres/postgres/blob/REL_12_0/src/backend/commands/explain.c
  */
+export const postgresVersion = '12.0';
 
 /**
  * Queries defines the JSON array that is produced by EXPLAIN (FORMAT JSON).
@@ -95,49 +96,53 @@ type CommonFragment = {
   "Actual Total Time": number;
 };
 
+
+export const nodeTypes = [
+  'Aggregate',
+  'Append',
+  'Bitmap Heap Scan',
+  'Bitmap Index Scan',
+  'BitmapAnd',
+  'BitmapOr',
+  'CTE Scan',
+  'Custom Scan',
+  'Foreign Scan',
+  'Function Scan',
+  'Gather Merge',
+  'Gather',
+  'Group',
+  'Hash Join',
+  'Hash',
+  'Index Only Scan',
+  'Index Scan',
+  'Limit',
+  'LockRows',
+  'Materialize',
+  'Merge Append',
+  'Merge Join',
+  'ModifyTable',
+  'Named Tuplestore Scan',
+  'Nested Loop',
+  'ProjectSet',
+  'Recursive Union',
+  'Result',
+  'Sample Scan',
+  'Seq Scan',
+  'SetOp',
+  'Sort',
+  'Subquery Scan',
+  'Table Function Scan',
+  'Tid Scan',
+  'Unique',
+  'Values Scan',
+  'WindowAgg',
+  'WorkTable Scan',
+] as const;
+
 /**
  * NodeType is a list of all Node Type values implemented by PostgreSQL.
  */
-export type NodeType =
-  'Result' |
-  'ProjectSet' |
-  'ModifyTable' |
-  'Append' |
-  'Merge Append' |
-  'Recursive Union' |
-  'BitmapAnd' |
-  'BitmapOr' |
-  'Nested Loop' |
-  'Merge Join' |
-  'Hash Join' |
-  'Seq Scan' |
-  'Sample Scan' |
-  'Gather' |
-  'Gather Merge' |
-  'Index Scan' |
-  'Index Only Scan' |
-  'Bitmap Index Scan' |
-  'Bitmap Heap Scan' |
-  'Tid Scan' |
-  'Subquery Scan' |
-  'Function Scan' |
-  'Table Function Scan' |
-  'Values Scan' |
-  'CTE Scan' |
-  'Named Tuplestore Scan' |
-  'WorkTable Scan' |
-  'Foreign Scan' |
-  'Custom Scan' |
-  'Materialize' |
-  'Sort' |
-  'Group' |
-  'Aggregate' |
-  'WindowAgg' |
-  'Unique' |
-  'SetOp' |
-  'LockRows' |
-  'Limit' |
-  'Hash';
+export type NodeType = (typeof nodeTypes)[number];
 
 /**
  * TargetRelFragment is present when Node Type is "Seq Scan" | "Sample Scan" |
