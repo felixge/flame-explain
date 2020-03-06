@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlameNode, FlameKey} from '../lib/FlameExplain';
+import {FlameNode} from '../lib/FlameExplain';
 import {columnText} from '../lib/TextTable';
 import {PreferencesState} from './Preferences';
 import {interpolateReds} from 'd3-scale-chromatic';
@@ -23,7 +23,7 @@ export default function VisualizerTable(p: Props) {
         }
         let color = '';
         let backgroundColor = '';
-        const percent = fn[(col + ' %%' as FlameKey)];
+        const percent = fn.Colors?.[col as keyof FlameNode["Colors"]];
         if (typeof percent === 'number') {
           [color, backgroundColor] = colorPair(percent);
         }

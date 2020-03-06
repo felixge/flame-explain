@@ -63,7 +63,7 @@ export default function VisualizerInput(p: Props) {
       {errorDiv}
       <div className="field content">
         <p>
-          Prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON)</strong>
+          Prefix your SQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON, VERBOSE, BUFFERS)</strong>
           , execute it, paste the resulting JSON below.
         </p>
         <p>

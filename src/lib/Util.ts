@@ -7,6 +7,14 @@ export type Disjoint<T1, T2> = Extract<keyof T1, keyof T2> extends never
   ? T1 & T2
   : never
 
+
+// See https://stackoverflow.com/a/50900933
+type AllowedFieldsWithType<Obj, Type> = {
+  [K in keyof Obj]: Obj[K] extends Type ? K : never
+};
+
+export type ExtractFieldsOfType<Obj, Type> = AllowedFieldsWithType<Required<Obj>, Type>[keyof Obj]
+
 export function assert(condition: any, msg?: string): asserts condition {
   if (!condition) {
     throw new Error(msg);

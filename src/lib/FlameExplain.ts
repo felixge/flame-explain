@@ -5,12 +5,20 @@ import {
   nodeTypes,
   postgresVersion
 } from './RawExplain';
-import {Disjoint} from './Util';
+import {Disjoint, ExtractFieldsOfType} from './Util';
 
-export type FlameNode = Disjoint<
+type FlameNodeWithoutColors = Disjoint<
   Omit<RawQuery, "Plan"> & Omit<RawNode, "Plans">,
   FlameFragment
 >;
+
+type FlameNodeColorFields = ExtractFieldsOfType<FlameNodeWithoutColors, number>;
+
+type ColorFragment = {[K in FlameNodeColorFields]?: number};
+
+export type FlameNode = FlameNodeWithoutColors & {
+  Colors?: ColorFragment
+};
 
 type FlameFragment = {
   /** Kind captures what kind of node this is. Root nodes have only Children
@@ -47,7 +55,8 @@ type FlameFragment = {
   "Self Time"?: number;
   /** Self Time % */
   "Self Time %"?: number;
-  "Self Time %%"?: number;
+  /** Depth is the depth of the node in the tree, starting with 0. */
+  "Depth"?: number;
   /** Warnings contains a list of problems encountered while transforming the
   * data.*/
   "Warnings"?: [];
@@ -137,6 +146,8 @@ export function fromRawQueries(
   }
   setSelfTimePercent(root);
   setIDs(root);
+  setDepths(root);
+  setColors(root);
 
   return root;
 };
@@ -432,7 +443,6 @@ function setSelfTimePercent(root: FlameNode) {
       if (typeof root["Total Time"] === 'number') {
         fn["Self Time %"] = fn["Self Time"] / root["Total Time"];
       }
-      fn["Self Time %%"] = fn["Self Time"] / maxSelfTime;
     }
     fn.Children?.forEach(assign);
   };
@@ -448,6 +458,57 @@ function setIDs(root: FlameNode) {
   }
   root.Children?.forEach(visit);
 }
+
+function setDepths(root: FlameNode) {
+  let maxDepth = 0;
+  const visit = (fn: FlameNode, depth: number = 0) => {
+    fn.Depth = depth;
+    maxDepth = Math.max(maxDepth, depth);
+    fn.Children?.forEach(child => visit(child, depth + 1));
+  }
+  root.Children?.forEach(visit);
+}
+
+function setColors(root: FlameNode) {
+  const maxVals = maxValsForColor(root) || {};
+  const visit = (fn: FlameNode) => {
+    fn.Colors = {};
+    const keys = Object.keys(maxVals).map(key => key as keyof typeof maxVals);
+    keys.forEach(key => {
+      const val = fn[key];
+      if (fn.Colors) {
+        fn.Colors[key] = 0;
+      }
+      if (typeof val === 'number' && fn.Colors && maxVals) {
+        const maxVal = maxVals[key] || 0;
+        if (maxVal > 0) {
+          fn.Colors[key] = val / maxVal;
+        }
+      }
+    });
+    fn.Children?.forEach(visit);
+  }
+  root.Children?.forEach(visit);
+}
+
+function maxValsForColor(root: FlameNode) {
+  let maxVals: ColorFragment = {};
+  const visit = (fn: FlameNode) => {
+    const keys = Object.keys(fn).map(key => key as keyof typeof maxVals);
+    keys.forEach(key => {
+      const val = fn[key];
+      if (typeof val === 'number') {
+        const maxVal = maxVals[key] || 0;
+        maxVals[key] = Math.max(maxVal, val);
+      }
+    });
+
+    fn.Children?.forEach(visit);
+  }
+  root.Children?.forEach(visit);
+  return maxVals;
+}
+
 
 
 function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
@@ -752,15 +813,5 @@ should never be negative. See \`Total Time\`.`,
     Unit: 'percent',
     Description: `
 The \`Self Time\` of this node divided by the \`Total Time\` of the root node.`,
-  },
-
-  'Self Time %%': {
-    Source: 'FlameExplain',
-    ShortKey: 'S. Time %%',
-    Unit: 'percent',
-    Description: `
-The \`Self Time\` of this node divided by \`Self Time\` of the node with the
-highest \`Self Time\`. This is used to color highlight the self time of the
-node in the table view.`,
   },
 }

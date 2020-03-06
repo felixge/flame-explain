@@ -44,6 +44,7 @@ export type RawNode = Partial<
   & TimingFragment
   & HashFragment
   & GatherFragment
+  & BuffersFragment
 >;
 
 type CommonFragment = {
@@ -322,3 +323,16 @@ type GatherFragment = {
 type WorkerFragment = {
   "Worker Number": number;
 } & TimingFragment & AnalyzedFragment;
+
+type BuffersFragment = {
+  "Shared Hit Blocks": number,
+  "Shared Read Blocks": number,
+  "Shared Dirtied Blocks": number,
+  "Shared Written Blocks": number,
+  "Local Hit Blocks": number,
+  "Local Read Blocks": number,
+  "Local Dirtied Blocks": number,
+  "Local Written Blocks": number,
+  "Temp Read Blocks": number,
+  "Temp Written Blocks": number,
+};
