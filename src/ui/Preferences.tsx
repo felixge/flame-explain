@@ -29,6 +29,16 @@ export default function Preferences(p: Props) {
     });
   }
 
+  // Our SelectedKeys keys might contain unknown keys (not found in
+  // flameKeyDescs) from a previous plan. It'd be weird if we simply remove
+  // those keys from the table view after the user had selected them, so we
+  // add them back to our list of keys that can be selected. However if the
+  // user then deselects those keys, they disappear from the list. This is
+  // not perfect, but okay for now.
+  allKeys = allKeys.concat(p.settings.SelectedKeys.filter(
+    key => !allKeys.includes(key)
+  ))
+
   const rows = allKeys.map(currentKey => {
     const toggleCheckbox = (val: boolean) => {
       const newKeys = allKeys.filter(key => {
