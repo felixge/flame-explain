@@ -18,6 +18,64 @@ export type PreferencesState = {
 };
 
 export default function Preferences(p: Props) {
+  const rows = PreferencesColumnsRows(p);
+
+  const clickClose = () => {
+    //const newPreferences: PreferencesState = {...p.settings, ...{Visible: false}};
+    //p.onChange(newPreferences);
+  };
+
+  useKeyboardShortcuts((key: string) => {
+    if (key === 'Enter' || key === 'Escape') {
+      clickClose();
+    }
+  });
+
+  if (!p.visible) {
+    return null;
+  }
+
+  return <div className="modal is-active">
+    <div className="modal-background"></div>
+    <div className="modal-card" style={{width: '90%'}}>
+      <header className="modal-card-head">
+        <span className="icon">
+          <FontAwesomeIcon icon={faWrench} />
+        </span>
+        <p className="modal-card-title">Preferences</p>
+        <button className="delete" aria-label="close" onClick={p.onClose}></button>
+      </header>
+      <section className="modal-card-body">
+        <div className="tabs is-toggle">
+          <ul>
+            <li className={''}>
+              <a href="/">General</a>
+            </li>
+            <li className={'is-active'}>
+              <a href="/">Tree Table</a>
+            </li>
+          </ul>
+        </div>
+        <table className="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Column</th>
+              <th>Source</th>
+              <th>Unit</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows}
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+};
+
+function PreferencesColumnsRows(p: Props) {
   let allKeys = Object.keys(flameKeyDescs)
     .map(key => key as keyof typeof flameKeyDescs);
 
@@ -79,61 +137,8 @@ export default function Preferences(p: Props) {
       <td><ReactMarkdown source={desc.Description} /></td>
     </tr>;
   });
-
-  const clickClose = () => {
-    //const newPreferences: PreferencesState = {...p.settings, ...{Visible: false}};
-    //p.onChange(newPreferences);
-  };
-
-  useKeyboardShortcuts((key: string) => {
-    if (key === 'Enter' || key === 'Escape') {
-      clickClose();
-    }
-  });
-
-  if (!p.visible) {
-    return null;
-  }
-
-  return <div className="modal is-active">
-    <div className="modal-background"></div>
-    <div className="modal-card" style={{width: '90%'}}>
-      <header className="modal-card-head">
-        <span className="icon">
-          <FontAwesomeIcon icon={faWrench} />
-        </span>
-        <p className="modal-card-title">Preferences</p>
-        <button className="delete" aria-label="close" onClick={p.onClose}></button>
-      </header>
-      <section className="modal-card-body">
-        <div className="tabs is-toggle">
-          <ul>
-            <li className={''}>
-              <a href="/">General</a>
-            </li>
-            <li className={'is-active'}>
-              <a href="/">Tree Table</a>
-            </li>
-          </ul>
-        </div>
-        <table className="table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Column</th>
-              <th>Source</th>
-              <th>Unit</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows}
-          </tbody>
-        </table>
-      </section>
-    </div>
-  </div>
-};
+  return rows;
+}
 
 function flameKeys(root: FlameNode): FlameKey[] {
   const cols: {[key in FlameKey]?: boolean} = {};
