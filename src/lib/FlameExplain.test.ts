@@ -243,7 +243,7 @@ describe('fromRawQueries', () => {
       const {queries} = NestedLoop;
       const root = fromRawQueries(queries, {});
       expect(Object.keys(root).sort()).toEqual(
-        ['Children', 'Kind', 'Self Time', 'Self Time %', 'Self Time %%', 'Total Time']
+        ['Children', 'Kind', 'Self Time', 'Self Time %', 'Total Time']
       );
 
       expect(root.Children?.length).toEqual(1);
@@ -254,7 +254,7 @@ describe('fromRawQueries', () => {
         .toEqual(Object
           .keys(queries[0].Plan || {})
           .filter(key => key !== 'Plans')
-          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID', 'Self Time', 'Self Time %', 'Self Time %%', 'Total Time'])
+          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID', 'Self Time', 'Self Time %', 'Total Time', 'Colors', 'Depth', 'Rows X'])
           .sort());
       expect(child).not.toBe(queries[0].Plan);
 

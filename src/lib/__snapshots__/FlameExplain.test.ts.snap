@@ -53,27 +53,27 @@ exports[`fromRawQueries example snapshots are matching NestedLoop 1`] = `
 `;
 
 exports[`fromRawQueries example snapshots are matching PGIndexes 1`] = `
-".------------------------------------------------------------------------------------------------------------------------------.
-|                                                          PGIndexes                                                           |
-|------------------------------------------------------------------------------------------------------------------------------|
-| ID |                            Label                            | Actual Total Time | Actual Loops | Total Time | Self Time |
-|----|-------------------------------------------------------------|-------------------|--------------|------------|-----------|
-|  1 | Query                                                       |                   |              |     9.2 ms |      0 μs |
-|  2 |   Planning                                                  |                   |              |     974 μs |    974 μs |
-|  3 |   Execution                                                 |                   |              |     8.2 ms |    135 μs |
-|  4 |     Nested Loop Left Join                                   |            8.1 ms |            1 |     8.1 ms |    6.9 ms |
-|  5 |       Hash Left Join                                        |            1.2 ms |            1 |     1.2 ms |    110 μs |
-|  6 |         Nested Loop                                         |            1.1 ms |            1 |     1.1 ms |     84 μs |
-|  7 |           Hash Join                                         |            469 μs |            1 |     469 μs |    142 μs |
-|  8 |             Seq Scan on pg_index x                          |             53 μs |            1 |      53 μs |     53 μs |
-|  9 |             Hash                                            |            274 μs |            1 |     274 μs |     40 μs |
-| 10 |               Seq Scan on pg_class c                        |            234 μs |            1 |     234 μs |    234 μs |
-| 11 |           Index Scan using pg_class_oid_index on pg_class i |              4 μs |          130 |     520 μs |    520 μs |
-| 12 |         Hash                                                |             16 μs |            1 |      16 μs |      6 μs |
-| 13 |           Seq Scan on pg_namespace n                        |             10 μs |            1 |      10 μs |     10 μs |
-| 14 |       Materialize                                           |              0 μs |          130 |       5 μs |      0 μs |
-| 15 |         Seq Scan on pg_tablespace t                         |              5 μs |            1 |       5 μs |      5 μs |
-'------------------------------------------------------------------------------------------------------------------------------'"
+".-----------------------------------------------------------------------------------------------------------------------------------------.
+|                                                                PGIndexes                                                                |
+|-----------------------------------------------------------------------------------------------------------------------------------------|
+| ID |                                 Label                                  | Actual Total Time | Actual Loops | Total Time | Self Time |
+|----|------------------------------------------------------------------------|-------------------|--------------|------------|-----------|
+|  1 | Query                                                                  |                   |              |    11.3 ms |      0 μs |
+|  2 |   Planning                                                             |                   |              |     833 μs |    833 μs |
+|  3 |   Execution                                                            |                   |              |    10.4 ms |    126 μs |
+|  4 |     Nested Loop Left Join                                              |           10.3 ms |            1 |    10.3 ms |    9.0 ms |
+|  5 |       Hash Left Join                                                   |            1.2 ms |            1 |     1.2 ms |    114 μs |
+|  6 |         Nested Loop                                                    |            1.1 ms |            1 |     1.1 ms |     94 μs |
+|  7 |           Hash Join                                                    |            480 μs |            1 |     480 μs |    156 μs |
+|  8 |             Seq Scan on pg_catalog.pg_index x                          |             63 μs |            1 |      63 μs |     63 μs |
+|  9 |             Hash                                                       |            261 μs |            1 |     261 μs |     40 μs |
+| 10 |               Seq Scan on pg_catalog.pg_class c                        |            221 μs |            1 |     221 μs |    221 μs |
+| 11 |           Index Scan using pg_class_oid_index on pg_catalog.pg_class i |              4 μs |          130 |     520 μs |    520 μs |
+| 12 |         Hash                                                           |             15 μs |            1 |      15 μs |      5 μs |
+| 13 |           Seq Scan on pg_catalog.pg_namespace n                        |             10 μs |            1 |      10 μs |     10 μs |
+| 14 |       Materialize                                                      |              1 μs |          130 |     130 μs |    125 μs |
+| 15 |         Seq Scan on pg_catalog.pg_tablespace t                         |              5 μs |            1 |       5 μs |      5 μs |
+'-----------------------------------------------------------------------------------------------------------------------------------------'"
 `;
 
 exports[`fromRawQueries example snapshots are matching ParallelAppend 1`] = `
