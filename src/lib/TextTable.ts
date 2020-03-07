@@ -58,6 +58,9 @@ export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions =
 
   let val = '';
   switch (col) {
+    case 'Rows X':
+      val = (fn[col] as number).toFixed(2);
+      break;
     case 'Self Time %':
       val = formatPercent(fn[col] || 0);
       break;

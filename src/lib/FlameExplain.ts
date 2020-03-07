@@ -57,6 +57,8 @@ type FlameFragment = {
   "Self Time %"?: number;
   /** Depth is the depth of the node in the tree, starting with 0. */
   "Depth"?: number;
+  /** Rows X is the rows estimation error */
+  "Rows X"?: number
   /** Warnings contains a list of problems encountered while transforming the
   * data.*/
   "Warnings"?: [];
@@ -147,6 +149,7 @@ export function fromRawQueries(
   setSelfTimePercent(root);
   setIDs(root);
   setDepths(root);
+  setRowsX(root);
   setColors(root);
 
   return root;
@@ -464,6 +467,16 @@ function setDepths(root: FlameNode) {
   const visit = (fn: FlameNode, depth: number = 0) => {
     fn.Depth = depth;
     maxDepth = Math.max(maxDepth, depth);
+    fn.Children?.forEach(child => visit(child, depth + 1));
+  }
+  root.Children?.forEach(visit);
+}
+
+function setRowsX(root: FlameNode) {
+  const visit = (fn: FlameNode, depth: number = 0) => {
+    if (typeof fn["Plan Rows"] === 'number' && typeof fn["Actual Rows"] === 'number') {
+      fn["Rows X"] = fn["Actual Rows"] / fn["Plan Rows"];
+    }
     fn.Children?.forEach(child => visit(child, depth + 1));
   }
   root.Children?.forEach(visit);
