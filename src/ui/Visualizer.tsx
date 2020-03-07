@@ -33,9 +33,7 @@ const defaultPreferences: PreferencesState = {
   SelectedKeys: [
     'ID',
     'Label',
-    'Plan Rows',
-    'Actual Rows',
-    'Actual Total Time',
+    'Rows X',
     'Total Time',
     'Self Time',
     'Self Time %',
