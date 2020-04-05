@@ -8,6 +8,7 @@ import {default as invert, RgbArray} from 'invert-color';
 interface Props {
   root: FlameNode;
   settings: PreferencesState;
+  clickNode: (fn: FlameNode) => void;
 }
 
 export default function VisualizerTable(p: Props) {
@@ -32,7 +33,7 @@ export default function VisualizerTable(p: Props) {
 
         return <td key={col} style={{textAlign, color, backgroundColor}}>{colVal}</td>;
       });
-      rows.push(<tr key={fn.ID}>{colVals}</tr>);
+      rows.push(<tr onClick={() => p.clickNode(fn)} style={{cursor: 'pointer'}} key={fn.ID}>{colVals}</tr>);
     }
     fn.Children?.forEach(child => visit(child, depth + 1));
   };
@@ -45,7 +46,9 @@ export default function VisualizerTable(p: Props) {
   return (<div className="content">
     <table className="table">
       <thead>
-        <tr>{headers}</tr>
+        <tr>
+          {headers}
+        </tr>
       </thead>
       <tbody>
         {rows}

@@ -828,3 +828,20 @@ should never be negative. See \`Total Time\`.`,
 The \`Self Time\` of this node divided by the \`Total Time\` of the root node.`,
   },
 }
+
+export function nodeByID(root: FlameNode | undefined, id: number | undefined): FlameNode | undefined {
+  if (root === undefined || id === undefined) {
+    return;
+  }
+
+  let found: FlameNode | undefined = undefined;
+  const visit = (fn: FlameNode) => {
+    if (fn.ID === id) {
+      found = fn;
+      return;
+    }
+    fn.Children?.forEach(visit);
+  }
+  root.Children?.forEach(visit);
+  return found;
+}

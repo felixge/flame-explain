@@ -3,12 +3,13 @@ import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
+import NodeInspector from './NodeInspector';
 import {
   default as VisualizerShare,
   SharingState,
 } from './VisualizerShare';
 import {PreferencesState, default as Preferences} from './Preferences';
-import {FlameNode, fromRawQueries} from '../lib/FlameExplain';
+import {FlameNode, fromRawQueries, nodeByID} from '../lib/FlameExplain';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faWrench as iconPreferences, faShareAlt as iconShare} from '@fortawesome/free-solid-svg-icons';
@@ -20,9 +21,10 @@ import Highlight from './Highlight';
 
 export type VisualizerState = {
   input: InputState;
-  modal: 'Preferences' | 'Share' | null;
+  modal: 'Preferences' | 'Share' | 'Inspector' | null;
   preferences: PreferencesState;
   share: SharingState;
+  selectedNode?: number;
 };
 
 interface Props {
@@ -59,6 +61,11 @@ export default function Visualizer(p: Props) {
   const toggleModal = (modal: typeof state.modal) => {
     const m = state.modal === modal ? null : modal;
     setState(state => ({...state, ...{modal: m}}));
+  };
+
+  const onClickNode = (fn: FlameNode) => {
+    toggleModal('Inspector');
+    setState(state => ({...state, ...{selectedNode: fn.ID}}));
   };
 
   const q = new URLSearchParams(history.location.search);
@@ -143,7 +150,7 @@ export default function Visualizer(p: Props) {
         <div className="content">
           <Highlight language="sql" source={state.input.sql} />
         </div>
-        <VisualizerTable settings={settings} root={rootNode} />
+        <VisualizerTable settings={settings} root={rootNode} clickNode={onClickNode} />
       </div>
       break;
     case 'flamegraph':
@@ -185,6 +192,11 @@ export default function Visualizer(p: Props) {
       onChange={onShareChange}
       state={state}
       visible={state.modal === 'Share'}
+    />
+    <NodeInspector
+      onClose={() => toggleModal('Inspector')}
+      visible={state.modal === 'Inspector'}
+      node={nodeByID(rootNode, state.selectedNode)}
     />
     <div className="container">
       <GistNotice gist={gist} />
