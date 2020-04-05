@@ -137,10 +137,10 @@ export function fromRawQueries(
   });
 
   setTotalTime(root);
+  calcActualLoops(root);
   calcFilterTime(root);
   calcCTETime(root);
   calcParallelAppendTime(root)
-  calcActualLoops(root);
   calcChildBoost(root);
   setSelfTime(root);
   if (opt.VirtualSubplanNodes) {
@@ -346,7 +346,14 @@ function calcFilterTime(fn: FlameNode): FlameNode {
 }
 
 function calcCTETime(fn: FlameNode) {
-  fn.Children?.forEach(calcCTETime);
+  // We apply our tweaks depth first to all children in reverse order. This
+  // makes sure queries like CTELoopedAggregateScan don't end up fixing the
+  // time of CTEs if their scans haven't been fixed yet.
+  if (fn.Children) {
+    for (let i = fn.Children.length - 1; i >= 0; i--) {
+      calcCTETime(fn.Children[i]);
+    }
+  }
 
   // Return early unless n is a CTE parent node.
   if (!(typeof fn["Total Time"] === 'number' && fn["CTE Scans"])) {

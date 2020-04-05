@@ -1,5 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`fromRawQueries example snapshots are matching CTELoopedAggregateScan 1`] = `
+".-----------------------------------------------------------------------------------------------------------------.
+|                                             CTELoopedAggregateScan                                              |
+|-----------------------------------------------------------------------------------------------------------------|
+| ID |                     Label                      | Actual Total Time | Actual Loops | Total Time | Self Time |
+|----|------------------------------------------------|-------------------|--------------|------------|-----------|
+|  1 | Query                                          |                   |              |   175.7 ms |      0 μs |
+|  2 |   Planning                                     |                   |              |     214 μs |    214 μs |
+|  3 |   Execution                                    |                   |              |   175.5 ms |     81 μs |
+|  4 |     Nested Loop                                |          175.4 ms |            1 |   175.4 ms |     73 μs |
+|  5 |       CTE tmp_data                             |                   |              |   175.2 ms |      0 μs |
+|  6 |         Function Scan on pg_sleep pg_sleep_for |          175.2 ms |            1 |   175.2 ms |  175.2 ms |
+|  7 |       CTE foo                                  |                   |              |     106 μs |      0 μs |
+|  8 |         Nested Loop                            |          175.3 ms |            1 |     106 μs |     31 μs |
+|  9 |           Function Scan on generate_series b   |             14 μs |            1 |      14 μs |     14 μs |
+| 10 |           Aggregate                            |            8.8 ms |           20 |      61 μs |     40 μs |
+| 11 |             CTE Scan on tmp_data               |            8.8 ms |           20 |      21 μs |     21 μs |
+| 12 |       CTE Scan on foo                          |          175.3 ms |            1 |      28 μs |     28 μs |
+| 13 |       Function Scan on generate_series         |              2 μs |           20 |      40 μs |     40 μs |
+'-----------------------------------------------------------------------------------------------------------------'"
+`;
+
 exports[`fromRawQueries example snapshots are matching CTESimple 1`] = `
 ".--------------------------------------------------------------------------------------.
 |                                      CTESimple                                       |

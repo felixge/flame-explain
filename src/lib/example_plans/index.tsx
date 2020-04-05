@@ -2,6 +2,7 @@
 // but I haven't been able to make it work with the build system for now : /.
 import {RawQueries} from '../RawExplain';
 
+import CTELoopedAggregateScan from './CTELoopedAggregateScan';
 import CTESimple from './CTESimple';
 import CTESleepUnion from './CTESleepUnion';
 import NestedLoop from './NestedLoop';
@@ -18,6 +19,7 @@ export type ExamplePlan = {
 };
 
 const Plans: {[key: string]: ExamplePlan} = {
+  CTELoopedAggregateScan,
   CTESimple,
   CTESleepUnion,
   NestedLoop,
