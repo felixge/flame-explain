@@ -375,9 +375,36 @@ function calcCTETime(fn: FlameNode) {
       return;
     }
 
-    let before = scan["Total Time"];
-    scan["Total Time"] *= (1 - 1 / scanTime * initTime);
-    let delta = before - scan["Total Time"];
+    // s  = CTE Scan Total Time
+    // t  = Sum of all scan times for this CTE
+    // i  = CTE InitPlan Total Time
+    // s' = Real CTE Scan Total Time
+    //
+    // A single CTE Scan `s` contains all of the time spent on executing its
+    // InitPlan `i`. This time duplication is bad because it obscures where a
+    // query is spending most of its time. So we try to determine the real scan
+    // time `s'`. In the trivial case of one CTE Scan, this could be done as
+    // follows:
+    //
+    // s = i + s'
+    // s' = s - i
+    //
+    // However, this doesn't work when there are multiple CTE Scans, because
+    // usually only the first CTE Scan includes the duplicate time. However, if
+    // the first CTE Scan is below a Limit node, the duplicate time may be
+    // split between multiple CTE Scans. It's not possible to exactly determine
+    // each scan's share of the InitPlan execution, but it seems reasonable to
+    // assume it's close to `s / t` where `t` is the total time spend on all
+    // CTE scans for this CTE. With this assumption we get:
+    //
+    // s  = s / t * i + s'
+    // s' = s * (1 - i / t)
+    //
+    // This equation is applied below and seems to work very well with a wide
+    // range of queries I've tested it against.
+    const newTime = scan["Total Time"] * (1 - initTime / scanTime);
+    let delta = scan["Total Time"] - newTime;
+    scan["Total Time"] = newTime;
 
     let p = scan.Parent;
     while (p) {
