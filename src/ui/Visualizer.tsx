@@ -147,10 +147,10 @@ export default function Visualizer(p: Props) {
         return <Redirect to="/" />;
       }
       tab = <div>
+        <VisualizerTable settings={settings} root={rootNode} clickNode={onClickNode} />
         <div className="content">
           <Highlight language="sql" source={state.input.sql} />
         </div>
-        <VisualizerTable settings={settings} root={rootNode} clickNode={onClickNode} />
       </div>
       break;
     case 'flamegraph':
@@ -158,10 +158,10 @@ export default function Visualizer(p: Props) {
         return <Redirect to="/" />;
       }
       tab = <div>
+        <VisualizerFlamegraph settings={settings} root={rootNode} />
         <div className="content">
           <Highlight language="sql" source={state.input.sql} />
         </div>
-        <VisualizerFlamegraph settings={settings} root={rootNode} />
       </div>
       break;
     case 'networkgraph':
