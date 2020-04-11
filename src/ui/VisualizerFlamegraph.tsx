@@ -33,7 +33,8 @@ export default function VisualizerFlamegraph(p: Props) {
         }
         const duration = formatDuration(d.value);
         const percent = formatPercent(d.value / total);
-        return `${duration} (${percent} of total)`;
+        const label = d.data.name;
+        return `${label} ${duration} (${percent} of total)`;
       })
       //.onClick((d) => {
       //if (!detailRef.current) {
