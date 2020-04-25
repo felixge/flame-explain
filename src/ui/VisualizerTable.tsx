@@ -44,7 +44,7 @@ export default function VisualizerTable(p: Props) {
   });
 
   return (<div className="content">
-    <table className="table">
+    <table className="table tree-table">
       <thead>
         <tr>
           {headers}
