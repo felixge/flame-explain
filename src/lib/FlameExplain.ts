@@ -538,7 +538,7 @@ function setColors(root: FlameNode) {
   root.Children?.forEach(visit);
 }
 
-function maxValsForColor(root: FlameNode) {
+function maxValsForColor(root: FlameNode): ColorFragment {
   let maxVals: ColorFragment = {};
   const visit = (fn: FlameNode) => {
     const keys = Object.keys(fn).map(key => key as keyof typeof maxVals);

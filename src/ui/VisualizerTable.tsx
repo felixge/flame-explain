@@ -40,7 +40,13 @@ export default function VisualizerTable(p: Props) {
   visit(p.root);
 
   const headers = columns.map(col => {
-    return <th key={col}>{col}</th>
+    let style: React.CSSProperties = {};
+    if (col === 'Label') {
+      style.width = '99%';
+    } else {
+      style.whiteSpace = 'nowrap';
+    }
+    return <th key={col} style={style}>{col}</th>
   });
 
   return (<div className="content">

@@ -198,7 +198,7 @@ export default function Visualizer(p: Props) {
       visible={state.modal === 'Inspector'}
       node={nodeByID(rootNode, state.selectedNode)}
     />
-    <div className="container">
+    <div>
       <GistNotice gist={gist} />
       <div className="tabs is-toggle">
         <ul>
