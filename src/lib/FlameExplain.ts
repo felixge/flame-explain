@@ -51,6 +51,7 @@ type FlameFragment = {
    * the total amount of wall clock time that can be attributed to this node
   * as well as its children. */
   "Total Time"?: number;
+  "Total Time %"?: number;
   /** Self Time is like Total Time, but excludes time spent in child nodes. */
   "Self Time"?: number;
   /** Self Time % */
@@ -146,7 +147,7 @@ export function fromRawQueries(
   if (opt.VirtualSubplanNodes) {
     createVirtualSubplanNodes(root);
   }
-  setSelfTimePercent(root);
+  setTimePercent(root);
   setIDs(root);
   setDepths(root);
   setRowsX(root);
@@ -465,27 +466,23 @@ function setSelfTime(fn: FlameNode) {
   fn["Self Time"] = fn["Total Time"] - sumTotalTime(fn.Children);
 }
 
-function setSelfTimePercent(root: FlameNode) {
-  let maxSelfTime = 0;
-  const findMax = (fn: FlameNode) => {
-    if (typeof fn["Self Time"] === 'number') {
-      maxSelfTime = Math.max(fn["Self Time"], maxSelfTime);
-    }
-    fn.Children?.forEach(findMax);
+function setTimePercent(root: FlameNode) {
+  const rootTotal = root["Total Time"];
+  if (typeof rootTotal !== 'number') {
+    return
   }
-  findMax(root);
 
-  const assign = (fn: FlameNode) => {
-    if (typeof fn["Self Time"] === 'number') {
-      if (typeof root["Total Time"] === 'number') {
-        fn["Self Time %"] = fn["Self Time"] / root["Total Time"];
-      }
+  const visit = (fn: FlameNode) => {
+    if (typeof fn["Total Time"] === 'number') {
+      fn["Total Time %"] = fn["Total Time"] / rootTotal;
     }
-    fn.Children?.forEach(assign);
-  };
-  assign(root);
+    if (typeof fn["Self Time"] === 'number') {
+      fn["Self Time %"] = fn["Self Time"] / rootTotal;
+    }
+    fn.Children?.forEach(visit);
+  }
+  root.Children?.forEach(visit);
 }
-
 
 function setIDs(root: FlameNode) {
   let id = 0;
@@ -859,7 +856,15 @@ should never be negative. See \`Total Time\`.`,
     ShortKey: 'S. Time %',
     Unit: 'percent',
     Description: `
-The \`Self Time\` of this node divided by the \`Total Time\` of the root node.`,
+The \`Self Time\` of this node divided by the largest \`Self Time\` of the root node.`,
+  },
+
+  'Total Time %': {
+    Source: 'FlameExplain',
+    ShortKey: 'T. Time %',
+    Unit: 'percent',
+    Description: `
+The \`Total Time\` of this node divided by the \`Total Time\` of the root node.`,
   },
 }
 

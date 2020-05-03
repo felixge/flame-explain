@@ -62,6 +62,7 @@ export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions =
       val = (fn[col] as number).toFixed(2);
       break;
     case 'Self Time %':
+    case 'Total Time %':
       val = formatPercent(fn[col] || 0);
       break;
     case 'Actual Total Time':
