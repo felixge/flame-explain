@@ -22,6 +22,7 @@ import Highlight from './Highlight';
 export type VisualizerState = {
   input: InputState;
   modal: 'Preferences' | 'Share' | 'Inspector' | null;
+  collapsed: {[K: number]: true};
   preferences: PreferencesState;
   share: SharingState;
   selectedNode?: number;
@@ -48,6 +49,7 @@ export default function Visualizer(p: Props) {
   const defaultState: VisualizerState = {
     input: {plan: p.planText || '', sql: ''},
     preferences: defaultPreferences,
+    collapsed: {},
     modal: null,
     share: {tab: 'json'},
   };
@@ -66,6 +68,36 @@ export default function Visualizer(p: Props) {
   const onClickNode = (fn: FlameNode) => {
     toggleModal('Inspector');
     setState(state => ({...state, ...{selectedNode: fn.ID}}));
+  };
+
+  const onToggleNode = (fn: FlameNode, recursive: boolean) => {
+    setState(state => {
+      if (!fn.ID) {
+        return state;
+      }
+
+      const collapsed = {...state.collapsed};
+      const expand = collapsed[fn.ID];
+
+      const visit = (child: FlameNode) => {
+        if (!child.ID) {
+          // do nothing
+        } else if (expand) {
+          delete collapsed[child.ID];
+        } else {
+          collapsed[child.ID] = true;
+        }
+
+        if (!recursive) {
+          return;
+        }
+
+        child.Children?.forEach(visit);
+      };
+      visit(fn);
+
+      return {...state, ...{collapsed}};
+    });
   };
 
   const q = new URLSearchParams(history.location.search);
@@ -138,7 +170,7 @@ export default function Visualizer(p: Props) {
         input={state.input}
         onChange={(input) => {
           history.push('/visualize/input');
-          setState(state => ({...state, ...{input: input}}));
+          setState(state => ({...state, ...{input: input, collapsed: {}}}));
         }}
       />;
       break;
@@ -147,7 +179,13 @@ export default function Visualizer(p: Props) {
         return <Redirect to="/" />;
       }
       tab = <div>
-        <VisualizerTable settings={settings} root={rootNode} clickNode={onClickNode} />
+        <VisualizerTable
+          settings={settings}
+          root={rootNode}
+          collapsed={state.collapsed}
+          toggleNode={onToggleNode}
+          clickNode={onClickNode}
+        />
         <div className="content">
           <Highlight language="sql" source={state.input.sql} />
         </div>

@@ -26,7 +26,7 @@ type Props = {
 
 type ShareJSON = {
   flameExplain: string,
-} & Pick<VisualizerState, 'preferences' | 'input'>;
+} & Pick<VisualizerState, 'preferences' | 'input' | 'collapsed'>;
 
 export default function VisualizerShare(p: Props) {
   const {tab} = p.state.share;
@@ -198,7 +198,7 @@ export default function VisualizerShare(p: Props) {
 
 function stateToShareText(s: VisualizerState): string {
   const flameExplain = 'Go to flame-explain.com and paste this JSON in the Input tab.';
-  const {input, preferences} = s;
-  const shareJSON: ShareJSON = {flameExplain, input, preferences};
+  const {input, preferences, collapsed} = s;
+  const shareJSON: ShareJSON = {flameExplain, input, preferences, collapsed};
   return JSON.stringify(shareJSON, null, '  ');
 }
