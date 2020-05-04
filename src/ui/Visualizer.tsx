@@ -236,39 +236,37 @@ export default function Visualizer(p: Props) {
       visible={state.modal === 'Inspector'}
       node={nodeByID(rootNode, state.selectedNode)}
     />
-    <div>
-      <GistNotice gist={gist} />
-      <div className="tabs is-toggle">
-        <ul>
-          <li className={match.params.tab === 'input' ? 'is-active' : ''}>
-            <Link to={"/visualize/input" + history.location.search}><u>I</u>nput</Link>
-          </li>
-          <li className={match.params.tab === 'treetable' ? 'is-active' : ''}>
-            <Link to={"/visualize/treetable" + history.location.search}><u>T</u>ree Table</Link>
-          </li>
-          <li className={match.params.tab === 'flamegraph' ? 'is-active' : ''}>
-            <Link to={"/visualize/flamegraph" + history.location.search}><u>F</u>lame Graph</Link>
-          </li>
-          <li className={match.params.tab === 'networkgraph' ? 'is-active' : ''}>
-            <Link to={"/visualize/networkgraph" + history.location.search}><u>N</u>etwork Graph</Link>
-          </li>
-        </ul>
-        <div className="buttons has-addons">
-          <button onClick={() => toggleModal('Preferences')} className="button">
-            <span className="icon is-small">
-              <FontAwesomeIcon icon={iconPreferences} />
-            </span>
-            <span><u>P</u>references</span>
-          </button>
-          <button onClick={() => toggleModal('Share')} className="button">
-            <span className="icon is-small">
-              <FontAwesomeIcon icon={iconShare} />
-            </span>
-            <span><u>S</u>hare</span>
-          </button>
-        </div>
+    <GistNotice gist={gist} />
+    <div className="tabs is-toggle">
+      <ul>
+        <li className={match.params.tab === 'input' ? 'is-active' : ''}>
+          <Link to={"/visualize/input" + history.location.search}><u>I</u>nput</Link>
+        </li>
+        <li className={match.params.tab === 'treetable' ? 'is-active' : ''}>
+          <Link to={"/visualize/treetable" + history.location.search}><u>T</u>ree Table</Link>
+        </li>
+        <li className={match.params.tab === 'flamegraph' ? 'is-active' : ''}>
+          <Link to={"/visualize/flamegraph" + history.location.search}><u>F</u>lame Graph</Link>
+        </li>
+        <li className={match.params.tab === 'networkgraph' ? 'is-active' : ''}>
+          <Link to={"/visualize/networkgraph" + history.location.search}><u>N</u>etwork Graph</Link>
+        </li>
+      </ul>
+      <div className="buttons has-addons">
+        <button onClick={() => toggleModal('Preferences')} className="button">
+          <span className="icon is-small">
+            <FontAwesomeIcon icon={iconPreferences} />
+          </span>
+          <span><u>P</u>references</span>
+        </button>
+        <button onClick={() => toggleModal('Share')} className="button">
+          <span className="icon is-small">
+            <FontAwesomeIcon icon={iconShare} />
+          </span>
+          <span><u>S</u>hare</span>
+        </button>
       </div>
-      {tab}
     </div>
+    {tab}
   </section>;
 };
