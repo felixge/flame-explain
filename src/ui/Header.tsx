@@ -14,6 +14,7 @@ export default function Header() {
           className={"navbar-burger" + (burgerMenu ? ' is-active' : '')}
           aria-label="menu"
           aria-expanded="false"
+          href="#"
           onClick={() => setBurgerMenu(s => !s)}
         >
           <span aria-hidden="true"></span>
