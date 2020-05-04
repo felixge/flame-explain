@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 
 export default function Footer() {
   const version = process.env.REACT_APP_VERSION || 'N/A';
@@ -7,9 +8,9 @@ export default function Footer() {
       <div className="content has-text-centered">
         <p>
           <strong>FlameExplain<span role="img" aria-label="trademark">™️</span></strong>
-          &nbsp;version <a href="https://github.com/felixge/flame-explain/releases">{version}</a>
-          &nbsp;by <a href="https://felixge.de/">Felix Geisendörfer</a> at fsync GmbH.
-          All rights reserved.
+          &nbsp;version <a target="_new" href="https://github.com/felixge/flame-explain/releases">{version}</a>
+          &nbsp;by <a target="_new" href="https://twitter.com/felixge">Felix Geisendörfer</a> at fsync GmbH.
+          Licensed under the <Link to={"/about#license"}>AGPLv3</Link>.
         </p>
       </div>
     </footer>

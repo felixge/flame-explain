@@ -32,7 +32,6 @@ export default function Header() {
           >Visualize</NavLink>
           <NavLink activeClassName="is-active" to="/docs" className="navbar-item">Documentation</NavLink>
           <NavLink activeClassName="is-active" to="/about" className="navbar-item">About</NavLink>
-          <NavLink activeClassName="is-active" to="/credits" className="navbar-item">Credits</NavLink>
         </div>
       </div>
       <a target="_new" className="github-fork-ribbon" href="https://github.com/felixge/flame-explain" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
