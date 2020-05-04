@@ -2,11 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './ui/App';
 import * as serviceWorker from './ui/serviceWorker';
-import plan from './lib/example_plans/CTESleepUnion';
 
-ReactDOM.render(<App
-  planText={JSON.stringify(plan.queries, null, 2)}
-/>, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
