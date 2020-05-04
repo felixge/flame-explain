@@ -1,7 +1,7 @@
 name: Node CI
-
-on: [push]
-
+on: [push, pull_request]
+env:
+  CI: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,10 +15,6 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: yarn install, test, build
-      run: |
-        yarn install
-        yarn test
-        yarn build
-      env:
-        CI: true
+    - run: 'yarn install'
+    - run: 'yarn test'
+    - run: 'yarn build'
