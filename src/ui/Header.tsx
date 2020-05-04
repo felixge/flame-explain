@@ -1,5 +1,6 @@
 import React from 'react';
 import {NavLink} from "react-router-dom";
+import "github-fork-ribbon-css/gh-fork-ribbon.css";
 
 export default function Header() {
   let [burgerMenu, setBurgerMenu] = React.useState(false);
@@ -34,6 +35,7 @@ export default function Header() {
           <NavLink activeClassName="is-active" to="/credits" className="navbar-item">Credits</NavLink>
         </div>
       </div>
+      <a target="_new" className="github-fork-ribbon" href="https://github.com/felixge/flame-explain" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
     </nav>
   );
 };
