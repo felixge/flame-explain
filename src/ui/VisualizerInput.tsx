@@ -8,6 +8,8 @@ import 'prismjs/plugins/custom-class/prism-custom-class';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
+import {faLock} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 // Can't import the theme from prismjs module directly because we need to hack
 // it with prefixes, see below.
@@ -67,7 +69,7 @@ export default function VisualizerInput(p: Props) {
           , execute it, paste the resulting JSON below.
         </p>
         <p>
-          FlameExplain runs in your browser and never sends your data to another computer, see <Link to="/about#Security-and-Privacy">Security & Privacy</Link>.
+          <FontAwesomeIcon icon={faLock} /> FlameExplain runs in your browser and never sends your data to another computer, see <Link to="/about#Security-and-Privacy">Security & Privacy</Link>.
         </p>
       </div>
       <div className="field is-grouped">
