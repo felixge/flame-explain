@@ -149,7 +149,7 @@ export default function VisualizerShare(p: Props) {
   }
 
   return <div className="modal is-active">
-    <div className="modal-background"></div>
+    <div className="modal-background" onClick={p.onClose}></div>
     <div className="modal-card" style={{width: '90%', maxWidth: '870px'}}>
       <header className="modal-card-head">
         <span className="icon">
