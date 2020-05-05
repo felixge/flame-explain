@@ -6,13 +6,13 @@ export default function About() {
     <div className="container">
       <Heading level={1}>About</Heading>
       <p>
-        In 2018 I found myself optimizing a lot of SQL queries using <a target="_new" href="https://www.postgresql.org/docs/current/sql-explain.html">EXPLAIN ANALYZE</a> and wondered if <a target="_new" href="http://www.brendangregg.com/flamegraphs.html">Flame Graph</a> visualizations might speed up this kind of work. I quickly build a proof of concept that converted the JSON output from PostgreSQL into the folded stack format expected by <a target="_new" href="https://github.com/brendangregg/FlameGraph">brendangregg/FlameGraph</a>. But unfortunately it didn't work for anything but trivial queries. As soon as CTEs or other Init Plans were present, the graphs would break due to child node times exceeding the total duration of their parents.
+        In 2018 I found myself optimizing a lot of SQL queries using <a target="_new" href="https://www.postgresql.org/docs/current/sql-explain.html">EXPLAIN ANALYZE</a> and wondered if <a target="_new" href="http://www.brendangregg.com/flamegraphs.html">Flame Graph</a> visualizations might help to speed up this kind of work. I quickly build a proof of concept that converted the JSON output from PostgreSQL into the folded stack format expected by <a target="_new" href="https://github.com/brendangregg/FlameGraph">brendangregg/FlameGraph</a>. But unfortunately it didn't work for anything but trivial queries. As soon as CTEs or other Init Plans were present, the graphs would break due to child node times exceeding the total duration of their parents.
       </p>
       <p>
         After that the project lingered in the back of my mind, but it wasn't until late 2019 that I had the time and inspiration that lead to a breakthrough in adjusting the node times. However, once I looked at some more complicated queries again, it quickly became clear that Flame Graphs alone were not sufficient. They are great at highlighting the expensive parts of a query, but they fail to reveal the overall plan structure due to fast nodes getting effectively hidden by the visualization.
       </p>
       <p>
-        So I decided that one size fits none, and set out to build a tool that provides multiple visualizations based on the same underlaying time adjustment algorithms. The result is FlameExplain and I hope you find it useful : ).
+        So I decided that one size fits none, and set out to build unique a tool that provides multiple visualizations based on the same underlaying time adjustment algorithms. The result is FlameExplain and I hope you find it useful : ).
       </p>
       <Heading level={2}>Security & Privacy</Heading>
       <p>
