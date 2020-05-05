@@ -1,5 +1,5 @@
 import React from 'react';
-import {useHistory} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import examplePlans from '../lib/example_plans';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
@@ -67,7 +67,7 @@ export default function VisualizerInput(p: Props) {
           , execute it, paste the resulting JSON below.
         </p>
         <p>
-          FlameExplain runs in your browser and never sends your data to another computer.
+          FlameExplain runs in your browser and never sends your data to another computer, see <Link to="/about#Security-and-Privacy">Security & Privacy</Link>.
         </p>
       </div>
       <div className="field is-grouped">

@@ -5,6 +5,7 @@ import "github-fork-ribbon-css/gh-fork-ribbon.css";
 export default function Header() {
   let [burgerMenu, setBurgerMenu] = React.useState(false);
 
+  //<NavLink activeClassName="is-active" to="/docs" className="navbar-item">Documentation</NavLink>
   return (
     <nav className="navbar is-info" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
@@ -14,7 +15,7 @@ export default function Header() {
           className={"navbar-burger" + (burgerMenu ? ' is-active' : '')}
           aria-label="menu"
           aria-expanded="false"
-          href="#"
+          href="# "
           onClick={() => setBurgerMenu(s => !s)}
         >
           <span aria-hidden="true"></span>
@@ -31,7 +32,6 @@ export default function Header() {
             className="navbar-item"
             isActive={(_, {pathname}) => pathname.startsWith('/visualize')}
           >Visualize</NavLink>
-          <NavLink activeClassName="is-active" to="/docs" className="navbar-item">Documentation</NavLink>
           <NavLink activeClassName="is-active" to="/about" className="navbar-item">About</NavLink>
         </div>
       </div>

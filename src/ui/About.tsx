@@ -5,26 +5,39 @@ export default function About() {
   return <section className="section content">
     <div className="container">
       <Heading level={1}>About</Heading>
-      <p>TODO ...</p>
+      <p>
+        In 2018 I found myself optimizing a lot of SQL queries using <a target="_new" href="https://www.postgresql.org/docs/current/sql-explain.html">EXPLAIN ANALYZE</a> and wondered if <a target="_new" href="http://www.brendangregg.com/flamegraphs.html">Flame Graph</a> visualizations might speed up this kind of work. I quickly build a proof of concept that converted the JSON output from PostgreSQL into the folded stack format expected by <a target="_new" href="https://github.com/brendangregg/FlameGraph">brendangregg/FlameGraph</a>. But unfortunately it didn't work for anything but trivial queries. As soon as CTEs or other Init Plans were present, the graphs would break due to child node times exceeding the total duration of their parents.
+      </p>
+      <p>
+        After that the project lingered in the back of my mind, but it wasn't until late 2019 that I had the time and inspiration that lead to a breakthrough in adjusting the node times. However, once I looked at some more complicated queries again, it quickly became clear that Flame Graphs alone were not sufficient. They are great at highlighting the expensive parts of a query, but they fail to reveal the overall plan structure due to fast nodes getting effectively hidden by the visualization.
+      </p>
+      <p>
+        So I decided that one size fits none, and set out to build a tool that provides multiple visualizations based on the same underlaying time adjustment algorithms. The result is FlameExplain and I hope you find it useful : ).
+      </p>
+      <Heading level={2}>Security & Privacy</Heading>
+      <p>
+        FlameExplain is a JavaScript application that runs in your browser and never sends your data to another computer. This should make it sufficiently secure for most use cases, including optimizing query plans that may contain confidential information.
+      </p>
+      <p>
+        Additionally FlameExplain is <a href="https://github.com/felixge/flame-explain">open source</a>, so you can study the code, create your own build, and run it on a machine without network access.
+      </p>
+      <Heading level={2}>Community & Support</Heading>
+      <p>
+        Please use <a href="https://github.com/felixge/flame-explain/issues">GitHub Issues</a> to report bugs, request features, or send pull requests.
+      </p>
+      <p>
+        Or if you prefer to have a chat, please join the <a href="https://t.me/FlameExplainChat">FlameExplain Telegram Group</a>.
+      </p>
       <Heading level={2}>License</Heading>
       <p>
-        FlameExplain is free software, published under the <a
-          href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License">AGPL
-        Version 3</a> license. You can use it free of charge, and such usage
-          will not "infect" the SQL/JSON code you paste into the UI. The
-          license will only restrict you if you intend to host or distribute a
-          forked version of FlameExplain.
-        </p>
+        FlameExplain is free software, published under the <a href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License">AGPL Version 3</a> license. You can use it free of charge, and such usage will not "infect" the SQL/JSON code you paste into the UI. The license will only restrict you if you intend to host or distribute a forked version of FlameExplain.
+      </p>
       <p>
-        However, the statements above are not legal advise, and your internal
-        company policies might prevent you from using any (A)GPL licensed
-        software in general. So if you're worried about the license, please <a
-          href="mailto:flame-explain@felixge.de">contact me</a>. I'm happy to
-            provide free alternative licenses to anybody who asks nicely.  </p>
+        However, the statements above are not legal advise, and your internal company policies might prevent you from using any (A)GPL licensed software in general. So if you're worried about the license, please <a href="mailto:flame-explain@felixge.de">contact me</a>. I'm happy to provide free alternative licenses to anybody who asks nicely.
+      </p>
       <Heading level={2}>Credits</Heading>
       <p>
-        A special thanks goes to the projects and people below that have helped
-        me with building FlameExplain:
+        A special thanks goes to the projects and people below that have helped me with building FlameExplain:
       </p>
       <ul>
         <li><a href="https://www.typescriptlang.org/">Typescript</a> for making JavaScript fun again after years of leaving Node.js for developing in Go.</li>
@@ -38,9 +51,7 @@ export default function About() {
         <li><a href="https://www.pgmustard.com/about">Michael Christofides & David Conlin</a> of <a href="https://www.pgmustard.com/">pgMustard</a> for in-depth conversations about EXPLAIN ANALYZE internals.</li>
       </ul>
       <p>
-        Additionally there are many smaller projects and transitive
-        dependencies that are not listed here.  If you're the author of one of
-        them and want to be listed, just let me know.
+        Additionally there are many smaller projects and transitive dependencies that are not listed here. If you're the author of one of them and want to be listed, just let me know.
         </p>
     </div>
   </section>;
