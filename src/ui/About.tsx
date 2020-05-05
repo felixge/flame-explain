@@ -1,11 +1,12 @@
 import React from 'react';
+import Heading from './Heading';
 
 export default function About() {
   return <section className="section content">
     <div className="container">
-      <h1 className="title">About</h1>
+      <Heading level={1}>About</Heading>
       <p>TODO ...</p>
-      <h2 id="license" className="title is-4">License</h2>
+      <Heading level={2}>License</Heading>
       <p>
         FlameExplain is free software, published under the <a
           href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License">AGPL
@@ -20,7 +21,7 @@ export default function About() {
         software in general. So if you're worried about the license, please <a
           href="mailto:flame-explain@felixge.de">contact me</a>. I'm happy to
             provide free alternative licenses to anybody who asks nicely.  </p>
-      <h1 className="title is-4">Credits</h1>
+      <Heading level={2}>Credits</Heading>
       <p>
         A special thanks goes to the projects and people below that have helped
         me with building FlameExplain:
