@@ -1,6 +1,6 @@
 # FlameExplain
 
-A PostgreSQL EXPLAIN ANALYZE visualizer with advanced node time adjustment algorithms.
+A PostgreSQL EXPLAIN ANALYZE visualizer with advanced time correction algorithms.
 
 See https://flame-explain.com/about for more information.
 
