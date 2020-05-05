@@ -60,12 +60,11 @@ export default function VisualizerTable(p: Props) {
         }
 
         const textAlign = typeof fn[col] === 'number' ? 'right' : 'left';
+        const whiteSpace = 'nowrap';
 
-        return <td key={col} style={{textAlign, color, backgroundColor}}>{colEl}</td>;
+        return <td key={col} style={{whiteSpace, textAlign, color, backgroundColor}}>{colEl}</td>;
       });
-      rows.push(<tr style={{cursor: 'pointer'}} key={fn.ID}>{colVals}</tr>);
-
-      //rows.push(<tr onClick={() => p.clickNode(fn)} style={{cursor: 'pointer'}} key={fn.ID}>{colVals}</tr>);
+      rows.push(<tr onClick={() => p.clickNode(fn)} style={{cursor: 'pointer'}} key={fn.ID}>{colVals}</tr>);
     }
     if (!collapsed) {
       fn.Children?.forEach(child => visit(child, depth + 1));
