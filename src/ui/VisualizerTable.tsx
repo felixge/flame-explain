@@ -25,6 +25,7 @@ export default function VisualizerTable(p: Props) {
       const colVals = columns.map(col => {
         let colVal = columnText(fn, col);
         let colEl: JSX.Element = <React.Fragment>{colVal}</React.Fragment>;
+        let whiteSpace: React.CSSProperties["whiteSpace"] = 'nowrap';
         if (col === 'Label') {
           const leafNode = (fn.Children?.length || 0) <= 0;
           const icon = leafNode
@@ -51,6 +52,7 @@ export default function VisualizerTable(p: Props) {
               </span>
               &nbsp;{colVal}
             </React.Fragment>;
+          whiteSpace = 'initial';
         }
         let color = '';
         let backgroundColor = '';
@@ -60,7 +62,6 @@ export default function VisualizerTable(p: Props) {
         }
 
         const textAlign = typeof fn[col] === 'number' ? 'right' : 'left';
-        const whiteSpace = 'nowrap';
 
         return <td key={col} style={{whiteSpace, textAlign, color, backgroundColor}}>{colEl}</td>;
       });
