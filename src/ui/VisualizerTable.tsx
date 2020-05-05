@@ -35,14 +35,16 @@ export default function VisualizerTable(p: Props) {
           colEl =
             <React.Fragment>
               {'\u00a0'.repeat((depth - 1) * 4)}
-              <FontAwesomeIcon
-                onClick={(e) => {
-                  e.preventDefault();
-                  p.toggleNode(fn, e.shiftKey || e.altKey)
-                }}
-                onSelect={e => e.preventDefault()}
-                icon={icon}
-              />
+              <span className="has-tooltip-right" data-tooltip="Shift click to expand/collapse nodes recursively." >
+                <FontAwesomeIcon
+                  onClick={(e) => {
+                    e.preventDefault();
+                    p.toggleNode(fn, e.shiftKey || e.altKey)
+                  }}
+                  onSelect={e => e.preventDefault()}
+                  icon={icon}
+                />
+              </span>
               &nbsp;{colVal}
             </React.Fragment>;
         }

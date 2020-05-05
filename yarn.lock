@@ -1036,6 +1036,11 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@creativebulma/bulma-tooltip@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@creativebulma/bulma-tooltip/-/bulma-tooltip-1.0.2.tgz#87885c1427f80ced188ae85eb29d5724a46b595b"
+  integrity sha512-/ykRqquizWxN9L3TicJs2doEuX7npPuwxT+WDykDs3QBAys8IiIWYxBZ04/G+Us+Z2gOe2Tg2x0+mW9tTAiT7w==
+
 "@csstools/convert-colors@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"

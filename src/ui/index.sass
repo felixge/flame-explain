@@ -15,6 +15,7 @@ svg
 
 // Import the rest of Bulma
 @import "bulma";
+@import '@creativebulma/bulma-tooltip';
 
 .navbar-item.is-active{font-weight: bold;};
 
@@ -29,6 +30,9 @@ table.tree-table
     position: sticky;
     background-color: white;
     top: 0;
+
+  span[data-tooltip]
+    border: none;
 
 .navbar
   padding: 0 0.75rem;
