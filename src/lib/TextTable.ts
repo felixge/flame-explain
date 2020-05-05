@@ -79,6 +79,8 @@ export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions =
         val = colVal ? 'x' : '';
       } else if (typeof colVal === 'string' || typeof colVal === 'number') {
         val = colVal.toString();
+      } else if (Array.isArray(colVal)) {
+        val = colVal.join(', ');
       } else {
         val = 'flameString: ' + typeof colVal + ' not supported yet';
       }

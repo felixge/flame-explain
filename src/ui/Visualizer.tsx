@@ -3,7 +3,7 @@ import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
-import NodeInspector from './NodeInspector';
+import NodeSideInspector from './NodeSideInspector';
 import {
   default as VisualizerShare,
   SharingState,
@@ -21,7 +21,8 @@ import Highlight from './Highlight';
 
 export type VisualizerState = {
   input: InputState;
-  modal: 'Preferences' | 'Share' | 'Inspector' | null;
+  modal: 'Preferences' | 'Share' | null;
+  showInspector: boolean;
   collapsed: {[K: number]: true};
   preferences: PreferencesState;
   share: SharingState;
@@ -51,6 +52,7 @@ export default function Visualizer(p: Props) {
     preferences: defaultPreferences,
     collapsed: {},
     modal: null,
+    showInspector: false,
     share: {tab: 'json'},
   };
 
@@ -66,8 +68,12 @@ export default function Visualizer(p: Props) {
   };
 
   const onClickNode = (fn: FlameNode) => {
-    toggleModal('Inspector');
-    setState(state => ({...state, ...{selectedNode: fn.ID}}));
+    setState(state => ({
+      ...state, ...{
+        selectedNode: fn.ID,
+        showInspector: true,
+      }
+    }));
   };
 
   const onToggleNode = (fn: FlameNode, recursive: boolean) => {
@@ -231,11 +237,6 @@ export default function Visualizer(p: Props) {
       state={state}
       visible={state.modal === 'Share'}
     />
-    <NodeInspector
-      onClose={() => toggleModal('Inspector')}
-      visible={state.modal === 'Inspector'}
-      node={nodeByID(rootNode, state.selectedNode)}
-    />
     <GistNotice gist={gist} />
     <div className="tabs is-toggle">
       <ul>
@@ -267,6 +268,19 @@ export default function Visualizer(p: Props) {
         </button>
       </div>
     </div>
-    {tab}
+    <div className="columns">
+      <div className="column is-narrow">
+        <NodeSideInspector
+          onClose={() => setState(state => (
+            {...state, ...{showInspector: !state.showInspector}}
+          ))}
+          visible={state.showInspector}
+          node={nodeByID(rootNode, state.selectedNode)}
+        />
+      </div>
+      <div className="column">
+        {tab}
+      </div>
+    </div>
   </section>;
 };
