@@ -54,7 +54,7 @@ export default function VisualizerInput(p: Props) {
 
   useKeyboardShortcuts((key: string) => {
     switch (key) {
-      case 'r':
+      case 'c':
         p.onChange({sql: '', plan: ''})
         break
     }
@@ -101,7 +101,7 @@ export default function VisualizerInput(p: Props) {
             disabled={!p.input.plan && !p.input.sql}
             onClick={() => {p.onChange({sql: '', plan: ''})}}
           >
-            <span><u>R</u>eset</span>
+            <span><u>C</u>lear</span>
           </button>
         </div>
       </div>
