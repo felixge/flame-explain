@@ -14,7 +14,7 @@ export default function Heading(p: Props) {
   let anchor = p.anchor;
   if (!anchor) {
     anchor = (p.children + '');
-    anchor = anchor.replace(/ /g, '-');
+    anchor = anchor.replace(/ - | /g, '-');
     anchor = anchor.replace(/&/g, 'and');
   }
   classes.push('is-' + (p.level + 2))

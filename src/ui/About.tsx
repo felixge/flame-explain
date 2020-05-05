@@ -52,7 +52,20 @@ export default function About() {
       </ul>
       <p>
         Additionally there are many smaller projects and transitive dependencies that are not listed here. If you're the author of one of them and want to be listed, just let me know.
-        </p>
+      </p>
+      <Heading level={2}>Legal Notices - Impressum</Heading>
+      <p>
+        In compliance with German law, the entitiy responsible for operating this website is:
+      </p>
+      <p>
+        fsync GmbH<br />
+        Brunnenstr. 43<br />
+        10115 Berlin<br /><br />
+        Director: Felix Geisendörfer<br />
+        Email: fsync@felixge.de<br />
+        VAT ID: DE323208876<br />
+        Entry in the commercial register: HRB 205398 B (Amtsgericht Charlottenburg)
+      </p>
     </div>
   </section>;
 };
