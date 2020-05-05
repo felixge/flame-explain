@@ -26,7 +26,7 @@ export default function About() {
         Please use <a href="https://github.com/felixge/flame-explain/issues">GitHub Issues</a> to report bugs, request features, or send pull requests.
       </p>
       <p>
-        Or if you prefer to have a chat, please join the <a href="https://t.me/FlameExplainChat">FlameExplain Telegram Group</a>.
+        Or if you prefer to have a chat, please join the <a href="https://t.me/FlameExplainChat">Telegram Group</a>.
       </p>
       <Heading level={2}>License</Heading>
       <p>
