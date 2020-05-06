@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlameNode, FlameKey} from '../lib/FlameExplain';
+import {FlameNode, FlameKey, flameKeyDescs} from '../lib/FlameExplain';
 import {columnText} from '../lib/TextTable';
 import {assert} from '../lib/Util';
 
@@ -15,10 +15,20 @@ export default function NodeSideInspector(p: Props) {
     return null;
   }
 
+  const exclude = new Set<FlameKey>([
+    'Colors',
+    'Children',
+    'Parent',
+    'CTE Node',
+    'CTE Scans',
+    'Filter Refs',
+    'Filter Nodes',
+  ]);
+
   const fn = p.node;
   const columns = Object.keys(fn)
     .map(key => key as FlameKey)
-    //.filter(key => ['string', 'number'].includes(typeof fn[key]))
+    .filter(key => !exclude.has(key))
     .sort();
 
 
@@ -27,8 +37,19 @@ export default function NodeSideInspector(p: Props) {
     // closure, but we do.
     assert(fn !== undefined);
 
+    const desc = flameKeyDescs[col];
+    let source = '❓';
+    switch (desc?.Source) {
+      case 'PostgreSQL':
+        source = '🐘';
+        break;
+      case 'FlameExplain':
+        source = '🔥';
+        break;
+    }
+
     return <tr>
-      <td>🐘 {col}</td>
+      <td>{source} {col}</td>
       <td>{columnText(fn, col)}</td>
     </tr>;
   });
@@ -54,5 +75,4 @@ export default function NodeSideInspector(p: Props) {
       </div>
     </p>
   </nav>;
-
 };
