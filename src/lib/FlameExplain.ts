@@ -522,6 +522,10 @@ function setColors(root: FlameNode) {
     fn.Colors = {};
     const keys = Object.keys(maxVals).map(key => key as keyof typeof maxVals);
     keys.forEach(key => {
+      if (key === 'ID') {
+        return;
+      }
+
       const val = fn[key];
       if (fn.Colors) {
         fn.Colors[key] = 0;
