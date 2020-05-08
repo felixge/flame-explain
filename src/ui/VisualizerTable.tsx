@@ -13,6 +13,7 @@ interface Props {
   collapsed: {[K: number]: true};
   clickNode: (fn: FlameNode) => void;
   toggleNode: (fn: FlameNode, recursive: boolean) => void;
+  selectedNode?: number;
 }
 
 export default function VisualizerTable(p: Props) {
@@ -65,7 +66,12 @@ export default function VisualizerTable(p: Props) {
 
         return <td key={col} style={{whiteSpace, textAlign, color, backgroundColor}}>{colEl}</td>;
       });
-      rows.push(<tr onClick={() => p.clickNode(fn)} style={{cursor: 'pointer'}} key={fn.ID}>{colVals}</tr>);
+      rows.push(<tr
+        onClick={() => p.clickNode(fn)}
+        style={{cursor: 'pointer'}}
+        key={fn.ID}
+        className={fn.ID === p.selectedNode ? 'is-active' : ''}
+      >{colVals}</tr>);
     }
     if (!collapsed) {
       fn.Children?.forEach(child => visit(child, depth + 1));
@@ -84,7 +90,7 @@ export default function VisualizerTable(p: Props) {
   });
 
   return (<div className="content">
-    <table className="table tree-table">
+    <table className="table tree-table is-narrow">
       <thead>
         <tr>
           {headers}

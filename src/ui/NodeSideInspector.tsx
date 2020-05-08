@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlameNode, FlameKey, flameKeyDescs} from '../lib/FlameExplain';
+import {FlameNode, FlameKey, flameKeyMeta} from '../lib/FlameExplain';
 import {columnText} from '../lib/TextTable';
 import {assert} from '../lib/Util';
 
@@ -37,22 +37,23 @@ export default function NodeSideInspector(p: Props) {
     // closure, but we do.
     assert(fn !== undefined);
 
-    const desc = flameKeyDescs[col];
-    let source = '❓';
-    switch (desc?.Source) {
-      case 'PostgreSQL':
-        source = '🐘';
-        break;
-      case 'FlameExplain':
-        source = '🔥';
-        break;
-    }
+    const meta = flameKeyMeta[col];
+    const source = (meta?.Source === 'FlameExplain')
+      ? '🔥'
+      : '🐘';
 
     return <tr>
       <td>{source} {col}</td>
       <td>{columnText(fn, col)}</td>
     </tr>;
   });
+  //<p className="panel-tabs">
+  //<a className="is-active">All</a>
+  //<a>Timing</a>
+  //<a>Rows</a>
+  //<a>I/O</a>
+  //<a>Misc</a>
+  //</p>
 
   return <nav className="panel inspector">
     <p className="panel-heading">
@@ -60,14 +61,8 @@ export default function NodeSideInspector(p: Props) {
       <button className="delete" aria-label="close" onClick={p.onClose}></button>
     </p>
     <p className="panel-block">
-      <div className="content inspector">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Field</th>
-              <th>Value</th>
-            </tr>
-          </thead>
+      <div>
+        <table className="table is-narrow">
           <tbody>
             {rows}
           </tbody>

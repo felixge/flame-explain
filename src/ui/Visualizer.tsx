@@ -139,7 +139,14 @@ export default function Visualizer(p: Props) {
     switch (key) {
       case 'Enter':
       case 'Escape':
-        setState(state => ({...state, ...{modal: null}}));
+        setState(state => {
+          if (state.modal) {
+            return {...state, ...{modal: null}};
+          } else if (key === 'Escape') {
+            return {...state, ...{selectedNode: undefined, showInspector: false}};
+          }
+          return state;
+        });
         break;
       case 'i':
         history.push('/visualize/input' + history.location.search);
@@ -191,6 +198,7 @@ export default function Visualizer(p: Props) {
           collapsed={state.collapsed}
           toggleNode={onToggleNode}
           clickNode={onClickNode}
+          selectedNode={state.selectedNode}
         />
         <div className="content">
           <Highlight language="sql" source={state.input.sql} />
@@ -272,7 +280,12 @@ export default function Visualizer(p: Props) {
       <div className="column is-narrow">
         <NodeSideInspector
           onClose={() => setState(state => (
-            {...state, ...{showInspector: !state.showInspector}}
+            {
+              ...state, ...{
+                showInspector: false,
+                selectedNode: undefined,
+              }
+            }
           ))}
           visible={state.showInspector}
           node={nodeByID(rootNode, state.selectedNode)}

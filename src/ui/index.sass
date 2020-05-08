@@ -2,6 +2,7 @@
 
 // Update Bulma's global variables
 $family-sans-serif: "Nunito", sans-serif;
+$panel-heading-padding: 0.25em 0.5em;
 
 svg
   .node
@@ -35,6 +36,10 @@ table.tree-table
   span[data-tooltip]
     border: none;
 
+  .is-active
+    background-color: $dark;
+    color: white;
+
 .navbar
   // Align navbar with body content (looks better to me)
   padding: 0 0.75rem;
@@ -54,11 +59,23 @@ table.tree-table
     width: 0.55em !important;
 
 .inspector
-  max-width: 400px;
+  position: sticky;
+  top: 10px;
+  overflow-y: auto;
+  max-height: calc(100vh - 20px);
+  width: 420px;
+  .panel-heading
+    background-color: $dark;
+    color: white;
+
+  table
+    table-layout: fixed;
+
   td:nth-child(1)
-    max-width: 200px;
+    width: 185px;
   td:nth-child(2)
-    max-width: 200px;
+    width: 220px;
+    word-wrap: break-word;
 
   .delete
     float: right;
