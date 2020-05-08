@@ -505,7 +505,11 @@ function setDepths(root: FlameNode) {
 function setRowsX(root: FlameNode) {
   const visit = (fn: FlameNode, depth: number = 0) => {
     if (typeof fn["Plan Rows"] === 'number' && typeof fn["Actual Rows"] === 'number') {
-      fn["Rows X"] = fn["Actual Rows"] / fn["Plan Rows"];
+      if (fn["Actual Rows"] >= fn["Plan Rows"]) {
+        fn["Rows X"] = fn["Actual Rows"] / fn["Plan Rows"];
+      } else {
+        fn["Rows X"] = -fn["Plan Rows"] / fn["Actual Rows"];
+      }
     }
     fn.Children?.forEach(child => visit(child, depth + 1));
   }
