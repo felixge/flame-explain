@@ -297,7 +297,7 @@ export default function Visualizer(p: Props) {
               }
             }
           ))}
-          visible={state.showInspector}
+          visible={state.showInspector && match.params.tab !== 'input'}
           node={nodeByID(rootNode, state.selectedNode)}
         />
       </div>
