@@ -3,7 +3,7 @@ import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
-import NodeSideInspector from './NodeSideInspector';
+import {default as NodeSideInspector, InspectorCategory} from './NodeSideInspector';
 import {
   default as VisualizerShare,
   SharingState,
@@ -23,6 +23,7 @@ export type VisualizerState = {
   input: InputState;
   modal: 'Preferences' | 'Share' | null;
   showInspector: boolean;
+  inspectorCategory: InspectorCategory;
   collapsed: {[K: number]: true};
   preferences: PreferencesState;
   share: SharingState;
@@ -53,6 +54,7 @@ export default function Visualizer(p: Props) {
     collapsed: {},
     modal: null,
     showInspector: false,
+    inspectorCategory: 'All',
     share: {tab: 'json'},
   };
 
@@ -210,7 +212,11 @@ export default function Visualizer(p: Props) {
         return <Redirect to="/" />;
       }
       tab = <div>
-        <VisualizerFlamegraph settings={settings} root={rootNode} />
+        <VisualizerFlamegraph
+          settings={settings}
+          root={rootNode}
+          clickNode={onClickNode}
+        />
         <div className="content">
           <Highlight language="sql" source={state.input.sql} />
         </div>
@@ -279,6 +285,10 @@ export default function Visualizer(p: Props) {
     <div className="columns">
       <div className="column is-narrow">
         <NodeSideInspector
+          category={state.inspectorCategory}
+          onClickCategory={(category) => setState(state => ({
+            ...state, ...{inspectorCategory: category}
+          }))}
           onClose={() => setState(state => (
             {
               ...state, ...{

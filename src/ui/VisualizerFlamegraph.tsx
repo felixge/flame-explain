@@ -9,6 +9,7 @@ import {formatDuration, formatPercent} from '../lib/Util';
 interface Props {
   root: FlameNode;
   settings: PreferencesState;
+  clickNode: (fn: FlameNode) => void;
 }
 
 export default function VisualizerFlamegraph(p: Props) {
