@@ -61,9 +61,14 @@ table.tree-table
 .inspector
   position: sticky;
   top: 10px;
-  overflow-y: auto;
-  max-height: calc(100vh - 20px);
-  width: 420px;
+  width: 410px;
+
+  .panel-block
+    padding: 0 0 0 1em;
+    div
+      overflow-y: auto;
+      max-height: calc(100vh - 100px);
+
   .panel-heading
     background-color: $dark;
     color: white;
@@ -74,7 +79,7 @@ table.tree-table
   td:nth-child(1)
     width: 210px;
   td:nth-child(2)
-    width: 195px;
+    width: 175px;
     word-wrap: break-word;
 
   .delete
