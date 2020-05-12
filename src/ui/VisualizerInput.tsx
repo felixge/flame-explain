@@ -110,27 +110,6 @@ export default function VisualizerInput(p: Props) {
       <div className="columns">
         <div className="column">
           <Editor
-            value={p.input.sql}
-            onValueChange={code => p.onChange({...p.input, ...{sql: code}})}
-            highlight={code => Prism.highlight(code, Prism.languages.sql, 'sql')}
-            padding={10}
-            preClassName="language-sql"
-            placeholder={`
-(Optional) Paste your SQL Query here, e.g.:
-
-EXPLAIN (ANALYZE, FORMAT JSON)
-SELECT *
-FROM generate_series(1, 10000);
-`.trim()}
-            style={{
-              fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: 12,
-              minHeight: '276px',
-            }}
-          />
-        </div>
-        <div className="column">
-          <Editor
             value={p.input.plan}
             onPaste={(e) => {
               const data = e.clipboardData.getData('text');
@@ -169,6 +148,27 @@ FROM generate_series(1, 10000);
               fontFamily: '"Fira code", "Fira Mono", monospace',
               fontSize: 12,
               minHeight: '320px',
+            }}
+          />
+        </div>
+        <div className="column">
+          <Editor
+            value={p.input.sql}
+            onValueChange={code => p.onChange({...p.input, ...{sql: code}})}
+            highlight={code => Prism.highlight(code, Prism.languages.sql, 'sql')}
+            padding={10}
+            preClassName="language-sql"
+            placeholder={`
+(Optional) Paste your SQL Query here, e.g.:
+
+EXPLAIN (ANALYZE, FORMAT JSON)
+SELECT *
+FROM generate_series(1, 10000);
+`.trim()}
+            style={{
+              fontFamily: '"Fira code", "Fira Mono", monospace',
+              fontSize: 12,
+              minHeight: '276px',
             }}
           />
         </div>
