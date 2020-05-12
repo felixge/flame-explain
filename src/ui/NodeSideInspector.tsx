@@ -21,7 +21,7 @@ export default function NodeSideInspector(p: Props) {
   const fn = p.node;
   const sections = nodeSections(p.node).map(section => {
     if (p.category !== 'All' && section.Category !== p.category) {
-      return;
+      return null;
     }
 
     const rows = section.Keys.map(key => {
@@ -53,6 +53,7 @@ export default function NodeSideInspector(p: Props) {
       {
         ['All'].concat(categories).map(category => {
           return <a
+            href="# "
             className={p.category === category ? 'is-active' : ''}
             onClick={() => p.onClickCategory(category as InspectorCategory)}
           >
