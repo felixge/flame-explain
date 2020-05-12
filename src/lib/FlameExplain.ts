@@ -576,8 +576,9 @@ function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
   if (fn.Parent) {
     sn.Parent = fn.Parent;
   }
-  if (typeof fn["Total Time"] === 'number') {
-    sn["Total Time"] = fn["Total Time"];
+  if (typeof sn["Self Time"] === 'number') {
+    // A small compromise to make the numbers add up and the visualizations
+    // work.
     sn["Self Time"] = 0;
   }
   fn.Parent = sn;
