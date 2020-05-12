@@ -14,7 +14,6 @@ type Props = {
 };
 
 export default function NodeSideInspector(p: Props) {
-  console.log(p);
   if (!p.visible || !p.node) {
     return null;
   }
@@ -44,8 +43,6 @@ export default function NodeSideInspector(p: Props) {
       {rows}
     </React.Fragment>
   });
-
-  console.log('cat', p.category);
 
   return <nav className="panel inspector">
     <p className="panel-heading">
