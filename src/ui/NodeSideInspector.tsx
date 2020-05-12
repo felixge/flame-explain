@@ -30,13 +30,13 @@ export default function NodeSideInspector(p: Props) {
         ? '🔥'
         : '🐘';
 
-      return <tr>
+      return <tr key={key}>
         <td>{source} {key}</td>
         <td>{columnText(fn, key)}</td>
       </tr>;
     });
 
-    return <React.Fragment>
+    return <React.Fragment key={section.Category}>
       <tr>
         <th colSpan={2}>{section.Category}</th>
       </tr>
@@ -45,14 +45,15 @@ export default function NodeSideInspector(p: Props) {
   });
 
   return <nav className="panel inspector">
-    <p className="panel-heading">
+    <div className="panel-heading">
       <span>#{fn.ID} - {fn.Label}</span>
       <button className="delete" aria-label="close" onClick={p.onClose}></button>
-    </p>
-    <p className="panel-tabs">
+    </div>
+    <div className="panel-tabs">
       {
         ['All'].concat(categories).map(category => {
           return <a
+            key={category}
             href="# "
             className={p.category === category ? 'is-active' : ''}
             onClick={() => p.onClickCategory(category as InspectorCategory)}
@@ -61,8 +62,8 @@ export default function NodeSideInspector(p: Props) {
           </a>
         })
       }
-    </p>
-    <p className="panel-block">
+    </div>
+    <div className="panel-block">
       <div>
         <table className="table is-narrow">
           <tbody>
@@ -70,7 +71,7 @@ export default function NodeSideInspector(p: Props) {
           </tbody>
         </table>
       </div>
-    </p>
+    </div>
   </nav>;
 };
 
