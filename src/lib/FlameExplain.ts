@@ -568,11 +568,11 @@ function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
     return fn;
   }
 
-  const sn: FlameNode = {
+  const sn: FlameNode = Object.assign<{}, FlameNode, FlameNode>({}, fn, {
     Kind: "Subplan",
     Label: fn["Subplan Name"],
     Children: [fn],
-  };
+  });
   if (fn.Parent) {
     sn.Parent = fn.Parent;
   }
