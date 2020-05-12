@@ -62,9 +62,6 @@ export type FlameFragment = {
   /** Warnings contains a list of problems encountered while transforming the
   * data.*/
   "Warnings"?: [];
-
-  /** TODO: remove */
-  "Virtual"?: boolean;
 };
 
 export type flameOptions = Partial<{

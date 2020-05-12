@@ -17,7 +17,6 @@ const flameExplainKeys: {[K in keyof FlameFragment]: boolean} = {
   "Self Time %": true,
   "Total Time %": true,
   "Total Time": true,
-  "Virtual": true,
   "Warnings": true,
 };
 
