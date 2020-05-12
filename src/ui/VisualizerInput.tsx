@@ -154,6 +154,27 @@ export default function VisualizerInput(p: Props) {
         <div className="column">
           <Editor
             value={p.input.sql}
+            onPaste={(e) => {
+              // The code below detects if the user accidentally pasted his
+              // JSON plan into the SQL textbox and corrects their mistake for
+              // them.
+              const data = e.clipboardData.getData('text');
+              let isJSON = false;
+              try {
+                JSON.parse(data)
+                isJSON = true;
+              } catch (e) {
+                // intentionally blank
+              }
+
+              if (isJSON && !p.input.plan) {
+                // prevent onValueChange from firing
+                e.preventDefault();
+                p.onChange({...p.input, ...{sql: '', plan: data}});
+              } else {
+                p.onChange({...p.input, ...{sql: data}});
+              }
+            }}
             onValueChange={code => p.onChange({...p.input, ...{sql: code}})}
             highlight={code => Prism.highlight(code, Prism.languages.sql, 'sql')}
             padding={10}
