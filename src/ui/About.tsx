@@ -44,7 +44,6 @@ export default function About() {
         <li><a href="https://reactjs.org/">React</a> for allowing me to pretend to be frontend developer.</li>
         <li><a href="https://bulma.io/">Bulma</a> for hiding my lack of CSS and design skills.</li>
         <li><a href="https://d3js.org/">D3.js</a> for being the ultimate frontend visualization powerhouse.</li>
-        <li><a href="https://github.com/spiermar/d3-flame-graph">d3-flame-graph</a> for powering the FlameGraph visualizations.</li>
         <li><a href="https://prismjs.com/">Prism</a> for great JSON and SQL syntax highlighting.</li>
         <li><a href="https://fontawesome.com/">Font Awesome</a> for all the pretty icons.</li>
         <li><a href="https://twitter.com/LKhaknazarova">Lina Khaknazarova</a> for providing lots of suggestions and feedback.</li>

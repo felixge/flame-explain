@@ -85,3 +85,31 @@ table.tree-table
   .delete
     float: right;
     margin-top: 3px;
+
+.flamegraph
+  display: inline-block;
+  margin-bottom: 20px;
+  float: left;
+  width: 100%;
+
+  .is-active > .rect
+    background-color: $dark;
+    color: white;
+
+  .group
+    float: left;
+    border-right: 1px solid white;
+
+  .rect
+    background-color: red
+    margin-bottom: 1px
+    height: 24px;
+    color: white;
+
+    span
+      width: 100%;
+      padding: 0 5px;
+      float: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;

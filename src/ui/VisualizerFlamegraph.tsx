@@ -1,94 +1,62 @@
 import React from 'react';
 import {FlameNode} from '../lib/FlameExplain';
 import {PreferencesState} from './Preferences';
-import {flamegraph} from 'd3-flame-graph';
-import * as d3 from 'd3';
-import 'd3-flame-graph/src/flamegraph.css'
 import {formatDuration, formatPercent} from '../lib/Util';
 
 interface Props {
   root: FlameNode;
   settings: PreferencesState;
   clickNode: (fn: FlameNode) => void;
+  selected?: FlameNode;
 }
 
 export default function VisualizerFlamegraph(p: Props) {
-  const input = flameInput(p.root);
-  const flameRef = React.useRef<HTMLDivElement>(null);
-  const detailRef = React.useRef<HTMLDivElement>(null);
-
-  React.useLayoutEffect(() => {
-    if (!flameRef.current) {
-      return;
+  const toGroups = (fn: FlameNode): JSX.Element => {
+    const children = fn.Children?.map(toGroups);
+    if (fn.Kind === 'Root') {
+      return <React.Fragment>{children}</React.Fragment>;
     }
 
-    const fg = flamegraph()
-      .width(flameRef.current.offsetWidth)
-      .label((d) => {
-        if (!d) {
-          return '';
-        }
-        const total = p.root["Total Time"];
-        if (typeof total !== 'number') {
-          return '';
-        }
-        const duration = formatDuration(d.value);
-        const percent = formatPercent(d.value / total);
-        const label = d.data.name;
-        return `${label} ${duration} (${percent} of total)`;
-      })
-      //.onClick((d) => {
-      //if (!detailRef.current) {
-      //return;
-      //}
-      ////ReactDOM.render(<FlameDetail node={d.data.explainNode} />, detailRef.current);
-      //})
-      .inverted(true)
-      .sort(true);
+    let width = '100%';
+    let tooltip = '';
+    if (fn.Parent &&
+      typeof fn.Parent["Total Time"] === 'number' &&
+      typeof fn["Total Time"] === 'number' &&
+      typeof p.root["Total Time"] === 'number') {
 
-    d3.select(flameRef.current)
-      .datum(input)
-      .call(fg);
+      const rootFraction = fn["Total Time"] / p.root["Total Time"];
+      if (rootFraction < 0.01 || fn["Total Time"] <= 0) {
+        return <React.Fragment key={fn.ID} />;
+      }
 
-    return () => fg.destroy();
-  });
+      const parentFraction = fn["Total Time"] / fn.Parent["Total Time"];
+      width = (parentFraction * 100) + '%';
 
-  return <div>
-    <div ref={flameRef} className="flamegraph" />
-    <div ref={detailRef}></div>
+      if (typeof p.root["Total Time"] === 'number') {
+        const duration = formatDuration(fn["Total Time"]);
+        const percent = formatPercent(rootFraction);
+        tooltip = `${fn.Label} ${duration} (${percent} of total)`;
+      }
+    }
+
+    return <div
+      key={fn.ID}
+      className={"group" + ((fn === p.selected) ? ' is-active' : '')}
+      style={{width}}
+    >
+      <div
+        className="rect has-tooltip-arrow"
+        data-tooltip={tooltip}
+        onClick={() => p.clickNode(fn)}
+      >
+        <span>{fn.Label}</span>
+      </div>
+      {children}
+    </div >
+  };
+  const groups = toGroups(p.root);
+
+  return <div className="flamegraph">
+    {groups}
   </div>;
 };
-
-function flameInput(n: FlameNode): FlameInput | null {
-  if (n.Kind === 'Root' && n.Children?.length === 1) {
-    n = n.Children[0];
-  }
-
-  if (typeof n["Total Time"] !== 'number') {
-    return null;
-  }
-
-  const children: FlameInput[] = [];
-  n.Children?.map(flameInput).forEach(child => {
-    if (child !== null) {
-      children.push(child);
-    }
-  });
-
-  return {
-    name: n.Label || '',
-    value: n["Total Time"],
-    children: children,
-    node: n,
-  }
-};
-
-/**
- * see https://github.com/spiermar/d3-flame-graph#input-format
- */
-type FlameInput = {
-  name: string,
-  value: number,
-  children?: FlameInput[],
-  node: FlameNode,
-}

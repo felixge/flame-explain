@@ -213,6 +213,7 @@ export default function Visualizer(p: Props) {
       }
       tab = <div>
         <VisualizerFlamegraph
+          selected={nodeByID(rootNode, state.selectedNode)}
           settings={settings}
           root={rootNode}
           clickNode={onClickNode}
