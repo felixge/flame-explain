@@ -38,7 +38,7 @@ export default function VisualizerTable(p: Props) {
             <React.Fragment>
               {'\u00a0'.repeat((depth - 1) * 4)}
               <span
-                className="has-tooltip-right"
+                className="has-tooltip-right has-tooltip-arrow"
                 data-tooltip="Shift click to expand/collapse nodes recursively."
                 // prevent text-selection
                 onMouseDown={e => e.preventDefault()}
