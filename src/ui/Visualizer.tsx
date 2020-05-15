@@ -123,18 +123,33 @@ export default function Visualizer(p: Props) {
     setPrevGist(gist);
   }
 
-  let rootNode: FlameNode | undefined = undefined;
-  let errorText: string | null = null;
-  try {
-    let data = JSON.parse(state.input.plan || '[]');
-    if (typeof data === 'object' && 'flameExplain' in data) {
-      const {input, preferences} = JSON.parse(state.input.plan);
-      setState(state => ({...state, ...{input, preferences}}));
-      data = [];
+  // JSON Parsing + fromRawQueries can take ~10ms for large plans. This is
+  // probably not the biggest perf issue right now, but useMemo lets us avoid
+  // worrying about this overhead as fromRawQueries becomes more complex over
+  // time.
+  const {rootNode, errorText, newState} = React.useMemo(() => {
+    let rootNode: FlameNode | undefined = undefined;
+    let errorText: string | null = null;
+    let newState;
+    try {
+      let data = JSON.parse(state.input.plan || '[]');
+      if (typeof data === 'object' && 'flameExplain' in data) {
+        // TODO(fg) there are more things we should probably accept here (e.g.
+        // selected node)!
+        const {input, preferences} = JSON.parse(state.input.plan);
+        newState = {input, preferences};
+        data = [];
+      } else {
+        rootNode = fromRawQueries(data);
+      }
+    } catch (e) {
+      errorText = e + '';
     }
-    rootNode = fromRawQueries(data);
-  } catch (e) {
-    errorText = e + '';
+    return {rootNode, errorText, newState};
+  }, [state.input.plan]);
+
+  if (newState) {
+    setState(state => ({...state, ...newState}));
   }
 
   useKeyboardShortcuts((key: string) => {
