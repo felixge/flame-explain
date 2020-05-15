@@ -174,9 +174,6 @@ export default function Visualizer(p: Props) {
       case 'f':
         history.push('/visualize/flamegraph' + history.location.search);
         break
-      case 'n':
-        history.push('/visualize/networkgraph' + history.location.search);
-        break
       case 's':
         toggleModal('Share');
         break
@@ -238,8 +235,6 @@ export default function Visualizer(p: Props) {
         </div>
       </div>
       break;
-    case 'networkgraph':
-      break;
     default:
       return <Redirect to="/" />;
   }
@@ -278,9 +273,6 @@ export default function Visualizer(p: Props) {
         </li>
         <li className={match.params.tab === 'flamegraph' ? 'is-active' : ''}>
           <Link to={"/visualize/flamegraph" + history.location.search}><u>F</u>lame Graph</Link>
-        </li>
-        <li className={match.params.tab === 'networkgraph' ? 'is-active' : ''}>
-          <Link to={"/visualize/networkgraph" + history.location.search}><u>N</u>etwork Graph</Link>
         </li>
       </ul>
       <div className="buttons has-addons">
