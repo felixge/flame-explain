@@ -2,8 +2,7 @@ import React from 'react';
 import {FlameNode} from '../lib/FlameExplain';
 import {columnText} from '../lib/TextTable';
 import {PreferencesState} from './Preferences';
-import {interpolateReds} from 'd3-scale-chromatic';
-import {default as invert, RgbArray} from 'invert-color';
+import {ColorScale, colorPair} from './Color';
 import {faMinusSquare, faPlusSquare, faLeaf} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
@@ -26,7 +25,8 @@ export default function VisualizerTable(p: Props) {
       const colVals = columns.map(col => {
         let colVal = columnText(fn, col);
         let colEl: JSX.Element = <React.Fragment>{colVal}</React.Fragment>;
-        let whiteSpace: React.CSSProperties["whiteSpace"] = 'nowrap';
+        let style: React.CSSProperties = {whiteSpace: 'nowrap'};
+
         if (col === 'Label') {
           const leafNode = (fn.Children?.length || 0) <= 0;
           const icon = leafNode
@@ -53,18 +53,16 @@ export default function VisualizerTable(p: Props) {
               </span>
               &nbsp;{colVal}
             </React.Fragment>;
-          whiteSpace = 'initial';
+          style.whiteSpace = 'initial';
         }
-        let color = '';
-        let backgroundColor = '';
+
         const percent = fn.Colors?.[col as keyof FlameNode["Colors"]];
         if (typeof percent === 'number') {
-          [color, backgroundColor] = colorPair(percent);
+          style = {...style, ...colorPair(percent)};
         }
+        style.textAlign = typeof fn[col] === 'number' ? 'right' : 'left';
 
-        const textAlign = typeof fn[col] === 'number' ? 'right' : 'left';
-
-        return <td key={col} style={{whiteSpace, textAlign, color, backgroundColor}}>{colEl}</td>;
+        return <td key={col} style={style}>{colEl}</td>;
       });
       rows.push(<tr
         onClick={() => p.clickNode(fn)}
@@ -100,25 +98,6 @@ export default function VisualizerTable(p: Props) {
         {rows}
       </tbody>
     </table>
-    <ColorScale n={200} />
+    <ColorScale />
   </div>);
 };
-
-function ColorScale(p: {n: number}) {
-  const children = Array(...Array(p.n)).map((_, i) =>
-    <div key={i} style={{flex: '1 1', backgroundColor: colorPair(i / p.n)[1]}} />
-  );
-  return <div style={{display: 'flex', flexWrap: 'nowrap', height: '20px'}}>
-    {children}
-  </div>
-}
-
-function colorPair(n: number): [string, string] {
-  const bg = interpolateReds(n);
-  const bgArray = bg
-    .split("(")[1]
-    .split(")")[0]
-    .split(/ *, */).map(s => parseInt(s, 10)) as RgbArray;
-  const fg = invert(bgArray, true);
-  return [fg, bg];
-}
