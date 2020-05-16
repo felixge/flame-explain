@@ -3,7 +3,7 @@ import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
-import {default as NodeSideInspector, InspectorCategory} from './NodeSideInspector';
+import {default as Inspector, InspectorCategory} from './Inspector';
 import {
   default as VisualizerShare,
   SharingState,
@@ -292,7 +292,7 @@ export default function Visualizer(p: Props) {
     </div>
     <div className="columns">
       <div className="column is-narrow">
-        <NodeSideInspector
+        <Inspector
           category={state.inspectorCategory}
           onClickCategory={(category) => setState(state => ({
             ...state, ...{inspectorCategory: category}

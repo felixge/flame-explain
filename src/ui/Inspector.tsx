@@ -13,7 +13,7 @@ type Props = {
   category: InspectorCategory,
 };
 
-export default function NodeSideInspector(p: Props) {
+export default function Inspector(p: Props) {
   if (!p.visible || !p.node) {
     return null;
   }
