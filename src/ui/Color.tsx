@@ -9,7 +9,7 @@ export function ColorScale(p: {n?: number}) {
     const {backgroundColor} = colorPair(i / n);
     return <div key={i} style={{flex, backgroundColor}} />
   });
-  return <div style={{display: 'flex', flexWrap: 'nowrap', height: '20px'}}>
+  return <div style={{display: 'flex', flexWrap: 'nowrap', height: '20px', clear: 'both'}}>
     {children}
   </div>
 }
