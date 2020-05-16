@@ -243,7 +243,7 @@ describe('fromRawQueries', () => {
       const {queries} = NestedLoop;
       const root = fromRawQueries(queries, {});
       expect(Object.keys(root).sort()).toEqual(
-        ['Children', 'Kind', 'Self Time', 'Total Time']
+        ['Children', 'Kind', 'Self Time', 'Self Time %', 'Total Time', 'Total Time %']
       );
 
       expect(root.Children?.length).toEqual(1);

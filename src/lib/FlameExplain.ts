@@ -477,7 +477,7 @@ function setTimePercent(root: FlameNode) {
     }
     fn.Children?.forEach(visit);
   }
-  root.Children?.forEach(visit);
+  visit(root);
 }
 
 function setIDs(root: FlameNode) {
