@@ -34,8 +34,9 @@ export type Category = (typeof categories)[number];
 export const categoryKeys: {[K in Exclude<Category, 'Misc'>]: FlameKey[]} = {
   "Node": [
     "Node Type",
-    "Relation Name",
     "Schema",
+    "Relation Name",
+    "Index Name",
     "Alias",
     "Join Type",
     "Output",
