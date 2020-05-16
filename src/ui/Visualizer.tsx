@@ -268,11 +268,11 @@ export default function Visualizer(p: Props) {
         <li className={match.params.tab === 'input' ? 'is-active' : ''}>
           <Link to={"/visualize/input" + history.location.search}><u>I</u>nput</Link>
         </li>
-        <li className={match.params.tab === 'treetable' ? 'is-active' : ''}>
-          <Link to={"/visualize/treetable" + history.location.search}><u>T</u>ree Table</Link>
-        </li>
         <li className={match.params.tab === 'flamegraph' ? 'is-active' : ''}>
           <Link to={"/visualize/flamegraph" + history.location.search}><u>F</u>lame Graph</Link>
+        </li>
+        <li className={match.params.tab === 'treetable' ? 'is-active' : ''}>
+          <Link to={"/visualize/treetable" + history.location.search}><u>T</u>ree Table</Link>
         </li>
       </ul>
       <div className="buttons has-addons">

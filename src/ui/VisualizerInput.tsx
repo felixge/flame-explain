@@ -114,7 +114,7 @@ export default function VisualizerInput(p: Props) {
             onPaste={(e) => {
               const data = e.clipboardData.getData('text');
               p.onChange({...p.input, ...{plan: data}});
-              history.push('/visualize/treetable' + history.location.search);
+              history.push('/visualize/flamegraph' + history.location.search);
             }}
             onValueChange={code => p.onChange({...p.input, ...{plan: code}})}
             highlight={code => Prism.highlight(code, Prism.languages.js, 'js')}
