@@ -10,6 +10,7 @@ type Props = {
   node?: FlameNode;
   onClose: () => void;
   onClickCategory: (c: InspectorCategory) => void;
+  onClickNode: (fn: FlameNode) => void;
   category: InspectorCategory,
 };
 
@@ -32,7 +33,7 @@ export default function Inspector(p: Props) {
 
       return <tr key={key}>
         <td>{source} {key}</td>
-        <td>{columnText(fn, key)}</td>
+        <td>{inspectorValue(fn, key, p.onClickNode)}</td>
       </tr>;
     });
 
@@ -102,10 +103,44 @@ function nodeSections(fn: FlameNode): Sections {
 
   let key: FlameKey;
   for (key in fn) {
-    if (!assigned[key] && misc) {
+    if (!assigned[key] && misc && key !== 'Colors') {
       misc.Keys.push(key);
     }
   }
 
   return sections;
+}
+
+function inspectorValue(fn: FlameNode, key: keyof FlameNode, onClick: (fn: FlameNode) => void): JSX.Element {
+  const val = fn[key];
+  if (isFlameNode(val)) {
+    if (val.Kind === 'Root') {
+      return <React.Fragment>-</React.Fragment>;
+    } else {
+      return nodeLink(val, onClick);
+    }
+  } else if (isFlameNodes(val) && val.length > 0) {
+    var elements: JSX.Element[] = [];
+    val.forEach((child, i) => {
+      elements.push(<React.Fragment key={child.ID} >
+        {nodeLink(child, onClick)}{i + 1 === val.length ? '' : ', '}
+      </React.Fragment>);
+    });
+    return <React.Fragment>{elements}</React.Fragment>;
+  }
+
+  const textVal = columnText(fn, key, {longBool: true});
+  return <React.Fragment>{textVal}</React.Fragment>;
+}
+
+function isFlameNodes(val: FlameNode[keyof FlameNode]): val is FlameNode[] {
+  return Array.isArray(val) && val.length > 0 && isFlameNode(val[0]);
+}
+
+function isFlameNode(val: FlameNode[keyof FlameNode]): val is FlameNode {
+  return typeof val === 'object' && 'Kind' in val;
+}
+
+function nodeLink(fn: FlameNode, onClick: (fn: FlameNode) => void) {
+  return <a href={'#' + fn.ID} onClick={(e) => {e.preventDefault(); onClick(fn)}}>#{fn.ID}</a>;
 }

@@ -49,6 +49,7 @@ export function textTable(
 
 type flameStringOptions = {
   depth?: number;
+  longBool?: boolean;
 };
 
 export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions = {}): string {
@@ -76,7 +77,11 @@ export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions =
     default:
       let colVal = fn[col];
       if (typeof colVal === 'boolean') {
-        val = colVal ? 'x' : '';
+        if (opt.longBool) {
+          val = colVal + '';
+        } else {
+          val = colVal ? 'x' : '';
+        }
       } else if (typeof colVal === 'string' || typeof colVal === 'number') {
         val = colVal.toString();
       } else if (Array.isArray(colVal)) {

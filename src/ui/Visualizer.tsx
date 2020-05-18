@@ -294,6 +294,7 @@ export default function Visualizer(p: Props) {
       <div className="column is-narrow">
         <Inspector
           category={state.inspectorCategory}
+          onClickNode={onClickNode}
           onClickCategory={(category) => setState(state => ({
             ...state, ...{inspectorCategory: category}
           }))}
