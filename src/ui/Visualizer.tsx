@@ -197,7 +197,13 @@ export default function Visualizer(p: Props) {
         input={state.input}
         onChange={(input) => {
           history.push('/visualize/input');
-          setState(state => ({...state, ...{input: input, collapsed: {}}}));
+          setState(state => ({
+            ...state, ...{
+              input: input,
+              collapsed: {},
+              selectedNode: undefined,
+            }
+          }));
         }}
       />;
       break;
