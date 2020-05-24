@@ -6,12 +6,8 @@ import {ColorScale, colorPair} from './Color';
 
 type FlameGraphNode = {
   node: FlameNode;
-  rootShare: number;
   parentShare: number;
   color: number;
-
-  absRowsX: number;
-  rank: number;
   tooltip: string;
   children: FlameGraphNode[];
 };
@@ -93,9 +89,6 @@ function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
     }
 
     const node = fn;
-    // TODO
-    const absRowsX = Math.abs(fn["Rows X"] || 1);
-
     const totalTime = formatDuration(fn["Total Time"]);
     const selfTime = formatDuration(fn["Self Time"]);
     const totalDuration = formatDuration(root["Total Time"]);
@@ -122,57 +115,22 @@ function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
         }
       });
 
-    const rank = 0;
-    const color = 0;
+    let color = 0.5;
+    if (typeof fn.Colors?.["Rows X"] === 'number') {
+      color = fn.Colors["Rows X"];
+    } else {
+      color = 0.5;
+    }
+
     return {
       node,
-      rootShare,
       parentShare,
       color,
       tooltip,
-      absRowsX,
-      rank,
       children,
     };
   };
 
   const flames = mapper(root);
-  if (flames) {
-    setColors(flames);
-  }
   return flames;
-}
-
-// TODO: Make this part of fromRawQueries().
-function setColors(root: FlameGraphNode) {
-  const nodes: FlameGraphNode[] = [];
-  const visit = (f: FlameGraphNode) => {
-    nodes.push(f);
-    f.children.forEach(visit);
-  }
-  root.children.forEach(visit);
-
-  let prev: Number | undefined = undefined;
-  let rank = -1;
-  nodes
-    .sort((a, b) => {
-      return (a.absRowsX === b.absRowsX)
-        ? 0
-        : b.absRowsX - a.absRowsX;
-    })
-    .forEach(f => {
-      if (prev === undefined || f.absRowsX < prev) {
-        rank++;
-        prev = f.absRowsX;
-      }
-      f.rank = rank;
-    });
-
-  nodes.forEach(f => {
-    if (f.absRowsX === 1) {
-      f.color = 0;
-    } else {
-      f.color = 1 - f.rank / rank;
-    }
-  });
 }

@@ -502,15 +502,36 @@ function setDepths(root: FlameNode) {
 function setRowsX(root: FlameNode) {
   const visit = (fn: FlameNode, depth: number = 0) => {
     if (typeof fn["Plan Rows"] === 'number' && typeof fn["Actual Rows"] === 'number') {
-      if (fn["Actual Rows"] >= fn["Plan Rows"]) {
-        fn["Rows X"] = fn["Actual Rows"] / fn["Plan Rows"];
-      } else {
-        fn["Rows X"] = -fn["Plan Rows"] / fn["Actual Rows"];
-      }
+      fn["Rows X"] = rowsXHuman(fn["Plan Rows"], fn["Actual Rows"]);
     }
     fn.Children?.forEach(child => visit(child, depth + 1));
   }
   root.Children?.forEach(visit);
+}
+
+export function rowsXHuman(plan: number, actual: number): number {
+  const x = actual / plan;
+  return (x < 1)
+    ? -1 / x
+    : x;
+}
+
+export function rowsXFraction(human: number): number {
+  return (human < 0)
+    ? -1 / human
+    : human;
+}
+
+// rowsXColor converts a rowsX fraction from 0...Infinity to a
+// color value from -1 to 1 using a log10 scale which maxes out at
+// 1/1000 and 1000/1.
+export function rowsXColor(fraction: number): number {
+  if (fraction < 0.001) {
+    return -1;
+  } else if (fraction > 1000) {
+    return 1;
+  }
+  return (Math.log10(fraction)) / 3;
 }
 
 function setColors(root: FlameNode) {
@@ -527,10 +548,14 @@ function setColors(root: FlameNode) {
       if (fn.Colors) {
         fn.Colors[key] = 0;
       }
-      if (typeof val === 'number' && fn.Colors && maxVals) {
-        const maxVal = maxVals[key] || 0;
-        if (maxVal > 0) {
-          fn.Colors[key] = val / maxVal;
+      if (typeof val === 'number' && fn.Colors) {
+        if (key === 'Rows X') {
+          fn.Colors[key] = rowsXColor(rowsXFraction(val));
+        } else {
+          const maxVal = maxVals[key] || 0;
+          if (maxVal > 0) {
+            fn.Colors[key] = val / maxVal;
+          }
         }
       }
     });

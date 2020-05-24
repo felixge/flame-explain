@@ -4,6 +4,9 @@ import {
   FlameNode,
   parseNumberedSubplanName,
   parseFilter,
+  rowsXColor,
+  rowsXHuman,
+  rowsXFraction,
 } from './FlameExplain';
 import NestedLoop from './example_plans/NestedLoop';
 import RewriteTwoQueries from './example_plans/RewriteTwoQueries';
@@ -529,4 +532,32 @@ test('parseFilter', () => {
   expect(parseFilter('g = $0')).toEqual([0]);
   expect(parseFilter('g < $2 AND g > $4')).toEqual([2, 4]);
   expect(parseFilter('a < $2 AND b > $2 OR $5 = 1')).toEqual([2, 2, 5]);
+});
+
+test('rowsXFraction', () => {
+  expect(rowsXFraction(3)).toBeCloseTo(3 / 1);
+  expect(rowsXFraction(1)).toBeCloseTo(1);
+  expect(rowsXFraction(-3)).toBeCloseTo(1 / 3);
+});
+
+test('rowsXHuman', () => {
+  expect(rowsXHuman(1, 3)).toBeCloseTo(3);
+  expect(rowsXHuman(1, 1)).toBeCloseTo(1);
+  expect(rowsXHuman(3, 1)).toBeCloseTo(-3);
+});
+
+test('rowsXColor', () => {
+  expect(rowsXColor(0 / 1)).toEqual(-3 / 3);
+  expect(rowsXColor(-Infinity)).toEqual(-3 / 3);
+  expect(rowsXColor(1 / 10000)).toEqual(-3 / 3);
+  expect(rowsXColor(1 / 1000)).toEqual(-3 / 3);
+  expect(rowsXColor(1 / 100)).toBeCloseTo(-2 / 3);
+  expect(rowsXColor(1 / 10)).toBeCloseTo(-1 / 3);
+  expect(rowsXColor(1 / 1)).toBeCloseTo(0);
+  expect(rowsXColor(10 / 1)).toBeCloseTo(1 / 3);
+  expect(rowsXColor(100 / 1)).toBeCloseTo(2 / 3);
+  expect(rowsXColor(1000 / 1)).toBeCloseTo(3 / 3);
+  expect(rowsXColor(10000 / 1)).toBeCloseTo(3 / 3);
+  expect(rowsXColor(Infinity)).toEqual(3 / 3);
+  expect(rowsXColor(1 / 0)).toEqual(3 / 3);
 });
