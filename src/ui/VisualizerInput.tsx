@@ -8,8 +8,9 @@ import 'prismjs/plugins/custom-class/prism-custom-class';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
-import {faLock} from '@fortawesome/free-solid-svg-icons';
+import {faLock, faCopy} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import Clipboard from 'react-clipboard.js';
 
 // Can't import the theme from prismjs module directly because we need to hack
 // it with prefixes, see below.
@@ -60,12 +61,16 @@ export default function VisualizerInput(p: Props) {
     }
   });
 
+  const explainPrefix = 'EXPLAIN (ANALYZE, FORMAT JSON, VERBOSE, BUFFERS)';
+
   return (
     <div>
       {errorDiv}
       <div className="field content">
         <p>
-          Prefix your PostgreSQL query with <strong className="is-family-monospace has-text-danger">EXPLAIN (ANALYZE, FORMAT JSON, VERBOSE, BUFFERS)</strong>
+          Prefix your PostgreSQL query with <Clipboard component="a" data-clipboard-text={explainPrefix}>
+            <strong className="is-family-monospace has-text-danger"><code>{explainPrefix} <FontAwesomeIcon icon={faCopy} /></code></strong>
+          </Clipboard>
           , execute it, paste the resulting JSON below.
         </p>
         <p>
