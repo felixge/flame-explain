@@ -45,6 +45,7 @@ export type RawNode = Partial<
   & HashFragment
   & GatherFragment
   & BuffersFragment
+  & IOTimingFragment
 >;
 
 type CommonFragment = {
@@ -335,4 +336,9 @@ type BuffersFragment = {
   "Local Written Blocks": number,
   "Temp Read Blocks": number,
   "Temp Written Blocks": number,
+};
+
+type IOTimingFragment = {
+  "I/O Read Time": number,
+  "I/O Write Time": number,
 };

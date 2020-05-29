@@ -4,7 +4,8 @@ import {
   RawQueries,
 } from './RawExplain';
 import {Disjoint, ExtractFieldsOfType} from './Util';
-export {flameKeyDescs, flameKeyMeta} from './FlameDocs';
+import {blockKeys} from './FlameDocs';
+export {flameKeyDescs, flameKeyMeta, blockKeys} from './FlameDocs';
 
 type FlameNodeWithoutColors = Disjoint<
   Omit<RawQuery, "Plan"> & Omit<RawNode, "Plans">,
@@ -58,7 +59,9 @@ export type FlameFragment = {
   /** Depth is the depth of the node in the tree, starting with 0. */
   "Depth"?: number;
   /** Rows X is the rows estimation error */
-  "Rows X"?: number
+  "Rows X"?: number;
+  "Self Blocks"?: number;
+  "Total Blocks"?: number;
   /** Warnings contains a list of problems encountered while transforming the
   * data.*/
   "Warnings"?: [];
@@ -134,12 +137,16 @@ export function fromRawQueries(
   });
 
   setTotalTime(root);
+  setTotalBlocks(root);
   calcActualLoops(root);
-  calcFilterTime(root);
-  calcCTETime(root);
+  calcFilter(root, 'Total Time');
+  calcFilter(root, 'Total Blocks');
+  calcCTE(root, 'Total Time');
+  calcCTE(root, 'Total Blocks');
   calcParallelAppendTime(root)
   calcChildBoost(root);
   setSelfTime(root);
+  setSelfBlocks(root);
   if (opt.VirtualSubplanNodes) {
     createVirtualSubplanNodes(root);
   }
@@ -311,20 +318,20 @@ function calcChildBoost(fn: FlameNode) {
   }
 }
 
-function calcFilterTime(fn: FlameNode): FlameNode {
-  fn.Children?.forEach(calcFilterTime);
+function calcFilter(fn: FlameNode, key: 'Total Time' | 'Total Blocks'): FlameNode {
+  fn.Children?.forEach(child => calcFilter(child, key));
 
-  if (!(typeof fn["Total Time"] === 'number' && fn["Filter Refs"])) {
+  const initVal = fn[key];
+  if (!(typeof initVal === 'number' && fn["Filter Refs"])) {
     return fn;
   }
 
-  let initTime = fn["Total Time"];
   let childCount = fn['Filter Refs'].length;
   fn['Filter Refs'].forEach(child => {
-    if (typeof child["Total Time"] !== 'number') {
+    if (typeof child[key] !== 'number') {
       return
     }
-    const delta = initTime / childCount;
+    const delta = initVal / childCount;
 
     let p: FlameNode | undefined = child;
     while (p) {
@@ -332,8 +339,9 @@ function calcFilterTime(fn: FlameNode): FlameNode {
         return;
       }
 
-      if (typeof p["Total Time"] === 'number') {
-        p["Total Time"] -= delta;
+      const val = p[key];
+      if (typeof val === 'number') {
+        p[key] = val - delta;
       }
       p = p.Parent;
     }
@@ -342,26 +350,36 @@ function calcFilterTime(fn: FlameNode): FlameNode {
   return fn;
 }
 
-function calcCTETime(fn: FlameNode) {
+
+function calcCTE(fn: FlameNode, key: 'Total Time' | 'Total Blocks') {
   // We apply our tweaks depth first to all children in reverse order. This
   // makes sure queries like CTELoopedAggregateScan don't end up fixing the
   // time of CTEs if their scans haven't been fixed yet.
   if (fn.Children) {
     for (let i = fn.Children.length - 1; i >= 0; i--) {
-      calcCTETime(fn.Children[i]);
+      calcCTE(fn.Children[i], key);
     }
   }
 
   // Return early unless n is a CTE parent node.
-  if (!(typeof fn["Total Time"] === 'number' && fn["CTE Scans"])) {
+  const initVal = fn[key];
+  if (!(typeof initVal === 'number' && fn["CTE Scans"])) {
     return;
   }
 
-  let initTime = fn["Total Time"];
-  let scanTime = sumTotalTime(fn["CTE Scans"]);
+  const scanVal = fn["CTE Scans"]?.reduce((sum, scan) => {
+    const val = scan[key];
+    return typeof val === 'number'
+      ? sum + val
+      : sum;
+  }, 0)
+  if (scanVal === 0) {
+    return;
+  }
 
   fn["CTE Scans"].forEach(scan => {
-    if (typeof scan["Total Time"] !== 'number') {
+    const val = scan[key];
+    if (typeof val !== 'number') {
       return;
     }
 
@@ -399,9 +417,9 @@ function calcCTETime(fn: FlameNode) {
     //
     // This equation is applied below and seems to work very well with a wide
     // range of queries I've tested it against.
-    const newTime = scan["Total Time"] * (1 - initTime / scanTime);
-    let delta = scan["Total Time"] - newTime;
-    scan["Total Time"] = newTime;
+    const newVal = val * (1 - initVal / scanVal);
+    let delta = val - newVal;
+    scan[key] = newVal;
 
     let p = scan.Parent;
     while (p) {
@@ -409,8 +427,9 @@ function calcCTETime(fn: FlameNode) {
         return;
       }
 
-      if (typeof p["Total Time"] === 'number') {
-        p["Total Time"] -= delta;
+      const pVal = p[key];
+      if (typeof pVal === 'number') {
+        p[key] = pVal - delta;
       }
       p = p.Parent;
     }
@@ -500,11 +519,11 @@ function setDepths(root: FlameNode) {
 }
 
 function setRowsX(root: FlameNode) {
-  const visit = (fn: FlameNode, depth: number = 0) => {
+  const visit = (fn: FlameNode) => {
     if (typeof fn["Plan Rows"] === 'number' && typeof fn["Actual Rows"] === 'number') {
       fn["Rows X"] = rowsXHuman(fn["Plan Rows"], fn["Actual Rows"]);
     }
-    fn.Children?.forEach(child => visit(child, depth + 1));
+    fn.Children?.forEach(visit);
   }
   root.Children?.forEach(visit);
 }
@@ -520,6 +539,44 @@ export function rowsXFraction(human: number): number {
   return (human < 0)
     ? -1 / human
     : human;
+}
+
+function setTotalBlocks(root: FlameNode) {
+  const visit = (fn: FlameNode) => {
+    let total: number | undefined = undefined;
+    blockKeys.forEach(blockKey => {
+      const val = fn[blockKey];
+      if (typeof val === 'number') {
+        total = total || 0;
+        total += val;
+      }
+    });
+
+    if (total !== undefined) {
+      fn["Total Blocks"] = total;
+    }
+
+    fn.Children?.forEach(visit);
+  }
+  root.Children?.forEach(visit);
+}
+
+function setSelfBlocks(root: FlameNode) {
+  const visit = (fn: FlameNode) => {
+    const childTotal = fn.Children?.reduce((sum, child) => {
+      return typeof child["Total Blocks"] === 'number'
+        ? sum + child["Total Blocks"]
+        : sum;
+    }, 0)
+
+
+    if (typeof fn["Total Blocks"] === 'number') {
+      fn["Self Blocks"] = fn["Total Blocks"] - (childTotal || 0);
+    }
+
+    fn.Children?.forEach(visit);
+  }
+  root.Children?.forEach(visit);
 }
 
 // rowsXColor converts a rowsX fraction from 0...Infinity to a
@@ -605,6 +662,7 @@ function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
     // A small compromise to make the numbers add up and the visualizations
     // work.
     sn["Self Time"] = 0;
+    sn["Self Blocks"] = 0;
   }
   fn.Parent = sn;
 

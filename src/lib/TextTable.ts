@@ -2,6 +2,7 @@ import {FlameNode} from './FlameExplain';
 import {formatDuration, formatPercent} from './Util';
 // @ts-ignore no type definitions
 import AsciiTable from 'ascii-table';
+import format from '../ui/Format';
 
 export type Column = keyof FlameNode;
 
@@ -59,6 +60,20 @@ export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions =
 
   let val = '';
   switch (col) {
+    case 'Shared Hit Blocks':
+    case 'Shared Read Blocks':
+    case 'Shared Dirtied Blocks':
+    case 'Shared Written Blocks':
+    case 'Local Hit Blocks':
+    case 'Local Read Blocks':
+    case 'Local Dirtied Blocks':
+    case 'Local Written Blocks':
+    case 'Temp Read Blocks':
+    case 'Temp Written Blocks':
+    case 'Total Blocks':
+    case 'Self Blocks':
+      val = format(fn[col] || 0, 'page');
+      break;
     case 'Rows X':
       val = (fn[col] as number).toFixed(2);
       break;
@@ -72,6 +87,8 @@ export function columnText(fn: FlameNode, col: Column, opt: flameStringOptions =
     case 'Self Time':
     case 'Execution Time':
     case 'Planning Time':
+    case 'I/O Read Time':
+    case 'I/O Write Time':
       val = formatDuration(fn[col] as number);
       break;
     default:

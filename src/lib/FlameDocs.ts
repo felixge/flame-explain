@@ -18,8 +18,25 @@ const flameExplainKeys: {[K in keyof FlameFragment]: boolean} = {
   "Total Time %": true,
   "Total Time": true,
   "Warnings": true,
+  "Total Blocks": true,
+  "Self Blocks": true,
 };
 
+
+export const blockKeys: FlameKey[] = [
+  'Shared Hit Blocks',
+  'Shared Read Blocks',
+  'Shared Dirtied Blocks',
+  'Shared Written Blocks',
+  'Local Hit Blocks',
+  'Local Read Blocks',
+  'Local Dirtied Blocks',
+  'Local Written Blocks',
+  'Temp Read Blocks',
+  'Temp Written Blocks',
+  'Total Blocks',
+  'Self Blocks',
+];
 
 export const categories = [
   "Node",
@@ -65,6 +82,8 @@ export const categoryKeys: {[K in Exclude<Category, 'Misc'>]: FlameKey[]} = {
     "Self Time %",
     "Total Time",
     "Total Time %",
+    "I/O Read Time",
+    "I/O Write Time",
   ],
   "I/O": [
     "Shared Hit Blocks",
@@ -77,6 +96,8 @@ export const categoryKeys: {[K in Exclude<Category, 'Misc'>]: FlameKey[]} = {
     "Local Written Blocks",
     "Temp Read Blocks",
     "Temp Written Blocks",
+    "Total Blocks",
+    "Self Blocks",
   ],
 };
 
