@@ -2,15 +2,20 @@ import React from 'react';
 import {FlameNode, FlameKey, flameKeyMeta} from '../lib/FlameExplain';
 import {Category, categories, categoryKeys} from '../lib/FlameDocs';
 import {columnText} from '../lib/TextTable';
+import {faStar as faStarBold} from '@fortawesome/free-solid-svg-icons';
+import {faStar} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 export type InspectorCategory = Category | 'All';
 
 type Props = {
   visible: boolean;
+  favorites: FlameKey[];
   node?: FlameNode;
   onClose: () => void;
   onClickCategory: (c: InspectorCategory) => void;
   onClickNode: (fn: FlameNode) => void;
+  onChangeFavorites: (favs: FlameKey[]) => void;
   category: InspectorCategory,
 };
 
@@ -19,20 +24,41 @@ export default function Inspector(p: Props) {
     return null;
   }
 
+  const onClickStar = (key: FlameKey) => {
+    const newFavorites = p.favorites.includes(key)
+      ? p.favorites.filter(f => f != key)
+      : [...p.favorites].concat(key);
+    p.onChangeFavorites(newFavorites);
+  }
+
   const fn = p.node;
-  const sections = nodeSections(p.node).map(section => {
+  const sections = nodeSections(p.node, p.favorites).map(section => {
     if (p.category !== 'All' && section.Category !== p.category) {
       return null;
     }
 
     const rows = section.Keys.map(key => {
       const meta = flameKeyMeta[key];
-      const source = (meta?.Source === 'FlameExplain')
-        ? '🔥'
-        : '🐘';
+      const tooltip = (meta?.Source === 'FlameExplain')
+        ? 'Source: 🔥 FlameExplain'
+        : 'Source: 🐘 PostgreSQL';
+
+      const icon = p.favorites.includes(key)
+        ? faStarBold
+        : faStar;
 
       return <tr key={key}>
-        <td>{source} {key}</td>
+        <td>
+          <span
+            data-tooltip={tooltip}
+            className="has-tooltip-right has-tooltip-arrow"
+          >
+            <span onClick={() => onClickStar(key)} className="star">
+              <FontAwesomeIcon icon={icon} />
+            </span>
+            &nbsp;{key}
+          </span>
+        </td>
         <td>{inspectorValue(fn, key, p.onClickNode)}</td>
       </tr>;
     });
@@ -52,7 +78,7 @@ export default function Inspector(p: Props) {
     </div>
     <div className="panel-tabs">
       {
-        ['All'].concat(categories).map(category => {
+        ['All', 'Favs'].concat(categories).map(category => {
           return <a
             key={category}
             href="# "
@@ -79,11 +105,11 @@ export default function Inspector(p: Props) {
 type Sections = Section[];
 
 type Section = {
-  Category: Category,
+  Category: 'Favs' | Category,
   Keys: FlameKey[],
 };
 
-function nodeSections(fn: FlameNode): Sections {
+function nodeSections(fn: FlameNode, favorites: FlameKey[]): Sections {
   const assigned: {[K in FlameKey]?: boolean} = {};
   let misc: Section | undefined;
   const sections: Sections = categories.map(category => {
@@ -108,7 +134,12 @@ function nodeSections(fn: FlameNode): Sections {
     }
   }
 
-  return sections;
+  const favs: Section = {
+    Category: 'Favs',
+    Keys: favorites,
+  };
+
+  return [favs].concat(sections);
 }
 
 function inspectorValue(fn: FlameNode, key: keyof FlameNode, onClick: (fn: FlameNode) => void): JSX.Element {

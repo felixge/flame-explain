@@ -9,7 +9,7 @@ import {
   SharingState,
 } from './VisualizerShare';
 import {PreferencesState, default as Preferences} from './Preferences';
-import {FlameNode, fromRawQueries, nodeByID} from '../lib/FlameExplain';
+import {FlameNode, FlameKey, fromRawQueries, nodeByID} from '../lib/FlameExplain';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faWrench as iconPreferences, faShareAlt as iconShare} from '@fortawesome/free-solid-svg-icons';
@@ -25,7 +25,7 @@ export type VisualizerState = {
   showInspector: boolean;
   inspectorCategory: InspectorCategory;
   collapsed: {[K: number]: true};
-  preferences: PreferencesState;
+  favorites: FlameKey[];
   share: SharingState;
   selectedNode?: number;
 };
@@ -34,23 +34,21 @@ interface Props {
   planText?: string,
 }
 
-const defaultPreferences: PreferencesState = {
-  SelectedKeys: [
-    'ID',
-    'Label',
-    'Rows X',
-    'Total Time',
-    'Self Time',
-    'Self Time %',
-  ],
-};
+const defaultFavorites: FlameKey[] = [
+  'ID',
+  'Label',
+  'Rows X',
+  'Total Time',
+  'Self Time',
+  'Self Time %',
+];
 
 export default function Visualizer(p: Props) {
   const history = useHistory();
 
   const defaultState: VisualizerState = {
     input: {plan: p.planText || '', sql: ''},
-    preferences: defaultPreferences,
+    favorites: defaultFavorites,
     collapsed: {},
     modal: null,
     showInspector: false,
@@ -60,7 +58,6 @@ export default function Visualizer(p: Props) {
 
   let [state, setState] = useLocalStorage('visualizer', defaultState);
 
-  const settings = state.preferences;
   const setPreferences = (s: PreferencesState) => {
     setState(state => ({...state, ...{preferences: s}}));
   };
@@ -213,7 +210,7 @@ export default function Visualizer(p: Props) {
       }
       tab = <div>
         <VisualizerTable
-          settings={settings}
+          settings={{SelectedKeys: state.favorites}}
           root={rootNode}
           collapsed={state.collapsed}
           toggleNode={onToggleNode}
@@ -232,7 +229,7 @@ export default function Visualizer(p: Props) {
       tab = <div>
         <VisualizerFlamegraph
           selected={nodeByID(rootNode, state.selectedNode)}
-          settings={settings}
+          settings={{SelectedKeys: state.favorites}}
           root={rootNode}
           clickNode={onClickNode}
         />
@@ -259,7 +256,7 @@ export default function Visualizer(p: Props) {
       onClose={() => toggleModal('Preferences')}
       onChange={onPreferencesChange}
       visible={state.modal === 'Preferences'}
-      settings={settings}
+      settings={{SelectedKeys: state.favorites}}
       root={rootNode}
     />
     <VisualizerShare
@@ -299,10 +296,14 @@ export default function Visualizer(p: Props) {
     <div className="columns">
       <div className="column is-narrow">
         <Inspector
+          favorites={state.favorites}
           category={state.inspectorCategory}
           onClickNode={onClickNode}
           onClickCategory={(category) => setState(state => ({
             ...state, ...{inspectorCategory: category}
+          }))}
+          onChangeFavorites={(favorites) => setState(state => ({
+            ...state, ...{favorites: favorites}
           }))}
           onClose={() => setState(state => (
             {
