@@ -5,6 +5,7 @@ import {columnText} from '../lib/TextTable';
 import {faStar as faStarBold} from '@fortawesome/free-solid-svg-icons';
 import {faStar} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {Arrows, Direction, move} from './Arrows';
 
 export type InspectorCategory = Category | 'All';
 
@@ -26,7 +27,7 @@ export default function Inspector(p: Props) {
 
   const onClickStar = (key: FlameKey) => {
     const newFavorites = p.favorites.includes(key)
-      ? p.favorites.filter(f => f != key)
+      ? p.favorites.filter(f => f !== key)
       : [...p.favorites].concat(key);
     p.onChangeFavorites(newFavorites);
   }
@@ -47,6 +48,10 @@ export default function Inspector(p: Props) {
         ? faStarBold
         : faStar;
 
+      const onArrowClick = (d: Direction) => {
+        p.onChangeFavorites(move(p.favorites, p.favorites.indexOf(key), d));
+      };
+
       return <tr key={key}>
         <td>
           <span
@@ -59,7 +64,10 @@ export default function Inspector(p: Props) {
             &nbsp;{key}
           </span>
         </td>
-        <td>{inspectorValue(fn, key, p.onClickNode)}</td>
+        <td className="has-arrows">
+          {inspectorValue(fn, key, p.onClickNode)}
+          {section.Category === 'Favs' ? <Arrows onClick={onArrowClick} arrows={['up', 'down']} /> : ''}
+        </td>
       </tr>;
     });
 

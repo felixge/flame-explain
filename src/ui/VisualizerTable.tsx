@@ -1,14 +1,15 @@
 import React from 'react';
-import {FlameNode} from '../lib/FlameExplain';
+import {FlameNode, FlameKey} from '../lib/FlameExplain';
 import {columnText} from '../lib/TextTable';
-import {PreferencesState} from './Preferences';
 import {ColorScale, colorPair} from './Color';
 import {faMinusSquare, faPlusSquare, faLeaf} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {Arrows, Direction, move} from './Arrows';
 
 interface Props {
   root: FlameNode;
-  settings: PreferencesState;
+  favorites: FlameKey[];
+  onChangeFavorites: (favs: FlameKey[]) => void;
   collapsed: {[K: number]: true};
   clickNode: (fn: FlameNode) => void;
   toggleNode: (fn: FlameNode, recursive: boolean) => void;
@@ -17,7 +18,7 @@ interface Props {
 
 export default function VisualizerTable(p: Props) {
   const rows: JSX.Element[] = [];
-  const columns = p.settings.SelectedKeys;
+  const columns = p.favorites;
 
   const visit = (fn: FlameNode, depth = 0) => {
     const collapsed = typeof fn.ID === 'number' && p.collapsed[fn.ID];
@@ -84,7 +85,15 @@ export default function VisualizerTable(p: Props) {
     } else {
       style.whiteSpace = 'nowrap';
     }
-    return <th key={col} style={style}>{col}</th>
+
+    const onArrowClick = (d: Direction) => {
+      p.onChangeFavorites(move(p.favorites, p.favorites.indexOf(col), d));
+    };
+
+    return <th className="has-arrows" key={col} style={style}>
+      {col}
+      <Arrows arrows={['left', 'right']} onClick={onArrowClick} />
+    </th>
   });
 
   return (<div className="content">

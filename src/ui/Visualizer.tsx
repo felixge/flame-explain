@@ -210,7 +210,10 @@ export default function Visualizer(p: Props) {
       }
       tab = <div>
         <VisualizerTable
-          settings={{SelectedKeys: state.favorites}}
+          favorites={state.favorites}
+          onChangeFavorites={(favorites) => setState(state => ({
+            ...state, ...{favorites: favorites}
+          }))}
           root={rootNode}
           collapsed={state.collapsed}
           toggleNode={onToggleNode}
