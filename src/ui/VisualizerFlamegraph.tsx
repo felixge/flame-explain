@@ -1,6 +1,5 @@
 import React from 'react';
 import {FlameNode} from '../lib/FlameExplain';
-import {PreferencesState} from './Preferences';
 import {formatDuration, formatPercent} from '../lib/Util';
 import {ColorScale, colorPair} from './Color';
 
@@ -14,7 +13,6 @@ type FlameGraphNode = {
 
 interface Props {
   root: FlameNode;
-  settings: PreferencesState;
   clickNode: (fn: FlameNode) => void;
   selected?: FlameNode;
 }

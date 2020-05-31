@@ -8,11 +8,10 @@ import {
   default as VisualizerShare,
   SharingState,
 } from './VisualizerShare';
-import {PreferencesState, default as Preferences} from './Preferences';
 import {FlameNode, FlameKey, fromRawQueries, nodeByID} from '../lib/FlameExplain';
 import {useRouteMatch, Redirect} from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faWrench as iconPreferences, faShareAlt as iconShare} from '@fortawesome/free-solid-svg-icons';
+import {faShareAlt as iconShare} from '@fortawesome/free-solid-svg-icons';
 import {useLocalStorage} from './LocalStorage';
 import {useGist, GistNotice} from './Gist';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
@@ -21,7 +20,7 @@ import Highlight from './Highlight';
 
 export type VisualizerState = {
   input: InputState;
-  modal: 'Preferences' | 'Share' | null;
+  modal: 'Share' | null;
   showInspector: boolean;
   inspectorCategory: InspectorCategory;
   collapsed: {[K: number]: true};
@@ -29,10 +28,6 @@ export type VisualizerState = {
   share: SharingState;
   selectedNode?: number;
 };
-
-interface Props {
-  planText?: string,
-}
 
 const defaultFavorites: FlameKey[] = [
   'ID',
@@ -43,11 +38,11 @@ const defaultFavorites: FlameKey[] = [
   'Self Time %',
 ];
 
-export default function Visualizer(p: Props) {
+export default function Visualizer() {
   const history = useHistory();
 
   const defaultState: VisualizerState = {
-    input: {plan: p.planText || '', sql: ''},
+    input: {plan: '', sql: ''},
     favorites: defaultFavorites,
     collapsed: {},
     modal: null,
@@ -58,9 +53,6 @@ export default function Visualizer(p: Props) {
 
   let [state, setState] = useLocalStorage('visualizer', defaultState);
 
-  const setPreferences = (s: PreferencesState) => {
-    setState(state => ({...state, ...{preferences: s}}));
-  };
   const toggleModal = (modal: typeof state.modal) => {
     const m = state.modal === modal ? null : modal;
     setState(state => ({...state, ...{modal: m}}));
@@ -164,20 +156,16 @@ export default function Visualizer(p: Props) {
         break;
       case 'i':
         history.push('/visualize/input' + history.location.search);
-        break
+        break;
       case 't':
         history.push('/visualize/treetable' + history.location.search);
-        break
+        break;
       case 'f':
         history.push('/visualize/flamegraph' + history.location.search);
-        break
+        break;
       case 's':
         toggleModal('Share');
-        break
-      case ',':
-      case 'p':
-        toggleModal('Preferences');
-        break
+        break;
     }
   });
 
@@ -232,7 +220,6 @@ export default function Visualizer(p: Props) {
       tab = <div>
         <VisualizerFlamegraph
           selected={nodeByID(rootNode, state.selectedNode)}
-          settings={{SelectedKeys: state.favorites}}
           root={rootNode}
           clickNode={onClickNode}
         />
@@ -245,23 +232,12 @@ export default function Visualizer(p: Props) {
       return <Redirect to="/" />;
   }
 
-  const onPreferencesChange = (newPreferences: PreferencesState) => {
-    setPreferences(newPreferences);
-  };
-
   const onShareChange = (share: SharingState) => {
     setState(state => ({...state, ...{share}}));
   };
 
 
   return <section className="section">
-    <Preferences
-      onClose={() => toggleModal('Preferences')}
-      onChange={onPreferencesChange}
-      visible={state.modal === 'Preferences'}
-      settings={{SelectedKeys: state.favorites}}
-      root={rootNode}
-    />
     <VisualizerShare
       onClose={() => toggleModal('Share')}
       onChange={onShareChange}
@@ -282,12 +258,6 @@ export default function Visualizer(p: Props) {
         </li>
       </ul>
       <div className="buttons has-addons">
-        <button onClick={() => toggleModal('Preferences')} className="button">
-          <span className="icon is-small">
-            <FontAwesomeIcon icon={iconPreferences} />
-          </span>
-          <span><u>P</u>references</span>
-        </button>
         <button onClick={() => toggleModal('Share')} className="button">
           <span className="icon is-small">
             <FontAwesomeIcon icon={iconShare} />
