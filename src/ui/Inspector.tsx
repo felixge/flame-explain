@@ -81,7 +81,7 @@ export default function Inspector(p: Props) {
 
   return <nav className="panel inspector">
     <div className="panel-heading">
-      <span>#{fn.ID} {fn.Label}</span>
+      <span>{fn.ID} {fn.Label}</span>
       <button className="delete" aria-label="close" onClick={p.onClose}></button>
     </div>
     <div className="panel-tabs">

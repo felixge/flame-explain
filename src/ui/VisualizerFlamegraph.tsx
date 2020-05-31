@@ -48,7 +48,7 @@ export default function VisualizerFlamegraph(p: Props) {
         onClick={() => p.clickNode(f.node)}
         style={colors}
       >
-        <span>{f.node.Label}</span>
+        <span>{f.node.ID} {f.node.Label}</span>
       </div>
       {children}
     </div>
@@ -96,7 +96,7 @@ function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
     const selfPercent = formatPercent(fn["Self Time %"]);
 
     let tooltipLines: string[] = [
-      `#${fn.ID} ${fn.Label}`,
+      `${fn.ID} ${fn.Label}`,
       `Total Time: ${totalTime} of ${totalDuration} (${totalPercent} of total)`,
       `Self Time: ${selfTime} of ${totalDuration} (${selfPercent} of total)`,
     ];
