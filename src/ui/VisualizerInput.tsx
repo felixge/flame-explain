@@ -172,13 +172,14 @@ export default function VisualizerInput(p: Props) {
                 // intentionally blank
               }
 
-              if (isJSON && !p.input.plan) {
+              if (isJSON) {
                 // prevent onValueChange from firing
-                e.preventDefault();
                 p.onChange({...p.input, ...{sql: '', plan: data}});
               } else {
                 p.onChange({...p.input, ...{sql: data}});
               }
+              e.preventDefault();
+              e.stopPropagation();
             }}
             onValueChange={code => p.onChange({...p.input, ...{sql: code}})}
             highlight={code => Prism.highlight(code, Prism.languages.sql, 'sql')}

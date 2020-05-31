@@ -53,6 +53,29 @@ export default function Visualizer() {
 
   let [state, setState] = useLocalStorage('visualizer', defaultState);
 
+  const setInput = (newInput: typeof defaultState.input) => {
+    setState(state => ({
+      ...state, ...{
+        input: newInput,
+        collapsed: {},
+        selectedNode: undefined,
+      }
+    }));
+  };
+
+  React.useEffect(() => {
+    const onPaste = (e: any) => {
+      const data = e.clipboardData?.getData('text');
+      if (data) {
+        setInput({plan: data, sql: state.input.sql});
+      }
+    };
+    window.addEventListener('paste', onPaste);
+    return () => {
+      window.removeEventListener('paste', onPaste);
+    };
+  });
+
   const toggleModal = (modal: typeof state.modal) => {
     const m = state.modal === modal ? null : modal;
     setState(state => ({...state, ...{modal: m}}));
@@ -182,13 +205,7 @@ export default function Visualizer() {
         input={state.input}
         onChange={(input) => {
           history.push('/visualize/input');
-          setState(state => ({
-            ...state, ...{
-              input: input,
-              collapsed: {},
-              selectedNode: undefined,
-            }
-          }));
+          setInput(input);
         }}
       />;
       break;
@@ -236,7 +253,7 @@ export default function Visualizer() {
     setState(state => ({...state, ...{share}}));
   };
 
-  const tabDisabled = state.input.plan ? '' : 'is-disabled';
+  const tabDisabled = (rootNode && state.input.plan) ? '' : 'is-disabled';
 
   return <section className="section">
     <VisualizerShare
