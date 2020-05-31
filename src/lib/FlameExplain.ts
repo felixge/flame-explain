@@ -563,6 +563,8 @@ function setTotalBlocks(root: FlameNode) {
 
 function setSelfBlocks(root: FlameNode) {
   const visit = (fn: FlameNode) => {
+    fn.Children?.forEach(visit);
+
     const childTotal = fn.Children?.reduce((sum, child) => {
       return typeof child["Total Blocks"] === 'number'
         ? sum + child["Total Blocks"]
@@ -572,11 +574,12 @@ function setSelfBlocks(root: FlameNode) {
 
     if (typeof fn["Total Blocks"] === 'number') {
       fn["Self Blocks"] = fn["Total Blocks"] - (childTotal || 0);
+    } else {
+      fn["Total Blocks"] = (childTotal || 0);
+      fn["Self Blocks"] = 0;
     }
-
-    fn.Children?.forEach(visit);
   }
-  root.Children?.forEach(visit);
+  visit(root);
 }
 
 // rowsXColor converts a rowsX fraction from 0...Infinity to a
