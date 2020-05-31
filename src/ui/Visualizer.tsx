@@ -193,7 +193,7 @@ export default function Visualizer() {
       />;
       break;
     case 'treetable':
-      if (!rootNode) {
+      if (!rootNode || !state.input.plan) {
         return <Redirect to="/" />;
       }
       tab = <div>
@@ -214,7 +214,7 @@ export default function Visualizer() {
       </div>
       break;
     case 'flamegraph':
-      if (!rootNode) {
+      if (!rootNode || !state.input.plan) {
         return <Redirect to="/" />;
       }
       tab = <div>
@@ -236,6 +236,7 @@ export default function Visualizer() {
     setState(state => ({...state, ...{share}}));
   };
 
+  const tabDisabled = state.input.plan ? '' : 'is-disabled';
 
   return <section className="section">
     <VisualizerShare
@@ -250,10 +251,10 @@ export default function Visualizer() {
         <li className={match.params.tab === 'input' ? 'is-active' : ''}>
           <Link to={"/visualize/input" + history.location.search}><u>I</u>nput</Link>
         </li>
-        <li className={match.params.tab === 'flamegraph' ? 'is-active' : ''}>
+        <li className={`${tabDisabled} ${match.params.tab === 'flamegraph' ? 'is-active' : ''}`}>
           <Link to={"/visualize/flamegraph" + history.location.search}><u>F</u>lame Graph</Link>
         </li>
-        <li className={match.params.tab === 'treetable' ? 'is-active' : ''}>
+        <li className={`${tabDisabled} ${match.params.tab === 'treetable' ? 'is-active' : ''}`}>
           <Link to={"/visualize/treetable" + history.location.search}><u>T</u>ree Table</Link>
         </li>
       </ul>
