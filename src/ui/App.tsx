@@ -10,13 +10,10 @@ import Footer from './Footer';
 import Visualizer from './Visualizer';
 import About from './About';
 import Docs from './Docs';
+import ErrorBoundary from './ErrorBoundary';
 import './index.sass';
 
-interface Props {
-  planText?: string,
-}
-
-export default function App(p: Props) {
+export default function App() {
   return (
     <BrowserRouter>
       <Header />
@@ -25,7 +22,9 @@ export default function App(p: Props) {
           <Redirect to="/visualize/input" />;
         </Route>
         <Route path="/visualize">
-          <Visualizer planText={p.planText} />
+          <ErrorBoundary>
+            <Visualizer />
+          </ErrorBoundary>
         </Route>
         <Route path="/about">
           <About />
