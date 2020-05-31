@@ -40,7 +40,7 @@ export default function About() {
         A special thanks goes to the projects and people below that have helped me with building FlameExplain:
       </p>
       <ul>
-        <li><a href="https://www.typescriptlang.org/">Typescript</a> for making JavaScript fun again after years of leaving Node.js for developing in Go.</li>
+        <li><a href="https://www.typescriptlang.org/">Typescript</a> for making JavaScript fun again after years of leaving Node.js for Go.</li>
         <li><a href="https://reactjs.org/">React</a> for allowing me to pretend to be frontend developer.</li>
         <li><a href="https://bulma.io/">Bulma</a> for hiding my lack of CSS and design skills.</li>
         <li><a href="https://d3js.org/">D3.js</a> for being the ultimate frontend visualization powerhouse.</li>
