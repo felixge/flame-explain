@@ -246,7 +246,7 @@ describe('fromRawQueries', () => {
       const {queries} = NestedLoop;
       const root = fromRawQueries(queries, {});
       expect(Object.keys(root).sort()).toEqual(
-        ['Children', 'Kind', 'Self Time', 'Self Time %', 'Total Time', 'Total Time %', 'Self Blocks', 'Total Blocks'].sort()
+        ['Children', 'Kind', 'Self Time', 'Self Time %', 'Total Time', 'Total Time %'].sort()
       );
 
       expect(root.Children?.length).toEqual(1);
@@ -257,7 +257,7 @@ describe('fromRawQueries', () => {
         .toEqual(Object
           .keys(queries[0].Plan || {})
           .filter(key => key !== 'Plans')
-          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID', 'Self Time', 'Self Time %', 'Total Time', 'Total Time %', 'Colors', 'Depth', 'Rows X', 'Self Blocks', 'Total Blocks'])
+          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID', 'Self Time', 'Self Time %', 'Total Time', 'Total Time %', 'Colors', 'Depth', 'Rows X'])
           .sort());
       expect(child).not.toBe(queries[0].Plan);
 
@@ -281,12 +281,12 @@ describe('fromRawQueries', () => {
     // node.
     test('no children', () => {
       const root2 = fromRawQueries([], {});
-      expect(Object.keys(root2).sort()).toEqual(['Kind', 'Self Blocks', 'Total Blocks']);
+      expect(Object.keys(root2).sort()).toEqual(['Kind']);
     });
 
     test('empty children', () => {
       const root3 = fromRawQueries([{}, {}], {});
-      expect(Object.keys(root3).sort()).toEqual(['Kind', 'Self Blocks', 'Total Blocks']);
+      expect(Object.keys(root3).sort()).toEqual(['Kind']);
     });
   });
 

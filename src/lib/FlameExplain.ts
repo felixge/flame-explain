@@ -565,16 +565,16 @@ function setSelfBlocks(root: FlameNode) {
   const visit = (fn: FlameNode) => {
     fn.Children?.forEach(visit);
 
-    const childTotal = fn.Children?.reduce((sum, child) => {
+    const childTotal = fn.Children?.reduce<number | null>((sum, child) => {
       return typeof child["Total Blocks"] === 'number'
-        ? sum + child["Total Blocks"]
+        ? (sum || 0) + child["Total Blocks"]
         : sum;
-    }, 0)
+    }, null)
 
 
     if (typeof fn["Total Blocks"] === 'number') {
       fn["Self Blocks"] = fn["Total Blocks"] - (childTotal || 0);
-    } else {
+    } else if (typeof childTotal === 'number') {
       fn["Total Blocks"] = (childTotal || 0);
       fn["Self Blocks"] = 0;
     }
