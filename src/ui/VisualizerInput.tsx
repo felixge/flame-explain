@@ -35,6 +35,7 @@ interface Props {
   errorText: string | null,
   input: InputState,
   onChange: (output: InputState) => void;
+  onReset: () => void;
 }
 
 export default function VisualizerInput(p: Props) {
@@ -56,8 +57,11 @@ export default function VisualizerInput(p: Props) {
   useKeyboardShortcuts((key: string) => {
     switch (key) {
       case 'c':
-        p.onChange({sql: '', plan: ''})
-        break
+        p.onChange({sql: '', plan: ''});
+        break;
+      case 'r':
+        p.onReset();
+        break;
     }
   });
 
@@ -100,13 +104,20 @@ export default function VisualizerInput(p: Props) {
             </select>
           </div>
         </div>
-        <div className="control">
+        <div className="control buttons">
           <button
             className="button is-warning"
             disabled={!p.input.plan && !p.input.sql}
             onClick={() => {p.onChange({sql: '', plan: ''})}}
           >
-            <span><u>C</u>lear</span>
+            <span><u>C</u>lear Data</span>
+          </button>
+
+          <button
+            className="button is-danger"
+            onClick={p.onReset}
+          >
+            <span><u>R</u>eset Settings & Data</span>
           </button>
         </div>
       </div>

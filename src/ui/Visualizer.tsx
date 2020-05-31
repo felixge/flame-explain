@@ -197,12 +197,17 @@ export default function Visualizer() {
     return <Redirect to="/" />;
   }
 
+  const onReset = () => {
+    setState(defaultState);
+  };
+
   let tab: JSX.Element = <div />;
   switch (match.params.tab) {
     case 'input':
       tab = <VisualizerInput
         errorText={errorText}
         input={state.input}
+        onReset={onReset}
         onChange={(input) => {
           history.push('/visualize/input');
           setInput(input);
