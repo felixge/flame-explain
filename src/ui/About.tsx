@@ -30,7 +30,7 @@ export default function About() {
       </p>
       <Heading level={2}>License</Heading>
       <p>
-        FlameExplain is free software, published under the <a href="https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License">AGPL Version 3</a> license. You can use it free of charge, and such usage will not "infect" the SQL/JSON code you paste into the UI. The license will only restrict you if you intend to host or distribute a forked version of FlameExplain.
+        FlameExplain is free software, published under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL Version 3</a> license. You can use it free of charge, and such usage will not "infect" the SQL/JSON code you paste into the UI. The license will only restrict you if you intend to host or distribute a forked version of FlameExplain.
       </p>
       <p>
         However, the statements above are not legal advise, and your internal company policies might prevent you from using any (A)GPL licensed software in general. So if you're worried about the license, please <a href="mailto:flame-explain@felixge.de">contact me</a>. I'm happy to provide free alternative licenses to anybody who asks nicely.
