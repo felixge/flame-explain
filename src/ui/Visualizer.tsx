@@ -36,6 +36,7 @@ const defaultFavorites: FlameKey[] = [
   'Total Time',
   'Self Time',
   'Self Time %',
+  'Total Blocks',
 ];
 
 export default function Visualizer() {
