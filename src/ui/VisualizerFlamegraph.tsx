@@ -94,7 +94,6 @@ function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
     const selfPercent = formatPercent(fn["Self Time %"]);
 
     let tooltipLines: string[] = [
-      `${fn.ID} ${fn.Label}`,
       `Total Time: ${totalTime} of ${totalDuration} (${totalPercent} of total)`,
       `Self Time: ${selfTime} of ${totalDuration} (${selfPercent} of total)`,
     ];
