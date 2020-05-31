@@ -39,8 +39,8 @@ export default class ErrorBoundary extends React.Component {
           <div className="container">
             <div className="notification is-danger">
               <Heading level={1}>Error</Heading>
-              <p>An internal error occured. You might be able to fix this issue by pressing the button below which will wipe your query plan and settings.</p>
-              <p><button onClick={() => this.onClearClick()} className="button is-warning">Clear Local Storage</button></p>
+              <p>An internal error occured. You might be able to fix this issue by pressing the button below.</p>
+              <p><button onClick={() => this.onClearClick()} className="button is-warning">Reset Data & Settings</button></p>
               <p>Please also <a href="https://github.com/felixge/flame-explain/issues/new" target="_new">report a bug</a>, including the details below:</p>
               <pre>
                 {
