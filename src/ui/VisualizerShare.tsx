@@ -28,6 +28,10 @@ type ShareJSON = {
   flameExplain: string,
 } & Pick<VisualizerState, 'favorites' | 'input' | 'collapsed'>;
 
+export const shareElements = <React.Fragment>
+  <code>Query Plan</code>, <code>SQL</code> and <code>Favs</code> fields
+  </React.Fragment>;
+
 export default function VisualizerShare(p: Props) {
   const {tab} = p.state.share;
   const [gistUrl, setGistUrl] = React.useState('');
@@ -57,9 +61,6 @@ export default function VisualizerShare(p: Props) {
   }
 
   const shareText = stateToShareText(p.state);
-  const shareElements = <React.Fragment>
-    <code>Query Plan</code>, <code>SQL</code> and <code>Favs</code> fields
-  </React.Fragment>;
 
   let tabElement: JSX.Element;
   switch (tab) {

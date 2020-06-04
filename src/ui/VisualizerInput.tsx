@@ -38,6 +38,8 @@ interface Props {
   onReset: () => void;
 }
 
+export const explainPrefix = 'EXPLAIN (ANALYZE, FORMAT JSON, VERBOSE, BUFFERS)';
+
 export default function VisualizerInput(p: Props) {
   const history = useHistory();
   let errorDiv: JSX.Element | null = null;
@@ -65,7 +67,6 @@ export default function VisualizerInput(p: Props) {
     }
   });
 
-  const explainPrefix = 'EXPLAIN (ANALYZE, FORMAT JSON, VERBOSE, BUFFERS)';
 
   return (
     <div>

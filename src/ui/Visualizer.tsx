@@ -35,6 +35,7 @@ const defaultFavorites: FlameKey[] = [
   'Label',
   'Rows X',
   'Total Time',
+  'Total Time %',
   'Self Time',
   'Self Time %',
   'Total Blocks',

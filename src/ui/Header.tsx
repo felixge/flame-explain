@@ -5,7 +5,6 @@ import "github-fork-ribbon-css/gh-fork-ribbon.css";
 export default function Header() {
   let [burgerMenu, setBurgerMenu] = React.useState(false);
 
-  //<NavLink activeClassName="is-active" to="/docs" className="navbar-item">Documentation</NavLink>
   return (
     <div>
       <div className="notification is-warning is-marginless">
@@ -36,6 +35,12 @@ export default function Header() {
               className="navbar-item"
               isActive={(_, {pathname}) => pathname.startsWith('/visualize')}
             >Visualize</NavLink>
+            <NavLink
+              activeClassName="is-active"
+              to="/docs/general/getting-started"
+              isActive={(_, {pathname}) => pathname.startsWith('/docs')}
+              className="navbar-item"
+            >Docs</NavLink>
             <NavLink activeClassName="is-active" to="/about" className="navbar-item">About</NavLink>
             <div className="navbar-item is-size-7">A PostgreSQL EXPLAIN ANALYZE visualizer with advanced quirk correction algorithms.</div>
 

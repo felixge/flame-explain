@@ -17,6 +17,8 @@ interface Props {
   selected?: FlameNode;
 }
 
+export const hideThreshold = 0.01;
+
 export default function VisualizerFlamegraph(p: Props) {
   const flameGraphNodes = toFlameGraphNodes(p.root);
   if (flameGraphNodes === null) {
@@ -77,7 +79,7 @@ function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
     }
 
     const rootShare = fn["Total Time %"];
-    if (rootShare < 0.01 || fn["Total Time"] <= 0) {
+    if (rootShare < hideThreshold || fn["Total Time"] <= 0) {
       return null;
     }
 
