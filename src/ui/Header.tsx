@@ -37,7 +37,7 @@ export default function Header() {
               isActive={(_, {pathname}) => pathname.startsWith('/visualize')}
             >Visualize</NavLink>
             <NavLink activeClassName="is-active" to="/about" className="navbar-item">About</NavLink>
-            <div className="navbar-item is-size-7">A PostgreSQL EXPLAIN ANALYZE visualizer with advanced time correction algorithms.</div>
+            <div className="navbar-item is-size-7">A PostgreSQL EXPLAIN ANALYZE visualizer with advanced quirk correction algorithms.</div>
 
           </div>
         </div>
