@@ -3,6 +3,7 @@ import {default as VisualizerInput, InputState} from './VisualizerInput';
 import {Link, useHistory} from "react-router-dom";
 import VisualizerTable from './VisualizerTable';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
+import {columnText} from '../lib/TextTable';
 import {default as Inspector, InspectorCategory} from './Inspector';
 import {
   default as VisualizerShare,
@@ -261,7 +262,7 @@ export default function Visualizer() {
 
   const tabDisabled = (rootNode && state.input.plan) ? '' : 'is-disabled';
 
-  return <section className="section">
+  return <section className="section visualizer">
     <VisualizerShare
       onClose={() => toggleModal('Share')}
       onChange={onShareChange}
@@ -281,6 +282,7 @@ export default function Visualizer() {
           <Link to={"/visualize/treetable" + history.location.search}><u>T</u>ree Table</Link>
         </li>
       </ul>
+      <Stats root={rootNode} />
       <div className="buttons has-addons">
         <button onClick={() => toggleModal('Share')} className="button">
           <span className="icon is-small">
@@ -320,3 +322,18 @@ export default function Visualizer() {
     </div>
   </section>;
 };
+
+function Stats(p: {root: FlameNode | undefined}) {
+  const keys: FlameKey[] = ['Total Time', 'Total Blocks'];
+
+  let spans = keys.map(key => {
+    if (typeof p.root?.[key] !== 'number') {
+      return null;
+    }
+    return <span key={key}><strong>{key}:</strong> {columnText(p.root, key)}</span>
+  }).filter(span => !!span);
+
+  return <div className="stats">
+    {spans}
+  </div>;
+}

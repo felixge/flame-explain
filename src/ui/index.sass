@@ -125,6 +125,9 @@ table.tree-table
 
   .group
     float: left;
+    box-sizing: border-box;
+
+  .group:not(:last-child)
     border-right: 1px solid white;
 
   .rect
@@ -141,12 +144,23 @@ table.tree-table
       overflow: hidden;
       text-overflow: ellipsis;
 
-.tabs .is-disabled a
-  color: $grey;
+.visualizer
+  .tabs > ul
+    flex-grow: unset;
+  .tabs > .stats
+    flex-grow: 1;
+    padding: 0.5em 1em;
+    border: 1px solid transparent;
 
-  cursor: not-allowed;
+    span
+      margin-right: 0.25em;
 
-  &:hover
-    background-color: white;
-    border-color: $tabs-toggle-link-border-color
-    z-index: auto;
+  .tabs .is-disabled a
+    color: $grey;
+
+    cursor: not-allowed;
+
+    &:hover
+      background-color: white;
+      border-color: $tabs-toggle-link-border-color
+      z-index: auto;
