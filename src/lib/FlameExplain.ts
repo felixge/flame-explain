@@ -282,7 +282,7 @@ function setTotalTime(fn: FlameNode) {
 
 // TODO(fg) can the gather related logic be separated?
 function calcActualLoops(fn: FlameNode, gather: FlameNode | undefined = undefined) {
-  if (fn["Node Type"] === 'Gather' && fn["Actual Loops"]) {
+  if ((fn["Node Type"] === 'Gather' || fn["Node Type"] === 'Gather Merge') && fn["Actual Loops"]) {
     gather = fn;
   }
 
