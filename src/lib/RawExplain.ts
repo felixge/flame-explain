@@ -22,6 +22,7 @@ export type RawQuery = Partial<{
   "Execution Time": number;
   "Triggers": Array<any>;
   "Plan": RawNode;
+  "JIT": JITFragment;
 }>;
 
 // TODO Describe or group fields below
@@ -43,6 +44,7 @@ export type RawNode = Partial<
   & TargetRelFragment
   & TimingFragment
   & HashFragment
+  & SortFragment
   & GatherFragment
   & BuffersFragment
   & IOTimingFragment
@@ -312,6 +314,18 @@ type HashFragment = {
 };
 
 /**
+ * SortFragment is available when "Node Type" is "Sort".
+ */
+type SortFragment = {
+  "Sort Key": string[],
+  "Sort Method": string | "still in progress" | "top-N heapsort" | "quicksort" | "external sort" | "external merge" | "unknown";
+  /* kB */
+  "Sort Space Used": number;
+  "Sort Space Type": string | "Disk" | "Memory";
+};
+
+
+/**
  * GatherFragment is available when "Node Type" is "Gather" | "Gather Merge". 
  */
 type GatherFragment = {
@@ -323,7 +337,8 @@ type GatherFragment = {
 
 type WorkerFragment = {
   "Worker Number": number;
-} & TimingFragment & AnalyzedFragment;
+} & Partial<TimingFragment & AnalyzedFragment & SortFragment & BuffersFragment & IOTimingFragment>;
+
 
 type BuffersFragment = {
   "Shared Hit Blocks": number,
@@ -341,4 +356,22 @@ type BuffersFragment = {
 type IOTimingFragment = {
   "I/O Read Time": number,
   "I/O Write Time": number,
+};
+
+type JITFragment = {
+  "Worker Number": number,
+  "Functions": number,
+  "Options": {
+    "Inlining": boolean,
+    "Optimization": boolean,
+    "Expressions": boolean,
+    "Deforming": boolean
+  },
+  "Timing": {
+    "Generation": number,
+    "Inlining": number,
+    "Optimization": number,
+    "Emission": number,
+    "Total": number
+  }
 };
