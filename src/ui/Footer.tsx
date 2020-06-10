@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from "react-router-dom";
+import {HashLink as Link} from 'react-router-hash-link';
 
 export default function Footer() {
   const version = process.env.REACT_APP_VERSION || 'N/A';

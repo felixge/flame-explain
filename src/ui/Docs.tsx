@@ -1,10 +1,10 @@
 import React from 'react';
 import {
   NavLink,
-  Link,
   Switch,
   Route,
 } from "react-router-dom";
+import {HashLink as Link} from 'react-router-hash-link';
 import Heading from './Heading';
 import KeyboardShortcuts from './docs/KeyboardShortcuts';
 import GettingStarted from './docs/GettingStarted';

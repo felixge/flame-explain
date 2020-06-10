@@ -1,5 +1,6 @@
 import React from 'react';
-import {Link, useHistory} from "react-router-dom";
+import {useHistory} from "react-router-dom";
+import {HashLink as Link} from 'react-router-hash-link';
 import examplePlans from '../lib/example_plans';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
