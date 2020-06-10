@@ -58,7 +58,7 @@ export default function VisualizerShare(p: Props) {
 
   const shareText = stateToShareText(p.state);
   const shareElements = <React.Fragment>
-    <code>Query Plan</code>, <code>SQL</code> and <code>Settings</code>
+    <code>Query Plan</code>, <code>SQL</code> and <code>Favs</code> fields
   </React.Fragment>;
 
   let tabElement: JSX.Element;
