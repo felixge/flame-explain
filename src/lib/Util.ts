@@ -28,7 +28,8 @@ export function formatDuration(ms: number): string {
     msec = 1,
     sec = 1000 * msec,
     min = 60 * sec,
-    usec = msec / 1000;
+    usec = msec / 1000,
+    nsec = usec / 1000;
 
   if (abs > min) {
     return sign + (abs / min).toFixed(1) + ' m';
@@ -36,8 +37,10 @@ export function formatDuration(ms: number): string {
     return sign + (abs / sec).toFixed(1) + ' s';
   } else if (abs > msec) {
     return sign + (abs / msec).toFixed(1) + ' ms';
-  } else {
+  } else if (abs > usec) {
     return sign + (abs / usec).toFixed(0) + ' μs';
+  } else {
+    return sign + (abs / nsec).toFixed(0) + ' ns';
   }
 }
 
