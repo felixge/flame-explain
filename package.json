@@ -21,7 +21,7 @@
     "@types/react-router-dom": "^5.1.1",
     "@types/react-router-hash-link": "^1.2.1",
     "ascii-table": "^0.0.9",
-    "bulma": "^0.8.2",
+    "bulma": "^0.9.0",
     "bytes": "^3.1.0",
     "clipboard-polyfill": "^2.8.6",
     "d3": "^5.12.0",
