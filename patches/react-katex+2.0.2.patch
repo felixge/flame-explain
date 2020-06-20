@@ -1,0 +1,86 @@
+diff --git a/node_modules/react-katex/dist/react-katex.js b/node_modules/react-katex/dist/react-katex.js
+index a78a1e6..40a9ef7 100644
+--- a/node_modules/react-katex/dist/react-katex.js
++++ b/node_modules/react-katex/dist/react-katex.js
+@@ -92,8 +92,8 @@ var createMathComponent = function createMathComponent(Component, _ref) {
+     }
+ 
+     createClass(MathComponent, [{
+-      key: 'componentWillReceiveProps',
+-      value: function componentWillReceiveProps() {
++      key: 'UNSAFE_componentWillReceiveProps',
++      value: function UNSAFE_componentWillReceiveProps() {
+         this.setState(this.createNewState);
+       }
+     }, {
+diff --git a/node_modules/react-katex/dist/react-katex.min.js b/node_modules/react-katex/dist/react-katex.min.js
+index 0ad3a1f..18a0734 100644
+--- a/node_modules/react-katex/dist/react-katex.min.js
++++ b/node_modules/react-katex/dist/react-katex.min.js
+@@ -1 +1 @@
+-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports,require("react"),require("prop-types"),require("katex")):"function"==typeof define&&define.amd?define(["exports","react","prop-types","katex"],t):t(e.ReactKaTeX=e.ReactKaTeX||{},e.React,e.PropTypes,e.katex)}(this,function(e,a,r,i){"use strict";a=a&&"default"in a?a.default:a,r=r&&"default"in r?r.default:r,i=i&&"default"in i?i.default:i;var u=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")},l=function(){function n(e,t){for(var r=0;r<t.length;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(e,t,r){return t&&n(e.prototype,t),r&&n(e,r),e}}(),s=function(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t},t=function(o,e){var n=e.displayMode,t=function(e){function r(e){u(this,r);var t=s(this,(r.__proto__||Object.getPrototypeOf(r)).call(this,e));return t.usedProp=e.math?"math":"children",t.state=t.createNewState(null,e),t}return function(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}(r,a.Component),l(r,[{key:"componentWillReceiveProps",value:function(){this.setState(this.createNewState)}},{key:"shouldComponentUpdate",value:function(e){return e[this.usedProp]!==this.props[this.usedProp]}},{key:"createNewState",value:function(e,t){try{return{html:this.generateHtml(t),error:void 0}}catch(e){if(e instanceof i.ParseError||e instanceof TypeError)return{error:e};throw e}}},{key:"generateHtml",value:function(e){var t=e.errorColor,r=e.renderError;return i.renderToString(e[this.usedProp],{displayMode:n,errorColor:t,throwOnError:!!r})}},{key:"render",value:function(){var e=this.state,t=e.error,r=e.html,n=this.props.renderError;return t?n?n(t):a.createElement(o,{html:""+t.message}):a.createElement(o,{html:r})}}]),r}();return t.propTypes={children:r.string,errorColor:r.string,math:r.string,renderError:r.func},t},n=function(e){var t=e.html;return a.createElement("span",{dangerouslySetInnerHTML:{__html:t}})};n.propTypes={html:r.string.isRequired};var o=t(n,{displayMode:!1}),c=function(e){var t=e.html;return a.createElement("div",{dangerouslySetInnerHTML:{__html:t}})};c.propTypes={html:r.string.isRequired};var p=t(c,{displayMode:!0});e.InlineMath=o,e.BlockMath=p,Object.defineProperty(e,"__esModule",{value:!0})});
++!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports,require("react"),require("prop-types"),require("katex")):"function"==typeof define&&define.amd?define(["exports","react","prop-types","katex"],t):t(e.ReactKaTeX=e.ReactKaTeX||{},e.React,e.PropTypes,e.katex)}(this,function(e,t,r,n){"use strict";t=t&&"default"in t?t.default:t,r=r&&"default"in r?r.default:r,n=n&&"default"in n?n.default:n;var o=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")},a=function(){function e(e,t){for(var r=0;r<t.length;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),i=function(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)},u=function(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t},l=function(e,l){var s=l.displayMode,c=function(r){function l(e){o(this,l);var t=u(this,(l.__proto__||Object.getPrototypeOf(l)).call(this,e));return t.usedProp=e.math?"math":"children",t.state=t.createNewState(null,e),t}return i(l,r),a(l,[{key:"UNSAFE_componentWillReceiveProps",value:function(){this.setState(this.createNewState)}},{key:"shouldComponentUpdate",value:function(e){return e[this.usedProp]!==this.props[this.usedProp]}},{key:"createNewState",value:function(e,t){try{return{html:this.generateHtml(t),error:void 0}}catch(e){if(e instanceof n.ParseError||e instanceof TypeError)return{error:e};throw e}}},{key:"generateHtml",value:function(e){var t=e.errorColor,r=e.renderError;return n.renderToString(e[this.usedProp],{displayMode:s,errorColor:t,throwOnError:!!r})}},{key:"render",value:function(){var r=this.state,n=r.error,o=r.html,a=this.props.renderError;return n?a?a(n):t.createElement(e,{html:""+n.message}):t.createElement(e,{html:o})}}]),l}(t.Component);return c.propTypes={children:r.string,errorColor:r.string,math:r.string,renderError:r.func},c},s=function(e){var r=e.html;return t.createElement("span",{dangerouslySetInnerHTML:{__html:r}})};s.propTypes={html:r.string.isRequired};var c=l(s,{displayMode:!1}),p=function(e){var r=e.html;return t.createElement("div",{dangerouslySetInnerHTML:{__html:r}})};p.propTypes={html:r.string.isRequired};var f=l(p,{displayMode:!0});e.InlineMath=c,e.BlockMath=f,Object.defineProperty(e,"__esModule",{value:!0})});
+diff --git a/node_modules/react-katex/src/createMathComponent.js b/node_modules/react-katex/src/createMathComponent.js
+index 9fc690b..e56d25e 100644
+--- a/node_modules/react-katex/src/createMathComponent.js
++++ b/node_modules/react-katex/src/createMathComponent.js
+@@ -2,7 +2,7 @@ import React from 'react';
+ import PropTypes from 'prop-types';
+ import KaTeX from 'katex';
+ 
+-const createMathComponent = (Component, { displayMode }) => {
++const createMathComponent = (Component, {displayMode}) => {
+   class MathComponent extends React.Component {
+     constructor(props) {
+       super(props);
+@@ -12,7 +12,7 @@ const createMathComponent = (Component, { displayMode }) => {
+       this.state = this.createNewState(null, props);
+     }
+ 
+-    componentWillReceiveProps() {
++    UNSAFE_componentWillReceiveProps() {
+       this.setState(this.createNewState);
+     }
+ 
+@@ -24,10 +24,10 @@ const createMathComponent = (Component, { displayMode }) => {
+       try {
+         const html = this.generateHtml(props);
+ 
+-        return { html, error: undefined };
++        return {html, error: undefined};
+       } catch (error) {
+         if (error instanceof KaTeX.ParseError || error instanceof TypeError) {
+-          return { error };
++          return {error};
+         }
+ 
+         throw error;
+@@ -35,7 +35,7 @@ const createMathComponent = (Component, { displayMode }) => {
+     }
+ 
+     generateHtml(props) {
+-      const { errorColor, renderError } = props;
++      const {errorColor, renderError} = props;
+ 
+       return KaTeX.renderToString(props[this.usedProp], {
+         displayMode,
+@@ -45,15 +45,15 @@ const createMathComponent = (Component, { displayMode }) => {
+     }
+ 
+     render() {
+-      const { error, html } = this.state;
+-      const { renderError } = this.props;
++      const {error, html} = this.state;
++      const {renderError} = this.props;
+ 
+       if (error) {
+         return renderError ? (
+           renderError(error)
+         ) : (
+-          <Component html={`${error.message}`} />
+-        );
++            <Component html={`${error.message}`} />
++          );
+       }
+ 
+       return <Component html={html} />;
