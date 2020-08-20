@@ -120,7 +120,7 @@ export function GistNotice(p: Props) {
     let cacheNotice = ""
     if (gist.expires) {
         const remain = ((gist.expires - Date.now()) / 1000).toFixed(0)
-        cacheNotice = ` To avoid API rate limiting, this response will remain ` + `cached for ${remain} second(s).`
+        cacheNotice = `To avoid API rate limiting, this response will remain cached for ${remain} second(s).`
     }
 
     if (gist.error) {
