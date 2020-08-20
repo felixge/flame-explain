@@ -1,10 +1,10 @@
-import React from "react"
-import { FlameNode, FlameKey } from "../lib/FlameExplain"
-import { columnText } from "../lib/TextTable"
-import { ColorScale, colorPair } from "./Color"
-import { faMinusSquare, faPlusSquare, faLeaf } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Arrows, Direction, move } from "./Arrows"
+import React from 'react'
+import { FlameNode, FlameKey } from '../lib/FlameExplain'
+import { columnText } from '../lib/TextTable'
+import { ColorScale, colorPair } from './Color'
+import { faMinusSquare, faPlusSquare, faLeaf } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Arrows, Direction, move } from './Arrows'
 
 interface Props {
   root: FlameNode
@@ -21,19 +21,19 @@ export default function VisualizerTable(p: Props) {
   const columns = p.favorites
 
   const visit = (fn: FlameNode, depth = 0) => {
-    const collapsed = typeof fn.ID === "number" && p.collapsed[fn.ID]
-    if (fn.Kind !== "Root") {
+    const collapsed = typeof fn.ID === 'number' && p.collapsed[fn.ID]
+    if (fn.Kind !== 'Root') {
       const colVals = columns.map(col => {
         let colVal = columnText(fn, col)
         let colEl: JSX.Element = <React.Fragment>{colVal}</React.Fragment>
-        let style: React.CSSProperties = { whiteSpace: "nowrap" }
+        let style: React.CSSProperties = { whiteSpace: 'nowrap' }
 
-        if (col === "Label") {
+        if (col === 'Label') {
           const leafNode = (fn.Children?.length || 0) <= 0
           const icon = leafNode ? faLeaf : collapsed ? faPlusSquare : faMinusSquare
           colEl = (
             <React.Fragment>
-              {"\u00a0".repeat((depth - 1) * 4)}
+              {'\u00a0'.repeat((depth - 1) * 4)}
               <span
                 className="has-tooltip-right has-tooltip-arrow"
                 data-tooltip="Shift click to expand/collapse nodes recursively."
@@ -49,14 +49,14 @@ export default function VisualizerTable(p: Props) {
               &nbsp;{colVal}
             </React.Fragment>
           )
-          style.whiteSpace = "initial"
+          style.whiteSpace = 'initial'
         }
 
-        const percent = fn.Colors?.[col as keyof FlameNode["Colors"]]
-        if (typeof percent === "number") {
+        const percent = fn.Colors?.[col as keyof FlameNode['Colors']]
+        if (typeof percent === 'number') {
           style = { ...style, ...colorPair(percent) }
         }
-        style.textAlign = typeof fn[col] === "number" ? "right" : "left"
+        style.textAlign = typeof fn[col] === 'number' ? 'right' : 'left'
 
         return (
           <td key={col} style={style}>
@@ -67,9 +67,9 @@ export default function VisualizerTable(p: Props) {
       rows.push(
         <tr
           onClick={() => p.clickNode(fn)}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: 'pointer' }}
           key={fn.ID}
-          className={fn.ID === p.selectedNode ? "is-active" : ""}
+          className={fn.ID === p.selectedNode ? 'is-active' : ''}
         >
           {colVals}
         </tr>
@@ -83,10 +83,10 @@ export default function VisualizerTable(p: Props) {
 
   const headers = columns.map(col => {
     let style: React.CSSProperties = {}
-    if (col === "Label") {
-      style.width = "99%"
+    if (col === 'Label') {
+      style.width = '99%'
     } else {
-      style.whiteSpace = "nowrap"
+      style.whiteSpace = 'nowrap'
     }
 
     const onArrowClick = (d: Direction) => {
@@ -96,7 +96,7 @@ export default function VisualizerTable(p: Props) {
     return (
       <th className="has-arrows" key={col} style={style}>
         {col}
-        <Arrows arrows={["left", "right"]} onClick={onArrowClick} />
+        <Arrows arrows={['left', 'right']} onClick={onArrowClick} />
       </th>
     )
   })

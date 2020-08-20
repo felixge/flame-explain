@@ -1,6 +1,6 @@
-import { format as formatBytes } from "bytes"
+import { format as formatBytes } from 'bytes'
 
-type Unit = "byte" | "page"
+type Unit = 'byte' | 'page'
 
 type Options = {
   pageSize: number
@@ -12,14 +12,14 @@ let defaultOptions = {
 
 export default function format(value: number, unit: Unit, o: Options = defaultOptions): string {
   switch (unit) {
-    case "byte":
+    case 'byte':
       if (Number.isNaN(value)) {
-        return "NaN"
+        return 'NaN'
       }
-      return formatBytes(value, { unitSeparator: " " })
-    case "page":
-      return format(value * o.pageSize, "byte")
+      return formatBytes(value, { unitSeparator: ' ' })
+    case 'page':
+      return format(value * o.pageSize, 'byte')
     default:
-      return "n/a"
+      return 'n/a'
   }
 }

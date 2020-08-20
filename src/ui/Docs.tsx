@@ -1,25 +1,25 @@
-import React from "react"
-import { NavLink, Switch, Route } from "react-router-dom"
-import { HashLink as Link } from "react-router-hash-link"
-import Heading from "./Heading"
-import KeyboardShortcuts from "./docs/KeyboardShortcuts"
-import GettingStarted from "./docs/GettingStarted"
-import Input from "./docs/Input"
-import Flamegraph from "./docs/Flamegraph"
-import Treetable from "./docs/Treetable"
-import Share from "./docs/Share"
-import Inspector from "./docs/Inspector"
-import QuirkCorrection from "./docs/QuirkCorrection"
+import React from 'react'
+import { NavLink, Switch, Route } from 'react-router-dom'
+import { HashLink as Link } from 'react-router-hash-link'
+import Heading from './Heading'
+import KeyboardShortcuts from './docs/KeyboardShortcuts'
+import GettingStarted from './docs/GettingStarted'
+import Input from './docs/Input'
+import Flamegraph from './docs/Flamegraph'
+import Treetable from './docs/Treetable'
+import Share from './docs/Share'
+import Inspector from './docs/Inspector'
+import QuirkCorrection from './docs/QuirkCorrection'
 
 const sections: Section[] = [
   {
-    name: "General",
-    slug: "general",
+    name: 'General',
+    slug: 'general',
     pages: [GettingStarted, QuirkCorrection],
   },
   {
-    name: "Visualize",
-    slug: "visualize",
+    name: 'Visualize',
+    slug: 'visualize',
     pages: [Input, Flamegraph, Treetable, Inspector, Share, KeyboardShortcuts],
   },
 ]
@@ -53,7 +53,7 @@ type PageLinkProps = {
 
 export function PageLink(p: PageLinkProps) {
   const text = p.text || p.page.name
-  const anchor = p.anchor ? "#" + p.anchor : ""
+  const anchor = p.anchor ? '#' + p.anchor : ''
   return <Link to={pageURL(p.page) + anchor}>{text}</Link>
 }
 

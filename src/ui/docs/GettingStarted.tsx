@@ -1,24 +1,24 @@
-import React from "react"
-import { Page, PageLink } from "../Docs"
-import Heading from "../Heading"
-import Flamegraph from "./Flamegraph"
-import Treetable from "./Treetable"
-import QuirkCorrection from "./QuirkCorrection"
-import Input from "./Input"
+import React from 'react'
+import { Page, PageLink } from '../Docs'
+import Heading from '../Heading'
+import Flamegraph from './Flamegraph'
+import Treetable from './Treetable'
+import QuirkCorrection from './QuirkCorrection'
+import Input from './Input'
 
 const page: Page = {
-  name: "Getting Started",
-  slug: "getting-started",
+  name: 'Getting Started',
+  slug: 'getting-started',
   page: () => (
     <React.Fragment>
       <p>FlameExplain is a tool to help you with optimizing PostgreSQL queries.</p>
       <Heading level={2}>Learn the Basics</Heading>
 
       <p>
-        If you're new to query optimization, you'll greatly benefit from a bit of studying before diving in. The{" "}
+        If you're new to query optimization, you'll greatly benefit from a bit of studying before diving in. The{' '}
         <a href="https://www.postgresql.org/docs/current/using-explain.html" target="_new">
           Using EXPLAIN
-        </a>{" "}
+        </a>{' '}
         page in the PostgreSQL documentation is a good introduction with many examples for default text output format.
       </p>
 
@@ -36,7 +36,7 @@ const page: Page = {
       <p>
         The main reason is that the numbers reported by PostgreSQL have various quirks that can be misleading to
         beginners. FlameExplain comes with some of the best <PageLink page={QuirkCorrection} /> algorithms found in any
-        tool.{" "}
+        tool.{' '}
       </p>
 
       <p>
@@ -46,7 +46,7 @@ const page: Page = {
       </p>
 
       <p>
-        And last but not least, the <PageLink page={Treetable} /> offers a classic view pioneered by{" "}
+        And last but not least, the <PageLink page={Treetable} /> offers a classic view pioneered by{' '}
         <a href="https://explain.depesz.com/" target="_new">
           explain.depesz.com
         </a>

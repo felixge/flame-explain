@@ -21,7 +21,7 @@ export function assert(condition: any, msg?: string): asserts condition {
 // TODO(fg) test cases!
 export function formatDuration(ms: number): string {
   const abs = Math.abs(ms),
-    sign = ms < 0 ? "-" : "",
+    sign = ms < 0 ? '-' : '',
     msec = 1,
     sec = 1000 * msec,
     min = 60 * sec,
@@ -29,18 +29,18 @@ export function formatDuration(ms: number): string {
     nsec = usec / 1000
 
   if (abs > min) {
-    return sign + (abs / min).toFixed(1) + " m"
+    return sign + (abs / min).toFixed(1) + ' m'
   } else if (abs > sec) {
-    return sign + (abs / sec).toFixed(1) + " s"
+    return sign + (abs / sec).toFixed(1) + ' s'
   } else if (abs > msec) {
-    return sign + (abs / msec).toFixed(1) + " ms"
+    return sign + (abs / msec).toFixed(1) + ' ms'
   } else if (abs > usec) {
-    return sign + (abs / usec).toFixed(0) + " μs"
+    return sign + (abs / usec).toFixed(0) + ' μs'
   } else {
-    return sign + (abs / nsec).toFixed(0) + " ns"
+    return sign + (abs / nsec).toFixed(0) + ' ns'
   }
 }
 
 export function formatPercent(f: number): string {
-  return isNaN(f) ? "-" : (f * 100).toFixed(2) + "%"
+  return isNaN(f) ? '-' : (f * 100).toFixed(2) + '%'
 }

@@ -1,13 +1,13 @@
-import React from "react"
+import React from 'react'
 import {
   faCaretSquareLeft,
   faCaretSquareRight,
   faCaretSquareUp,
   faCaretSquareDown,
-} from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-export type Direction = "left" | "right" | "up" | "down"
+export type Direction = 'left' | 'right' | 'up' | 'down'
 
 type Props = {
   arrows: Direction[]
@@ -34,12 +34,12 @@ export function Arrows(p: Props) {
 export function move<T>(list: T[], i: number, d: Direction): T[] {
   let delta = 0
   switch (d) {
-    case "up":
-    case "left":
+    case 'up':
+    case 'left':
       delta = -1
       break
-    case "down":
-    case "right":
+    case 'down':
+    case 'right':
       delta = 1
       break
   }

@@ -1,17 +1,17 @@
-import React from "react"
-import { Page, PageLink } from "../Docs"
-import Treetable from "./Treetable"
-import Flamegraph from "./Flamegraph"
+import React from 'react'
+import { Page, PageLink } from '../Docs'
+import Treetable from './Treetable'
+import Flamegraph from './Flamegraph'
 
 const page: Page = {
-  name: "Inspector",
-  slug: "inspector",
+  name: 'Inspector',
+  slug: 'inspector',
   page: () => (
     <React.Fragment>
       <img alt="Inspector Example" src="/docs/inspector.png" width={300} className="is-pulled-right" />
 
       <p>
-        The Inspector allows to you view the details of any node shown in the <PageLink page={Flamegraph} /> or{" "}
+        The Inspector allows to you view the details of any node shown in the <PageLink page={Flamegraph} /> or{' '}
         <PageLink page={Treetable} />.
       </p>
 

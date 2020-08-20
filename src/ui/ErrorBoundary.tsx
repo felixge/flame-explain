@@ -1,5 +1,5 @@
-import React from "react"
-import Heading from "./Heading"
+import React from 'react'
+import Heading from './Heading'
 
 // Set this to true to debug this component by simulating bad data in
 // localStorage.
@@ -7,7 +7,7 @@ const debug = false
 
 let debugError = (() => {
   if (debug && localStorage.length) {
-    return new Error("test")
+    return new Error('test')
   }
 })()
 
@@ -46,7 +46,7 @@ export default class ErrorBoundary extends React.Component {
                 </button>
               </p>
               <p>
-                Please also{" "}
+                Please also{' '}
                 <a href="https://github.com/felixge/flame-explain/issues/new" target="_new">
                   report a bug
                 </a>

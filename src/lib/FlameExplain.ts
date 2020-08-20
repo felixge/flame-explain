@@ -1,9 +1,9 @@
-import { RawNode, RawQuery, RawQueries } from "./RawExplain"
-import { Disjoint, ExtractFieldsOfType } from "./Util"
-import { blockKeys } from "./FlameDocs"
-export { flameKeyDescs, flameKeyMeta, blockKeys } from "./FlameDocs"
+import { RawNode, RawQuery, RawQueries } from './RawExplain'
+import { Disjoint, ExtractFieldsOfType } from './Util'
+import { blockKeys } from './FlameDocs'
+export { flameKeyDescs, flameKeyMeta, blockKeys } from './FlameDocs'
 
-type FlameNodeWithoutColors = Disjoint<Omit<RawQuery, "Plan"> & Omit<RawNode, "Plans">, FlameFragment>
+type FlameNodeWithoutColors = Disjoint<Omit<RawQuery, 'Plan'> & Omit<RawNode, 'Plans'>, FlameFragment>
 
 type FlameNodeColorFields = ExtractFieldsOfType<FlameNodeWithoutColors, number>
 
@@ -16,48 +16,48 @@ export type FlameNode = FlameNodeWithoutColors & {
 export type FlameFragment = {
   /** Kind captures what kind of node this is. Root nodes have only Children
    * and no other properties. */
-  "Kind": "Root" | "Queries" | "Query" | "Planning" | "Execution" | "Node" | "Subplan"
+  'Kind': 'Root' | 'Queries' | 'Query' | 'Planning' | 'Execution' | 'Node' | 'Subplan'
   /** ID is a unique identifier present on all nodes except the Root node. */
-  "ID"?: number
+  'ID'?: number
   /** Label is a short human-readable description of the node, present for all
    * nodes except the Root node. For Kind=Node the label attempts to be identical
    * to what EXPLAIN (ANALYZE, FORMAT TEXT) would print. */
-  "Label"?: string
+  'Label'?: string
   /** Parent points to the parent node, which simplifies some of the transform
    * algorithms. Present for all nodes except the Root node. */
-  "Parent"?: FlameNode
+  'Parent'?: FlameNode
   /** Children is an array children. */
-  "Children"?: FlameNode[]
+  'Children'?: FlameNode[]
   /** If this node has a "Filter" or "One-Time Filter" that references other
    * nodes in the plan, then they are referenced here. */
-  "Filter Nodes"?: FlameNode[]
+  'Filter Nodes'?: FlameNode[]
   /** Similar to "Filter Node" above, this array references all nodes that
    * reference this node in one of their filters. */
-  "Filter Refs"?: FlameNode[]
+  'Filter Refs'?: FlameNode[]
   /** If this node is a "CTE Scan", then the CTE InitPlan that is being scanned
    * is referenced here. */
-  "CTE Node"?: FlameNode
+  'CTE Node'?: FlameNode
   /** If this node is a CTE InitPlan, then all CTE Scan nodes that use it are
    * referenced here. */
-  "CTE Scans"?: FlameNode[]
+  'CTE Scans'?: FlameNode[]
   /** Total Time is derived from "Actual Total Time" and attempts to represent
    * the total amount of wall clock time that can be attributed to this node
    * as well as its children. */
-  "Total Time"?: number
-  "Total Time %"?: number
+  'Total Time'?: number
+  'Total Time %'?: number
   /** Self Time is like Total Time, but excludes time spent in child nodes. */
-  "Self Time"?: number
+  'Self Time'?: number
   /** Self Time % */
-  "Self Time %"?: number
+  'Self Time %'?: number
   /** Depth is the depth of the node in the tree, starting with 0. */
-  "Depth"?: number
+  'Depth'?: number
   /** Rows X is the rows estimation error */
-  "Rows X"?: number
-  "Self Blocks"?: number
-  "Total Blocks"?: number
+  'Rows X'?: number
+  'Self Blocks'?: number
+  'Total Blocks'?: number
   /** Warnings contains a list of problems encountered while transforming the
    * data.*/
-  "Warnings"?: []
+  'Warnings'?: []
 }
 
 export type flameOptions = Partial<{
@@ -79,14 +79,14 @@ const defaultOptions: flameOptions = {
  * without modifying its inputs.
  */
 export function fromRawQueries(rqs: RawQueries, opt: flameOptions = defaultOptions): FlameNode {
-  const root: FlameNode = { Kind: "Root" }
+  const root: FlameNode = { Kind: 'Root' }
   rqs = rqs.filter(rq => rq.Plan)
 
   let queryRoot = root
   if (opt.VirtualQueryNodes && rqs.length > 1) {
     queryRoot = {
-      Kind: "Queries",
-      Label: "Queries",
+      Kind: 'Queries',
+      Label: 'Queries',
       Parent: root,
     }
     root.Children = [queryRoot]
@@ -97,18 +97,18 @@ export function fromRawQueries(rqs: RawQueries, opt: flameOptions = defaultOptio
     let parent = queryRoot
     if (opt.VirtualQueryNodes) {
       query = {
-        Kind: "Query",
-        Label: "Query" + (rqs.length > 1 ? " " + (i + 1) : ""),
+        Kind: 'Query',
+        Label: 'Query' + (rqs.length > 1 ? ' ' + (i + 1) : ''),
       }
       parent.Children = (parent.Children || []).concat(query)
 
-      const planning: FlameNode = { Kind: "Planning", Label: "Planning" }
-      if (rq["Planning Time"]) {
-        planning["Planning Time"] = rq["Planning Time"]
+      const planning: FlameNode = { Kind: 'Planning', Label: 'Planning' }
+      if (rq['Planning Time']) {
+        planning['Planning Time'] = rq['Planning Time']
       }
-      const execution: FlameNode = { Kind: "Execution", Label: "Execution" }
-      if (rq["Execution Time"]) {
-        execution["Execution Time"] = rq["Execution Time"]
+      const execution: FlameNode = { Kind: 'Execution', Label: 'Execution' }
+      if (rq['Execution Time']) {
+        execution['Execution Time'] = rq['Execution Time']
       }
       query.Children = [planning, execution]
       parent = execution
@@ -127,10 +127,10 @@ export function fromRawQueries(rqs: RawQueries, opt: flameOptions = defaultOptio
   setTotalTime(root)
   setTotalBlocks(root)
   calcActualLoops(root)
-  calcFilter(root, "Total Time")
-  calcFilter(root, "Total Blocks")
-  calcCTE(root, "Total Time")
-  calcCTE(root, "Total Blocks")
+  calcFilter(root, 'Total Time')
+  calcFilter(root, 'Total Blocks')
+  calcCTE(root, 'Total Time')
+  calcCTE(root, 'Total Blocks')
   calcParallelAppendTime(root)
   calcChildBoost(root)
   setSelfTime(root)
@@ -149,7 +149,7 @@ export function fromRawQueries(rqs: RawQueries, opt: flameOptions = defaultOptio
 
 function fromRawNode(rn: RawNode): FlameNode {
   let fn: FlameNode = {
-    Kind: "Node",
+    Kind: 'Node',
     Label: label(rn),
   }
 
@@ -172,11 +172,11 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode) {
   root = root || fn
   fn.Children?.forEach(c => setFilterRefs(c, root))
 
-  if (!fn["Subplan Name"]) {
+  if (!fn['Subplan Name']) {
     return
   }
 
-  const sp = parseNumberedSubplanName(fn["Subplan Name"])
+  const sp = parseNumberedSubplanName(fn['Subplan Name'])
   if (!sp) {
     return
   }
@@ -188,7 +188,7 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode) {
   const visit = (fn2: FlameNode) => {
     fn2.Children?.forEach(visit)
 
-    const filters = [fn2["One-Time Filter"], fn2.Filter]
+    const filters = [fn2['One-Time Filter'], fn2.Filter]
     // isRef is true if fn2 has filter that references fn's "Subplan Name".
     const isRef = filters.some(f => {
       let refs = f ? parseFilter(f) : []
@@ -196,8 +196,8 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode) {
     })
 
     if (isRef) {
-      fn2["Filter Nodes"] = (fn2["Filter Nodes"] || []).concat(fn)
-      fn["Filter Refs"] = (fn["Filter Refs"] || []).concat(fn2)
+      fn2['Filter Nodes'] = (fn2['Filter Nodes'] || []).concat(fn)
+      fn['Filter Refs'] = (fn['Filter Refs'] || []).concat(fn2)
     }
   }
   visit(root)
@@ -208,19 +208,19 @@ function setFilterRefs(fn: FlameNode, root?: FlameNode) {
 function setCTERefs(fn: FlameNode) {
   fn.Children?.forEach(setCTERefs)
 
-  if (fn["Node Type"] !== "CTE Scan") {
+  if (fn['Node Type'] !== 'CTE Scan') {
     return
   }
 
   let parent: FlameNode | undefined = fn
   while (parent) {
     const cteNode = parent.Children?.find(
-      child => child["Parent Relationship"] === "InitPlan" && child["Subplan Name"] === "CTE " + fn["CTE Name"]
+      child => child['Parent Relationship'] === 'InitPlan' && child['Subplan Name'] === 'CTE ' + fn['CTE Name']
     )
 
     if (cteNode) {
-      fn["CTE Node"] = cteNode
-      cteNode["CTE Scans"] = (cteNode["CTE Scans"] || []).concat(fn)
+      fn['CTE Node'] = cteNode
+      cteNode['CTE Scans'] = (cteNode['CTE Scans'] || []).concat(fn)
       return
     }
 
@@ -232,56 +232,56 @@ function setTotalTime(fn: FlameNode) {
   fn.Children?.forEach(setTotalTime)
 
   switch (fn.Kind) {
-    case "Node":
-      if (typeof fn["Actual Total Time"] === "number") {
-        fn["Total Time"] = fn["Actual Total Time"]
+    case 'Node':
+      if (typeof fn['Actual Total Time'] === 'number') {
+        fn['Total Time'] = fn['Actual Total Time']
       }
       break
-    case "Execution":
-      if (typeof fn["Execution Time"] === "number") {
-        fn["Total Time"] = fn["Execution Time"]
+    case 'Execution':
+      if (typeof fn['Execution Time'] === 'number') {
+        fn['Total Time'] = fn['Execution Time']
       }
       break
-    case "Planning":
-      if (typeof fn["Planning Time"] === "number") {
-        fn["Total Time"] = fn["Planning Time"]
+    case 'Planning':
+      if (typeof fn['Planning Time'] === 'number') {
+        fn['Total Time'] = fn['Planning Time']
       }
       break
     default:
       let total: number | undefined = undefined
       fn.Children?.forEach(child => {
-        if (typeof child["Total Time"] === "number") {
-          total = (total || 0) + child["Total Time"]
+        if (typeof child['Total Time'] === 'number') {
+          total = (total || 0) + child['Total Time']
         }
       })
 
       if (total !== undefined) {
-        fn["Total Time"] = total
+        fn['Total Time'] = total
       }
       break
   }
 
-  if (fn["Total Time"] !== undefined) {
-    fn["Self Time"] = 0
+  if (fn['Total Time'] !== undefined) {
+    fn['Self Time'] = 0
   }
 }
 
 // TODO(fg) can the gather related logic be separated?
 function calcActualLoops(fn: FlameNode, gather: FlameNode | undefined = undefined) {
-  if ((fn["Node Type"] === "Gather" || fn["Node Type"] === "Gather Merge") && fn["Actual Loops"]) {
+  if ((fn['Node Type'] === 'Gather' || fn['Node Type'] === 'Gather Merge') && fn['Actual Loops']) {
     gather = fn
   }
 
   fn.Children?.forEach(child => calcActualLoops(child, gather))
 
-  let loops = fn["Actual Loops"]
-  if (typeof loops !== "number" || typeof fn["Total Time"] !== "number") {
+  let loops = fn['Actual Loops']
+  if (typeof loops !== 'number' || typeof fn['Total Time'] !== 'number') {
     return
-  } else if (typeof gather?.["Actual Loops"] === "number") {
-    loops = gather["Actual Loops"]
+  } else if (typeof gather?.['Actual Loops'] === 'number') {
+    loops = gather['Actual Loops']
   }
 
-  fn["Total Time"] *= loops
+  fn['Total Time'] *= loops
 }
 
 function calcChildBoost(fn: FlameNode) {
@@ -293,27 +293,27 @@ function calcChildBoost(fn: FlameNode) {
   // big as the sum of its child nodes in this case. However, we don't adjust
   // nodes above and including the 'Execution' node as we trust it more than
   // this heuristic.
-  if (typeof fn["Total Time"] !== "number" || !(fn.Kind === "Node" || fn.Kind === "Subplan")) {
+  if (typeof fn['Total Time'] !== 'number' || !(fn.Kind === 'Node' || fn.Kind === 'Subplan')) {
     return
   }
 
   const childTotal = sumTotalTime(fn.Children)
-  if (childTotal > fn["Total Time"]) {
-    fn["Total Time"] = childTotal
+  if (childTotal > fn['Total Time']) {
+    fn['Total Time'] = childTotal
   }
 }
 
-function calcFilter(fn: FlameNode, key: "Total Time" | "Total Blocks"): FlameNode {
+function calcFilter(fn: FlameNode, key: 'Total Time' | 'Total Blocks'): FlameNode {
   fn.Children?.forEach(child => calcFilter(child, key))
 
   const initVal = fn[key]
-  if (!(typeof initVal === "number" && fn["Filter Refs"])) {
+  if (!(typeof initVal === 'number' && fn['Filter Refs'])) {
     return fn
   }
 
-  let childCount = fn["Filter Refs"].length
-  fn["Filter Refs"].forEach(child => {
-    if (typeof child[key] !== "number") {
+  let childCount = fn['Filter Refs'].length
+  fn['Filter Refs'].forEach(child => {
+    if (typeof child[key] !== 'number') {
       return
     }
     const delta = initVal / childCount
@@ -325,7 +325,7 @@ function calcFilter(fn: FlameNode, key: "Total Time" | "Total Blocks"): FlameNod
       }
 
       const val = p[key]
-      if (typeof val === "number") {
+      if (typeof val === 'number') {
         p[key] = val - delta
       }
       p = p.Parent
@@ -335,7 +335,7 @@ function calcFilter(fn: FlameNode, key: "Total Time" | "Total Blocks"): FlameNod
   return fn
 }
 
-function calcCTE(fn: FlameNode, key: "Total Time" | "Total Blocks") {
+function calcCTE(fn: FlameNode, key: 'Total Time' | 'Total Blocks') {
   // We apply our tweaks depth first to all children in reverse order. This
   // makes sure queries like CTELoopedAggregateScan don't end up fixing the
   // time of CTEs if their scans haven't been fixed yet.
@@ -347,28 +347,28 @@ function calcCTE(fn: FlameNode, key: "Total Time" | "Total Blocks") {
 
   // Return early unless n is a CTE parent node.
   const initVal = fn[key]
-  if (!(typeof initVal === "number" && fn["CTE Scans"])) {
+  if (!(typeof initVal === 'number' && fn['CTE Scans'])) {
     return
   }
 
-  const scanVal = fn["CTE Scans"]?.reduce((sum, scan) => {
+  const scanVal = fn['CTE Scans']?.reduce((sum, scan) => {
     const val = scan[key]
-    return typeof val === "number" ? sum + val : sum
+    return typeof val === 'number' ? sum + val : sum
   }, 0)
   if (scanVal === 0) {
     return
   }
 
-  fn["CTE Scans"].forEach(scan => {
+  fn['CTE Scans'].forEach(scan => {
     const val = scan[key]
-    if (typeof val !== "number") {
+    if (typeof val !== 'number') {
       return
     }
 
     // Sometimes the CTE Scan is a child of the CTE Node, in this case we
     // must not apply our fancy calculation below. See CTESimple for an
     // example.
-    if (scan["CTE Node"]?.Parent === scan) {
+    if (scan['CTE Node']?.Parent === scan) {
       return
     }
 
@@ -410,7 +410,7 @@ function calcCTE(fn: FlameNode, key: "Total Time" | "Total Blocks") {
       }
 
       const pVal = p[key]
-      if (typeof pVal === "number") {
+      if (typeof pVal === 'number') {
         p[key] = pVal - delta
       }
       p = p.Parent
@@ -420,16 +420,16 @@ function calcCTE(fn: FlameNode, key: "Total Time" | "Total Blocks") {
 
 // TODO(fg) can this be combined with gather logic from calcActualLoops
 function calcParallelAppendTime(fn: FlameNode, gather: FlameNode | undefined = undefined, scale: number = 1) {
-  if (fn["Node Type"] === "Gather" && typeof fn["Total Time"] === "number") {
+  if (fn['Node Type'] === 'Gather' && typeof fn['Total Time'] === 'number') {
     gather = fn
   }
 
-  if (typeof fn["Total Time"] === "number" && scale !== 1) {
-    fn["Total Time"] *= scale
+  if (typeof fn['Total Time'] === 'number' && scale !== 1) {
+    fn['Total Time'] *= scale
   }
 
-  if (fn["Node Type"] === "Append" && fn["Parallel Aware"] && typeof gather?.["Total Time"] === "number") {
-    scale = gather["Total Time"] / sumTotalTime(fn.Children)
+  if (fn['Node Type'] === 'Append' && fn['Parallel Aware'] && typeof gather?.['Total Time'] === 'number') {
+    scale = gather['Total Time'] / sumTotalTime(fn.Children)
   }
 
   fn.Children?.forEach(child => calcParallelAppendTime(child, gather, scale))
@@ -438,8 +438,8 @@ function calcParallelAppendTime(fn: FlameNode, gather: FlameNode | undefined = u
 function sumTotalTime(nodes?: FlameNode[]): number {
   let total = 0
   nodes?.forEach(fn => {
-    if (typeof fn["Total Time"] === "number") {
-      total += fn["Total Time"]
+    if (typeof fn['Total Time'] === 'number') {
+      total += fn['Total Time']
     }
   })
   return total
@@ -448,25 +448,25 @@ function sumTotalTime(nodes?: FlameNode[]): number {
 function setSelfTime(fn: FlameNode) {
   fn.Children?.forEach(setSelfTime)
 
-  if (typeof fn["Total Time"] !== "number") {
+  if (typeof fn['Total Time'] !== 'number') {
     return
   }
 
-  fn["Self Time"] = fn["Total Time"] - sumTotalTime(fn.Children)
+  fn['Self Time'] = fn['Total Time'] - sumTotalTime(fn.Children)
 }
 
 function setTimePercent(root: FlameNode) {
-  const rootTotal = root["Total Time"]
-  if (typeof rootTotal !== "number") {
+  const rootTotal = root['Total Time']
+  if (typeof rootTotal !== 'number') {
     return
   }
 
   const visit = (fn: FlameNode) => {
-    if (typeof fn["Total Time"] === "number") {
-      fn["Total Time %"] = fn["Total Time"] / rootTotal
+    if (typeof fn['Total Time'] === 'number') {
+      fn['Total Time %'] = fn['Total Time'] / rootTotal
     }
-    if (typeof fn["Self Time"] === "number") {
-      fn["Self Time %"] = fn["Self Time"] / rootTotal
+    if (typeof fn['Self Time'] === 'number') {
+      fn['Self Time %'] = fn['Self Time'] / rootTotal
     }
     fn.Children?.forEach(visit)
   }
@@ -494,8 +494,8 @@ function setDepths(root: FlameNode) {
 
 function setRowsX(root: FlameNode) {
   const visit = (fn: FlameNode) => {
-    if (typeof fn["Plan Rows"] === "number" && typeof fn["Actual Rows"] === "number") {
-      fn["Rows X"] = rowsXHuman(fn["Plan Rows"], fn["Actual Rows"])
+    if (typeof fn['Plan Rows'] === 'number' && typeof fn['Actual Rows'] === 'number') {
+      fn['Rows X'] = rowsXHuman(fn['Plan Rows'], fn['Actual Rows'])
     }
     fn.Children?.forEach(visit)
   }
@@ -516,14 +516,14 @@ function setTotalBlocks(root: FlameNode) {
     let total: number | undefined = undefined
     blockKeys.forEach(blockKey => {
       const val = fn[blockKey]
-      if (typeof val === "number") {
+      if (typeof val === 'number') {
         total = total || 0
         total += val
       }
     })
 
     if (total !== undefined) {
-      fn["Total Blocks"] = total
+      fn['Total Blocks'] = total
     }
 
     fn.Children?.forEach(visit)
@@ -536,14 +536,14 @@ function setSelfBlocks(root: FlameNode) {
     fn.Children?.forEach(visit)
 
     const childTotal = fn.Children?.reduce<number | null>((sum, child) => {
-      return typeof child["Total Blocks"] === "number" ? (sum || 0) + child["Total Blocks"] : sum
+      return typeof child['Total Blocks'] === 'number' ? (sum || 0) + child['Total Blocks'] : sum
     }, null)
 
-    if (typeof fn["Total Blocks"] === "number") {
-      fn["Self Blocks"] = fn["Total Blocks"] - (childTotal || 0)
-    } else if (typeof childTotal === "number") {
-      fn["Total Blocks"] = childTotal || 0
-      fn["Self Blocks"] = 0
+    if (typeof fn['Total Blocks'] === 'number') {
+      fn['Self Blocks'] = fn['Total Blocks'] - (childTotal || 0)
+    } else if (typeof childTotal === 'number') {
+      fn['Total Blocks'] = childTotal || 0
+      fn['Self Blocks'] = 0
     }
   }
   visit(root)
@@ -567,7 +567,7 @@ function setColors(root: FlameNode) {
     fn.Colors = {}
     const keys = Object.keys(maxVals).map(key => key as keyof typeof maxVals)
     keys.forEach(key => {
-      if (key === "ID") {
+      if (key === 'ID') {
         return
       }
 
@@ -575,8 +575,8 @@ function setColors(root: FlameNode) {
       if (fn.Colors) {
         fn.Colors[key] = 0
       }
-      if (typeof val === "number" && fn.Colors) {
-        if (key === "Rows X") {
+      if (typeof val === 'number' && fn.Colors) {
+        if (key === 'Rows X') {
           fn.Colors[key] = rowsXColor(rowsXFraction(val))
         } else {
           const maxVal = maxVals[key] || 0
@@ -597,7 +597,7 @@ function maxValsForColor(root: FlameNode): ColorFragment {
     const keys = Object.keys(fn).map(key => key as keyof typeof maxVals)
     keys.forEach(key => {
       const val = fn[key]
-      if (typeof val === "number") {
+      if (typeof val === 'number') {
         const maxVal = maxVals[key] || 0
         maxVals[key] = Math.max(maxVal, val)
       }
@@ -614,23 +614,23 @@ function createVirtualSubplanNodes(fn: FlameNode): FlameNode {
     fn.Children = fn.Children.map(createVirtualSubplanNodes)
   }
 
-  if (!fn["Subplan Name"]) {
+  if (!fn['Subplan Name']) {
     return fn
   }
 
   const sn: FlameNode = Object.assign<{}, FlameNode, FlameNode>({}, fn, {
-    Kind: "Subplan",
-    Label: fn["Subplan Name"],
+    Kind: 'Subplan',
+    Label: fn['Subplan Name'],
     Children: [fn],
   })
   if (fn.Parent) {
     sn.Parent = fn.Parent
   }
-  if (typeof sn["Self Time"] === "number") {
+  if (typeof sn['Self Time'] === 'number') {
     // A small compromise to make the numbers add up and the visualizations
     // work.
-    sn["Self Time"] = 0
-    sn["Self Blocks"] = 0
+    sn['Self Time'] = 0
+    sn['Self Blocks'] = 0
   }
   fn.Parent = sn
 
@@ -651,7 +651,7 @@ export function parseNumberedSubplanName(name: string): subplanName | undefined 
     return
   }
 
-  const returns = m[3].split(",").map(dollarID => {
+  const returns = m[3].split(',').map(dollarID => {
     return parseInt(dollarID.substr(1), 10)
   })
 
@@ -690,111 +690,111 @@ export function parseFilter(filter: string): number[] {
  */
 export function label(n: RawNode): string {
   let pname: string
-  switch (n["Node Type"]) {
-    case "Aggregate":
-      pname = "Aggregate ???"
+  switch (n['Node Type']) {
+    case 'Aggregate':
+      pname = 'Aggregate ???'
       switch (n.Strategy) {
-        case "Plain":
-          pname = "Aggregate"
+        case 'Plain':
+          pname = 'Aggregate'
           break
-        case "Sorted":
-          pname = "GroupAggregate"
+        case 'Sorted':
+          pname = 'GroupAggregate'
           break
-        case "Hashed":
-          pname = "HashAggregate"
+        case 'Hashed':
+          pname = 'HashAggregate'
           break
-        case "Mixed":
-          pname = "MixedAggregate"
+        case 'Mixed':
+          pname = 'MixedAggregate'
           break
       }
-      if (n["Partial Mode"] && n["Partial Mode"] !== "Simple") {
-        pname = n["Partial Mode"] + " " + pname
+      if (n['Partial Mode'] && n['Partial Mode'] !== 'Simple') {
+        pname = n['Partial Mode'] + ' ' + pname
       }
       break
-    case "Foreign Scan":
+    case 'Foreign Scan':
       if (n.Operation) {
-        if (n.Operation === "Select") {
-          pname = "Foreign Scan"
+        if (n.Operation === 'Select') {
+          pname = 'Foreign Scan'
         } else {
-          pname = "Foreign " + n.Operation
+          pname = 'Foreign ' + n.Operation
         }
       } else {
-        pname = "???"
+        pname = '???'
       }
       break
-    case "ModifyTable":
+    case 'ModifyTable':
       if (n.Operation !== undefined) {
         pname = n.Operation
       } else {
-        pname = "???"
+        pname = '???'
       }
       break
-    case "Merge Join":
-      pname = "Merge"
+    case 'Merge Join':
+      pname = 'Merge'
       break
-    case "Hash Join":
-      pname = "Hash"
+    case 'Hash Join':
+      pname = 'Hash'
       break
-    case "SetOp":
-      pname = "SetOp ???"
+    case 'SetOp':
+      pname = 'SetOp ???'
       switch (n.Strategy) {
-        case "Sorted":
-          pname = "SetOp"
+        case 'Sorted':
+          pname = 'SetOp'
           break
-        case "Hashed":
-          pname = "HashedSetOp"
+        case 'Hashed':
+          pname = 'HashedSetOp'
           break
       }
-      pname += " " + n.Command
+      pname += ' ' + n.Command
       break
     default:
-      pname = n["Node Type"] || "???"
+      pname = n['Node Type'] || '???'
       break
   }
 
-  if (n["Join Type"]) {
-    if (n["Join Type"] !== "Inner") {
-      pname += " " + n["Join Type"] + " Join"
-    } else if (n["Node Type"] !== "Nested Loop") {
-      pname += " Join"
+  if (n['Join Type']) {
+    if (n['Join Type'] !== 'Inner') {
+      pname += ' ' + n['Join Type'] + ' Join'
+    } else if (n['Node Type'] !== 'Nested Loop') {
+      pname += ' Join'
     }
   }
 
-  if (n["Parallel Aware"]) {
-    pname = "Parallel " + pname
+  if (n['Parallel Aware']) {
+    pname = 'Parallel ' + pname
   }
 
-  if (n["Scan Direction"] !== undefined) {
-    if (n["Scan Direction"] === "Backward") {
-      pname += " " + n["Scan Direction"]
+  if (n['Scan Direction'] !== undefined) {
+    if (n['Scan Direction'] === 'Backward') {
+      pname += ' ' + n['Scan Direction']
     }
-    pname += " using " + n["Index Name"]
-  } else if (n["Index Name"]) {
-    pname += " on " + n["Index Name"]
+    pname += ' using ' + n['Index Name']
+  } else if (n['Index Name']) {
+    pname += ' on ' + n['Index Name']
   }
 
-  let objectname = ""
-  if (n["Relation Name"] !== undefined) {
-    objectname = n["Relation Name"]
-  } else if (n["Function Name"] !== undefined) {
-    objectname = n["Function Name"]
-  } else if (n["Table Function Name"] !== undefined) {
-    objectname = n["Table Function Name"]
-  } else if (n["CTE Name"] !== undefined) {
-    objectname = n["CTE Name"]
-  } else if (n["Tuplestore Name"] !== undefined) {
-    objectname = n["Tuplestore Name"]
+  let objectname = ''
+  if (n['Relation Name'] !== undefined) {
+    objectname = n['Relation Name']
+  } else if (n['Function Name'] !== undefined) {
+    objectname = n['Function Name']
+  } else if (n['Table Function Name'] !== undefined) {
+    objectname = n['Table Function Name']
+  } else if (n['CTE Name'] !== undefined) {
+    objectname = n['CTE Name']
+  } else if (n['Tuplestore Name'] !== undefined) {
+    objectname = n['Tuplestore Name']
   }
 
   if (objectname) {
-    pname += " on "
+    pname += ' on '
     if (n.Schema !== undefined) {
-      pname += quoteIdentifier(n.Schema) + "." + quoteIdentifier(objectname)
+      pname += quoteIdentifier(n.Schema) + '.' + quoteIdentifier(objectname)
     } else {
       pname += quoteIdentifier(objectname)
     }
     if (n.Alias && n.Alias !== objectname) {
-      pname += " " + n.Alias
+      pname += ' ' + n.Alias
     }
   }
 

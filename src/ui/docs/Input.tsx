@@ -1,15 +1,15 @@
-import React from "react"
-import { Page, PageLink } from "../Docs"
-import Heading from "../Heading"
-import { explainPrefix } from "../VisualizerInput"
-import Flamegraph from "./Flamegraph"
-import Treetable from "./Treetable"
-import Inspector from "./Inspector"
-import Share from "./Share"
+import React from 'react'
+import { Page, PageLink } from '../Docs'
+import Heading from '../Heading'
+import { explainPrefix } from '../VisualizerInput'
+import Flamegraph from './Flamegraph'
+import Treetable from './Treetable'
+import Inspector from './Inspector'
+import Share from './Share'
 
 const page: Page = {
-  name: "Input",
-  slug: "input",
+  name: 'Input',
+  slug: 'input',
   page: () => (
     <React.Fragment>
       <p>The input tab is the starting point for any query optimization.</p>
@@ -21,10 +21,10 @@ const page: Page = {
         handle.
       </p>
       <p>
-        However, it would be nice to add more real-world queries, so please{" "}
+        However, it would be nice to add more real-world queries, so please{' '}
         <a target="_new" href="https://github.com/felixge/flame-explain/issues/new">
           reach out
-        </a>{" "}
+        </a>{' '}
         if you have any interesting queries you're willing to share.
       </p>
 
@@ -33,14 +33,14 @@ const page: Page = {
         In order to analyze your own query, you have to prefix it with <code>{explainPrefix}</code> and run it via your
         PostgreSQL client. For example:
       </p>
-      <pre>{explainPrefix + "\nSELECT * FROM pg_indexes;"}</pre>
+      <pre>{explainPrefix + '\nSELECT * FROM pg_indexes;'}</pre>
       <p>
         <strong>Protip:</strong> The prefix is also shown on the input tab itself, and you can simply click it to copy
         it to your clipboard.
       </p>
       <p>
         If your query takes forever to run, you can also remove the <code>ANALYZE</code> option from the prefix. When
-        you do this, the <PageLink page={Flamegraph} /> visualization won't work, but you can still use{" "}
+        you do this, the <PageLink page={Flamegraph} /> visualization won't work, but you can still use{' '}
         <PageLink page={Treetable} /> to explore your plan.
       </p>
       <p>
@@ -68,7 +68,7 @@ const page: Page = {
       <Heading level={2}>SQL Input</Heading>
       <p>
         On the right hand side, next to the JSON Input, you can also paste the SQL that was used to produce your query
-        plan. This SQL query will show up on the bottom of the <PageLink page={Flamegraph} /> and{" "}
+        plan. This SQL query will show up on the bottom of the <PageLink page={Flamegraph} /> and{' '}
         <PageLink page={Treetable} /> for your convenience, but doesn't serve any functional role.
       </p>
       <p>

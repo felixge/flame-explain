@@ -1,13 +1,13 @@
-import React from "react"
-import { Page, PageLink } from "../Docs"
-import Inspector from "./Inspector"
-import Flamegraph from "./Flamegraph"
-import Heading from "../Heading"
-import QuirkCorrection from "./QuirkCorrection"
+import React from 'react'
+import { Page, PageLink } from '../Docs'
+import Inspector from './Inspector'
+import Flamegraph from './Flamegraph'
+import Heading from '../Heading'
+import QuirkCorrection from './QuirkCorrection'
 
 const page: Page = {
-  name: "Tree Table",
-  slug: "treetable",
+  name: 'Tree Table',
+  slug: 'treetable',
   page: () => (
     <React.Fragment>
       <p>
@@ -18,8 +18,8 @@ const page: Page = {
       <img alt="Tree Table Visualization Example" src="/docs/treetable.png" />
 
       <p>
-        To <strong>add or remove a column</strong> in the table, simply click on a row to open the{" "}
-        <PageLink page={Inspector} /> where you can click on the star next to a field to toggle it. You can also{" "}
+        To <strong>add or remove a column</strong> in the table, simply click on a row to open the{' '}
+        <PageLink page={Inspector} /> where you can click on the star next to a field to toggle it. You can also{' '}
         <strong>reorder</strong> the columns in the Inspector itself, or by using the little arrows that appear when you
         hover over the table headers.
       </p>
@@ -34,7 +34,7 @@ const page: Page = {
 
       <p>
         The <strong>Color</strong> of a column value is assigned on a linear scale from <strong>grey</strong> for the
-        lowest value to <strong>dark red</strong> for the highest value in the column. The only exception is the{" "}
+        lowest value to <strong>dark red</strong> for the highest value in the column. The only exception is the{' '}
         <code>Rows X</code> column which uses the same colors as described in the <PageLink page={Flamegraph} /> docs.
       </p>
 
@@ -44,7 +44,7 @@ const page: Page = {
         created by Hubert Lubaczewski in 2008.
       </p>
       <p>
-        FlameExplain enhances this classic idea by adding configurable columns, color highlighting, and advanced{" "}
+        FlameExplain enhances this classic idea by adding configurable columns, color highlighting, and advanced{' '}
         <PageLink page={QuirkCorrection} />.
       </p>
     </React.Fragment>

@@ -1,6 +1,6 @@
-import React from "react"
-import fetchJSONP from "fetch-jsonp"
-import { setCancelable } from "./Util"
+import React from 'react'
+import fetchJSONP from 'fetch-jsonp'
+import { setCancelable } from './Util'
 
 const cacheDuration = 180 * 1000
 
@@ -8,7 +8,7 @@ const cacheDuration = 180 * 1000
 // meant for debugging.
 const debugDelay = 1000
 
-export const useGist = (id: string): null | "loading" | Result => {
+export const useGist = (id: string): null | 'loading' | Result => {
   const [gist, setGist] = React.useState<{ [id: string]: Result }>({})
 
   React.useEffect(() => {
@@ -43,7 +43,7 @@ export const useGist = (id: string): null | "loading" | Result => {
           result.planText = text
           return result
         }
-        result.error = new Error("No JSON plan was found in the gist.")
+        result.error = new Error('No JSON plan was found in the gist.')
         return result
       })
       .then(result => setGistUnlessCanceled(result))
@@ -51,11 +51,11 @@ export const useGist = (id: string): null | "loading" | Result => {
     return cancel
   }, [id])
 
-  return !id ? null : gist[id] || "loading"
+  return !id ? null : gist[id] || 'loading'
 }
 
 const loadFromCacheOrGithub = async (id: string) => {
-  const cacheKey = "gist:" + id
+  const cacheKey = 'gist:' + id
   const cacheValue = localStorage.getItem(cacheKey)
   if (cacheValue) {
     let cacheEntry: cacheEntry
@@ -67,7 +67,7 @@ const loadFromCacheOrGithub = async (id: string) => {
     } catch (e) {}
   }
 
-  const res = await fetchJSONP("https://api.github.com/gists/" + id)
+  const res = await fetchJSONP('https://api.github.com/gists/' + id)
   const ghRes: githubResponse = await res.json()
   const entry: cacheEntry = {
     expires: Date.now() + cacheDuration,
@@ -112,12 +112,12 @@ export function GistNotice(p: Props) {
     return null
   }
 
-  if (gist === "loading") {
+  if (gist === 'loading') {
     return <progress key="gist-loading" className="progress is-warning" max="100"></progress>
   }
 
-  const gistLink = <a href={"https://gist.github.com/" + gist.id}>{gist.id}</a>
-  let cacheNotice = ""
+  const gistLink = <a href={'https://gist.github.com/' + gist.id}>{gist.id}</a>
+  let cacheNotice = ''
   if (gist.expires) {
     const remain = ((gist.expires - Date.now()) / 1000).toFixed(0)
     cacheNotice = `To avoid API rate limiting, this response will remain cached for ${remain} second(s).`
@@ -126,7 +126,7 @@ export function GistNotice(p: Props) {
   if (gist.error) {
     return (
       <div key="gist-error" className="notification is-danger">
-        Failed to load Gist {gistLink} from GitHub: {gist.error.message + "."}
+        Failed to load Gist {gistLink} from GitHub: {gist.error.message + '.'}
         {cacheNotice}
       </div>
     )

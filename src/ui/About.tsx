@@ -1,7 +1,7 @@
-import React from "react"
-import Heading from "./Heading"
-import { PageLink } from "./Docs"
-import QuirkCorrection from "./docs/QuirkCorrection"
+import React from 'react'
+import Heading from './Heading'
+import { PageLink } from './Docs'
+import QuirkCorrection from './docs/QuirkCorrection'
 
 export default function About() {
   return (
@@ -9,16 +9,16 @@ export default function About() {
       <div className="container">
         <Heading level={1}>About</Heading>
         <p>
-          In 2018 I found myself optimizing a lot of SQL queries using{" "}
+          In 2018 I found myself optimizing a lot of SQL queries using{' '}
           <a target="_new" href="https://www.postgresql.org/docs/current/sql-explain.html">
             EXPLAIN ANALYZE
-          </a>{" "}
-          and wondered if{" "}
+          </a>{' '}
+          and wondered if{' '}
           <a target="_new" href="http://www.brendangregg.com/flamegraphs.html">
             flame graph
-          </a>{" "}
+          </a>{' '}
           visualizations might help to speed up this kind of work. I quickly build a proof of concept that converted the
-          JSON output from PostgreSQL into the folded stack format expected by{" "}
+          JSON output from PostgreSQL into the folded stack format expected by{' '}
           <a target="_new" href="https://github.com/brendangregg/FlameGraph">
             brendangregg/FlameGraph
           </a>
@@ -60,14 +60,14 @@ export default function About() {
         </p>
         <Heading level={2}>License</Heading>
         <p>
-          FlameExplain is free software, published under the{" "}
+          FlameExplain is free software, published under the{' '}
           <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL Version 3</a> license. You can use it free of
           charge, and such usage will not "infect" the SQL/JSON code you paste into the UI. The license will only
           restrict you if you intend to host or distribute a forked version of FlameExplain.
         </p>
         <p>
           However, the statements above are not legal advice, and your internal company policies might prevent you from
-          using any (A)GPL licensed software in general. So if you're worried about the license, please{" "}
+          using any (A)GPL licensed software in general. So if you're worried about the license, please{' '}
           <a href="mailto:flame-explain@felixge.de">contact me</a>. I'm happy to provide free alternative licenses to
           anybody who asks nicely.
         </p>
@@ -79,44 +79,44 @@ export default function About() {
           <li>
             <a href="https://www.typescriptlang.org/" target="_new">
               Typescript
-            </a>{" "}
+            </a>{' '}
             for making JavaScript fun again after years of leaving Node.js for Go.
           </li>
           <li>
             <a href="https://reactjs.org/" target="_new">
               React
-            </a>{" "}
+            </a>{' '}
             for allowing me to pretend to be frontend developer.
           </li>
           <li>
             <a href="https://bulma.io/" target="_new">
               Bulma
-            </a>{" "}
+            </a>{' '}
             for hiding my lack of CSS and design skills.
           </li>
           <li>
             <a href="https://d3js.org/" target="_new">
               D3.js
-            </a>{" "}
+            </a>{' '}
             for being the ultimate frontend visualization powerhouse.
           </li>
           <li>
             <a href="https://prismjs.com/" target="_new">
               Prism
-            </a>{" "}
+            </a>{' '}
             for great JSON and SQL syntax highlighting.
           </li>
           <li>
             <a href="https://fontawesome.com/" target="_new">
               Font Awesome
-            </a>{" "}
+            </a>{' '}
             for all the pretty icons.
           </li>
           <li>
             <a href="Brendan Gregg" target="_new">
               Brendan Gregg
-            </a>{" "}
-            for inventing{" "}
+            </a>{' '}
+            for inventing{' '}
             <a href="http://www.brendangregg.com/flamegraphs.html" target="_new">
               Flame graphs
             </a>
@@ -125,27 +125,27 @@ export default function About() {
           <li>
             <a href="https://www.linkedin.com/in/depesz" target="_new">
               Hubert Lubaczewski
-            </a>{" "}
-            for building the original{" "}
+            </a>{' '}
+            for building the original{' '}
             <a href="https://explain.depesz.com/" target="_new">
               explain.depesz.com
-            </a>{" "}
+            </a>{' '}
             tool which was a big inspiration.
           </li>
           <li>
             <a href="https://twitter.com/LKhaknazarova" target="_new">
               Lina Khaknazarova
-            </a>{" "}
+            </a>{' '}
             for providing lots of suggestions and feedback.
           </li>
           <li>
             <a href="https://www.pgmustard.com/about" target="_new">
               Michael Christofides & David Conlin
-            </a>{" "}
-            of{" "}
+            </a>{' '}
+            of{' '}
             <a href="https://www.pgmustard.com/" target="_new">
               pgMustard
-            </a>{" "}
+            </a>{' '}
             for in-depth conversations about EXPLAIN ANALYZE internals.
           </li>
         </ul>

@@ -1,10 +1,10 @@
-import React from "react"
-import { Page } from "../Docs"
-import { shareElements } from "../VisualizerShare"
+import React from 'react'
+import { Page } from '../Docs'
+import { shareElements } from '../VisualizerShare'
 
 const page: Page = {
-  name: "Share",
-  slug: "share",
+  name: 'Share',
+  slug: 'share',
   page: () => (
     <React.Fragment>
       <img alt="Share Example" src="/docs/share.png" width={500} className="is-pulled-right" />

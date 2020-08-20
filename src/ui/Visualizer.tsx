@@ -1,23 +1,23 @@
-import React from "react"
-import { default as VisualizerInput, InputState } from "./VisualizerInput"
-import { Link, useHistory } from "react-router-dom"
-import VisualizerTable from "./VisualizerTable"
-import VisualizerFlamegraph from "./VisualizerFlamegraph"
-import { columnText } from "../lib/TextTable"
-import { default as Inspector, InspectorCategory } from "./Inspector"
-import { default as VisualizerShare, SharingState } from "./VisualizerShare"
-import { FlameNode, FlameKey, fromRawQueries, nodeByID } from "../lib/FlameExplain"
-import { useRouteMatch, Redirect } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faShareAlt as iconShare } from "@fortawesome/free-solid-svg-icons"
-import { useLocalStorage } from "./LocalStorage"
-import { useGist, GistNotice } from "./Gist"
-import { useKeyboardShortcuts } from "./KeyboardShortcuts"
-import Highlight from "./Highlight"
+import React from 'react'
+import { default as VisualizerInput, InputState } from './VisualizerInput'
+import { Link, useHistory } from 'react-router-dom'
+import VisualizerTable from './VisualizerTable'
+import VisualizerFlamegraph from './VisualizerFlamegraph'
+import { columnText } from '../lib/TextTable'
+import { default as Inspector, InspectorCategory } from './Inspector'
+import { default as VisualizerShare, SharingState } from './VisualizerShare'
+import { FlameNode, FlameKey, fromRawQueries, nodeByID } from '../lib/FlameExplain'
+import { useRouteMatch, Redirect } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faShareAlt as iconShare } from '@fortawesome/free-solid-svg-icons'
+import { useLocalStorage } from './LocalStorage'
+import { useGist, GistNotice } from './Gist'
+import { useKeyboardShortcuts } from './KeyboardShortcuts'
+import Highlight from './Highlight'
 
 export type VisualizerState = {
   input: InputState
-  modal: "Share" | null
+  modal: 'Share' | null
   showInspector: boolean
   inspectorCategory: InspectorCategory
   collapsed: { [K: number]: true }
@@ -27,30 +27,30 @@ export type VisualizerState = {
 }
 
 const defaultFavorites: FlameKey[] = [
-  "ID",
-  "Label",
-  "Rows X",
-  "Total Time",
-  "Total Time %",
-  "Self Time",
-  "Self Time %",
-  "Total Blocks",
+  'ID',
+  'Label',
+  'Rows X',
+  'Total Time',
+  'Total Time %',
+  'Self Time',
+  'Self Time %',
+  'Total Blocks',
 ]
 
 export default function Visualizer() {
   const history = useHistory()
 
   const defaultState: VisualizerState = {
-    input: { plan: "", sql: "" },
+    input: { plan: '', sql: '' },
     favorites: defaultFavorites,
     collapsed: {},
     modal: null,
     showInspector: false,
-    inspectorCategory: "All",
-    share: { tab: "json" },
+    inspectorCategory: 'All',
+    share: { tab: 'json' },
   }
 
-  let [state, setState] = useLocalStorage("visualizer", defaultState)
+  let [state, setState] = useLocalStorage('visualizer', defaultState)
 
   const setInput = (newInput: typeof defaultState.input) => {
     setState(state => ({
@@ -65,14 +65,14 @@ export default function Visualizer() {
 
   React.useEffect(() => {
     const onPaste = (e: any) => {
-      const data = e.clipboardData?.getData("text")
+      const data = e.clipboardData?.getData('text')
       if (data) {
         setInput({ plan: data, sql: state.input.sql })
       }
     }
-    window.addEventListener("paste", onPaste)
+    window.addEventListener('paste', onPaste)
     return () => {
-      window.removeEventListener("paste", onPaste)
+      window.removeEventListener('paste', onPaste)
     }
   })
 
@@ -122,13 +122,13 @@ export default function Visualizer() {
   }
 
   const q = new URLSearchParams(history.location.search)
-  const gist = useGist(q.get("gist") || "")
+  const gist = useGist(q.get('gist') || '')
   let [prevGist, setPrevGist] = React.useState<typeof gist>(null)
   if (gist && prevGist !== gist) {
-    const plan = gist === "loading" ? "[]" : gist.planText || "[]"
+    const plan = gist === 'loading' ? '[]' : gist.planText || '[]'
 
     let newState: Partial<VisualizerState> = {
-      input: { plan: plan, sql: "" },
+      input: { plan: plan, sql: '' },
     }
     setState(state => ({ ...state, ...newState }))
     setPrevGist(gist)
@@ -143,8 +143,8 @@ export default function Visualizer() {
     let errorText: string | null = null
     let newState
     try {
-      let data = JSON.parse(state.input.plan || "[]")
-      if (typeof data === "object" && "flameExplain" in data) {
+      let data = JSON.parse(state.input.plan || '[]')
+      if (typeof data === 'object' && 'flameExplain' in data) {
         // TODO(fg) there are more things we should probably accept here (e.g.
         // selected node)!
         const { input, preferences } = JSON.parse(state.input.plan)
@@ -154,7 +154,7 @@ export default function Visualizer() {
         rootNode = fromRawQueries(data)
       }
     } catch (e) {
-      errorText = e + ""
+      errorText = e + ''
     }
     return { rootNode, errorText, newState }
   }, [state.input.plan])
@@ -165,33 +165,33 @@ export default function Visualizer() {
 
   useKeyboardShortcuts((key: string) => {
     switch (key) {
-      case "Enter":
-      case "Escape":
+      case 'Enter':
+      case 'Escape':
         setState(state => {
           if (state.modal) {
             return { ...state, ...{ modal: null } }
-          } else if (key === "Escape") {
+          } else if (key === 'Escape') {
             return { ...state, ...{ selectedNode: undefined, showInspector: false } }
           }
           return state
         })
         break
-      case "i":
-        history.push("/visualize/input" + history.location.search)
+      case 'i':
+        history.push('/visualize/input' + history.location.search)
         break
-      case "t":
-        history.push("/visualize/treetable" + history.location.search)
+      case 't':
+        history.push('/visualize/treetable' + history.location.search)
         break
-      case "f":
-        history.push("/visualize/flamegraph" + history.location.search)
+      case 'f':
+        history.push('/visualize/flamegraph' + history.location.search)
         break
-      case "s":
-        toggleModal("Share")
+      case 's':
+        toggleModal('Share')
         break
     }
   })
 
-  const match = useRouteMatch<{ tab: string }>("/visualize/:tab")
+  const match = useRouteMatch<{ tab: string }>('/visualize/:tab')
   if (!match) {
     return <Redirect to="/" />
   }
@@ -202,20 +202,20 @@ export default function Visualizer() {
 
   let tab: JSX.Element = <div />
   switch (match.params.tab) {
-    case "input":
+    case 'input':
       tab = (
         <VisualizerInput
           errorText={errorText}
           input={state.input}
           onReset={onReset}
           onChange={input => {
-            history.push("/visualize/input")
+            history.push('/visualize/input')
             setInput(input)
           }}
         />
       )
       break
-    case "treetable":
+    case 'treetable':
       if (!rootNode || !state.input.plan) {
         return <Redirect to="/" />
       }
@@ -241,7 +241,7 @@ export default function Visualizer() {
         </div>
       )
       break
-    case "flamegraph":
+    case 'flamegraph':
       if (!rootNode || !state.input.plan) {
         return <Redirect to="/" />
       }
@@ -266,38 +266,38 @@ export default function Visualizer() {
     setState(state => ({ ...state, ...{ share } }))
   }
 
-  const tabDisabled = rootNode && state.input.plan ? "" : "is-disabled"
+  const tabDisabled = rootNode && state.input.plan ? '' : 'is-disabled'
 
   return (
     <section className="section visualizer">
       <VisualizerShare
-        onClose={() => toggleModal("Share")}
+        onClose={() => toggleModal('Share')}
         onChange={onShareChange}
         state={state}
-        visible={state.modal === "Share"}
+        visible={state.modal === 'Share'}
       />
       <GistNotice gist={gist} />
       <div className="tabs is-toggle">
         <ul>
-          <li className={match.params.tab === "input" ? "is-active" : ""}>
-            <Link to={"/visualize/input" + history.location.search}>
+          <li className={match.params.tab === 'input' ? 'is-active' : ''}>
+            <Link to={'/visualize/input' + history.location.search}>
               <u>I</u>nput
             </Link>
           </li>
-          <li className={`${tabDisabled} ${match.params.tab === "flamegraph" ? "is-active" : ""}`}>
-            <Link to={"/visualize/flamegraph" + history.location.search}>
+          <li className={`${tabDisabled} ${match.params.tab === 'flamegraph' ? 'is-active' : ''}`}>
+            <Link to={'/visualize/flamegraph' + history.location.search}>
               <u>F</u>lame Graph
             </Link>
           </li>
-          <li className={`${tabDisabled} ${match.params.tab === "treetable" ? "is-active" : ""}`}>
-            <Link to={"/visualize/treetable" + history.location.search}>
+          <li className={`${tabDisabled} ${match.params.tab === 'treetable' ? 'is-active' : ''}`}>
+            <Link to={'/visualize/treetable' + history.location.search}>
               <u>T</u>ree Table
             </Link>
           </li>
         </ul>
         <Stats root={rootNode} />
         <div className="buttons has-addons">
-          <button onClick={() => toggleModal("Share")} className="button">
+          <button onClick={() => toggleModal('Share')} className="button">
             <span className="icon is-small">
               <FontAwesomeIcon icon={iconShare} />
             </span>
@@ -334,7 +334,7 @@ export default function Visualizer() {
                 },
               }))
             }
-            visible={state.showInspector && match.params.tab !== "input"}
+            visible={state.showInspector && match.params.tab !== 'input'}
             node={nodeByID(rootNode, state.selectedNode)}
           />
         </div>
@@ -345,11 +345,11 @@ export default function Visualizer() {
 }
 
 function Stats(p: { root: FlameNode | undefined }) {
-  const keys: FlameKey[] = ["Total Time", "Total Blocks"]
+  const keys: FlameKey[] = ['Total Time', 'Total Blocks']
 
   let spans = keys
     .map(key => {
-      if (typeof p.root?.[key] !== "number") {
+      if (typeof p.root?.[key] !== 'number') {
         return null
       }
       return (
