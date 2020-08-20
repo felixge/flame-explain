@@ -4,16 +4,16 @@
  * to ignore any future call to the set function, effectively canceling it.
  */
 export function setCancelable<T>(set: SetFn<T>): [SetFn<T>, CancelFn] {
-    let canceled = false
-    const setFn = (v: T) => {
-        if (!canceled) {
-            set(v)
-        }
+  let canceled = false
+  const setFn = (v: T) => {
+    if (!canceled) {
+      set(v)
     }
-    const cancelFn = () => {
-        canceled = true
-    }
-    return [setFn, cancelFn]
+  }
+  const cancelFn = () => {
+    canceled = true
+  }
+  return [setFn, cancelFn]
 }
 
 type SetFn<T> = (v: T) => void

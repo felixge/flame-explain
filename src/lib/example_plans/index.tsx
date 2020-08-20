@@ -15,26 +15,26 @@ import RewriteTwoQueries from "./RewriteTwoQueries"
 import ParallelSort from "./ParallelSort"
 
 export type ExamplePlan = {
-    queries: RawQueries
-    sql: string
+  queries: RawQueries
+  sql: string
 }
 
 const Plans: { [key: string]: ExamplePlan } = {
-    CTELoopedAggregateScan,
-    CTESimple,
-    CTESleepUnion,
-    NestedLoop,
-    PGIndexes,
-    ParallelAppend,
-    ParallelAppendCount,
-    ParallelCount,
-    ParallelCountAppend,
-    RewriteTwoQueries,
-    ParallelSort,
+  CTELoopedAggregateScan,
+  CTESimple,
+  CTESleepUnion,
+  NestedLoop,
+  PGIndexes,
+  ParallelAppend,
+  ParallelAppendCount,
+  ParallelCount,
+  ParallelCountAppend,
+  RewriteTwoQueries,
+  ParallelSort,
 }
 
 for (const plan of Object.values(Plans)) {
-    plan.sql = (plan.sql || "").trim()
+  plan.sql = (plan.sql || "").trim()
 }
 
 export default Plans

@@ -13,23 +13,23 @@ Prism.plugins.customClass.prefix("prism-")
 Prism.manual = true
 
 type Props = {
-    language: "sql" | "json"
-    source: string
+  language: "sql" | "json"
+  source: string
 }
 
 export default function Highlight(p: Props) {
-    const ref = React.useRef<HTMLElement>(null)
-    React.useEffect(() => {
-        if (ref.current) {
-            Prism.highlightElement(ref.current)
-        }
-    })
+  const ref = React.useRef<HTMLElement>(null)
+  React.useEffect(() => {
+    if (ref.current) {
+      Prism.highlightElement(ref.current)
+    }
+  })
 
-    return (
-        <pre>
-            <code ref={ref} className={"language-" + p.language}>
-                {p.source}
-            </code>
-        </pre>
-    )
+  return (
+    <pre>
+      <code ref={ref} className={"language-" + p.language}>
+        {p.source}
+      </code>
+    </pre>
+  )
 }
