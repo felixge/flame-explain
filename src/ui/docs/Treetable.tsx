@@ -1,9 +1,9 @@
-import React from 'react'
-import { Page, PageLink } from '../Docs'
-import Inspector from './Inspector'
-import Flamegraph from './Flamegraph'
-import Heading from '../Heading'
-import QuirkCorrection from './QuirkCorrection'
+import React from 'react';
+import { Page, PageLink } from '../Docs';
+import Inspector from './Inspector';
+import Flamegraph from './Flamegraph';
+import Heading from '../Heading';
+import QuirkCorrection from './QuirkCorrection';
 
 const page: Page = {
   name: 'Tree Table',
@@ -49,6 +49,6 @@ const page: Page = {
       </p>
     </React.Fragment>
   ),
-}
+};
 
-export default page
+export default page;

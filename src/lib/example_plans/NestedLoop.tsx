@@ -1,4 +1,4 @@
-import { ExamplePlan } from './'
+import { ExamplePlan } from './';
 
 const Sample: ExamplePlan = {
   sql: `
@@ -66,5 +66,5 @@ JOIN generate_series(5, 15) b ON a > b;
       'Execution Time': 0.087,
     },
   ],
-}
-export default Sample
+};
+export default Sample;

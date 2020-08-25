@@ -1,9 +1,9 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import 'github-fork-ribbon-css/gh-fork-ribbon.css'
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import 'github-fork-ribbon-css/gh-fork-ribbon.css';
 
 export default function Header() {
-  let [burgerMenu, setBurgerMenu] = React.useState(false)
+  let [burgerMenu, setBurgerMenu] = React.useState(false);
 
   return (
     <div>
@@ -70,5 +70,5 @@ export default function Header() {
         </a>
       </nav>
     </div>
-  )
+  );
 }

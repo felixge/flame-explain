@@ -1,10 +1,10 @@
-import React from 'react'
-import { Page, PageLink } from '../Docs'
-import Input from './Input'
-import Inspector from './Inspector'
-import Flamegraph from './Flamegraph'
-import Treetable from './Treetable'
-import Share from './Share'
+import React from 'react';
+import { Page, PageLink } from '../Docs';
+import Input from './Input';
+import Inspector from './Inspector';
+import Flamegraph from './Flamegraph';
+import Treetable from './Treetable';
+import Share from './Share';
 
 const page: Page = {
   name: 'Keyboard Shortcuts',
@@ -69,6 +69,6 @@ const page: Page = {
       </table>
     </React.Fragment>
   ),
-}
+};
 
-export default page
+export default page;

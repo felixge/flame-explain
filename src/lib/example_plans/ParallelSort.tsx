@@ -1,4 +1,4 @@
-import { ExamplePlan } from './'
+import { ExamplePlan } from './';
 
 const Sample: ExamplePlan = {
   sql: `
@@ -748,5 +748,5 @@ LIMIT 100
       'Execution Time': 4725.163,
     },
   ],
-}
-export default Sample
+};
+export default Sample;

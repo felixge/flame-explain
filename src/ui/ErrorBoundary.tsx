@@ -1,35 +1,35 @@
-import React from 'react'
-import Heading from './Heading'
+import React from 'react';
+import Heading from './Heading';
 
 // Set this to true to debug this component by simulating bad data in
 // localStorage.
-const debug = false
+const debug = false;
 
 let debugError = (() => {
   if (debug && localStorage.length) {
-    return new Error('test')
+    return new Error('test');
   }
-})()
+})();
 
 export default class ErrorBoundary extends React.Component {
   state: {
-    error: Error | null
-    errorInfo: React.ErrorInfo | null
+    error: Error | null;
+    errorInfo: React.ErrorInfo | null;
   } = {
     error: debugError || null,
     errorInfo: null,
-  }
+  };
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({
       error: error,
       errorInfo: errorInfo,
-    })
+    });
   }
 
   onClearClick() {
-    localStorage.clear()
-    this.setState({ error: null })
+    localStorage.clear();
+    this.setState({ error: null });
   }
 
   render() {
@@ -60,9 +60,9 @@ export default class ErrorBoundary extends React.Component {
             </div>
           </div>
         </section>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

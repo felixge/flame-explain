@@ -7,7 +7,7 @@
  *
  * [1] https://github.com/postgres/postgres/blob/REL_12_0/src/backend/commands/explain.c
  */
-export const postgresVersion = '12.0'
+export const postgresVersion = '12.0';
 
 /**
  * Queries defines the JSON array that is produced by EXPLAIN (FORMAT JSON).
@@ -15,15 +15,15 @@ export const postgresVersion = '12.0'
  * only a single query element, however query rewrite rules can produce multiple
  * queries.
  */
-export type RawQueries = Array<RawQuery>
+export type RawQueries = Array<RawQuery>;
 
 export type RawQuery = Partial<{
-  'Planning Time': number
-  'Execution Time': number
-  'Triggers': Array<any>
-  'Plan': RawNode
-  'JIT': JITFragment
-}>
+  'Planning Time': number;
+  'Execution Time': number;
+  'Triggers': Array<any>;
+  'Plan': RawNode;
+  'JIT': JITFragment;
+}>;
 
 // TODO Describe or group fields below
 export type RawNode = Partial<
@@ -48,10 +48,10 @@ export type RawNode = Partial<
     GatherFragment &
     BuffersFragment &
     IOTimingFragment
->
+>;
 
 type CommonFragment = {
-  'Node Type': NodeType
+  'Node Type': NodeType;
 
   /**
    * "Parent Relationship" is available for all plan nodes except the root
@@ -77,21 +77,21 @@ type CommonFragment = {
    *
    * [1] https://www.postgresql.org/message-id/4572.1280671706%40sss.pgh.pa.us
    */
-  'Parent Relationship': 'InitPlan' | 'Outer' | 'Inner' | 'Member' | 'Subquery' | 'SubPlan'
+  'Parent Relationship': 'InitPlan' | 'Outer' | 'Inner' | 'Member' | 'Subquery' | 'SubPlan';
   /** Available starting in PostgreSQL 9.6 and later for parallel query. */
-  'Parallel Aware': boolean
-  'Subplan Name': string
-  'Filter': string
-  'Rows Removed by Filter': number
-  'Output': string[]
-  'Workers': WorkerFragment[]
-  'Plans': RawNode[]
+  'Parallel Aware': boolean;
+  'Subplan Name': string;
+  'Filter': string;
+  'Rows Removed by Filter': number;
+  'Output': string[];
+  'Workers': WorkerFragment[];
+  'Plans': RawNode[];
 
   /** Average startup time / per 'Actual Loops' of this node. */
-  'Actual Startup Time': number
+  'Actual Startup Time': number;
   /** Average total time / per 'Actual Loops' of this node. */
-  'Actual Total Time': number
-}
+  'Actual Total Time': number;
+};
 
 export const nodeTypes = [
   'Aggregate',
@@ -133,12 +133,12 @@ export const nodeTypes = [
   'Values Scan',
   'WindowAgg',
   'WorkTable Scan',
-] as const
+] as const;
 
 /**
  * NodeType is a list of all Node Type values implemented by PostgreSQL.
  */
-export type NodeType = typeof nodeTypes[number]
+export type NodeType = typeof nodeTypes[number];
 
 /**
  * TargetRelFragment is present when Node Type is "Seq Scan" | "Sample Scan" |
@@ -146,48 +146,48 @@ export type NodeType = typeof nodeTypes[number]
  * "Foreign Scan" | "Custom Scan" | "ModifyTable".
  */
 type TargetRelFragment = {
-  'Schema': string
-  'Relation Name': string
-  'Alias': string
-}
+  'Schema': string;
+  'Relation Name': string;
+  'Alias': string;
+};
 
 /**
  * CostFragment is present when the COSTS option is enabled.
  */
 type CostFragment = {
-  'Startup Cost': number
-  'Total Cost': number
-  'Plan Rows': number
-  'Plan Width': number
-}
+  'Startup Cost': number;
+  'Total Cost': number;
+  'Plan Rows': number;
+  'Plan Width': number;
+};
 
 /**
  * AnalyzedFragment is present when the ANALYZE option is enabled.
  */
 type AnalyzedFragment = {
   /** Number of rows returned by this node. */
-  'Actual Rows': number
+  'Actual Rows': number;
   /** Number of times this node was executed in a loop. Can be 0 if the
    * node was not executed at all. */
-  'Actual Loops': number
-}
+  'Actual Loops': number;
+};
 
 /**
  * TimingFragment is present when the TIMING option is enabled.
  */
 type TimingFragment = {
   /** Average startup time / per 'Actual Loops' of this node. */
-  'Actual Startup Time': number
+  'Actual Startup Time': number;
   /** Average total time / per 'Actual Loops' of this node. */
-  'Actual Total Time': number
-}
+  'Actual Total Time': number;
+};
 
 /**
  * CTENameFragment is present when "Node Type" is "CTE Scan" | "WorkTable Scan".
  */
 type CTENameFragment = {
-  'CTE Name': string
-}
+  'CTE Name': string;
+};
 
 /**
  * JoinFragment is present when "Node Type" is "Nested Loop" | "Hash Join" |
@@ -195,14 +195,14 @@ type CTENameFragment = {
  * enabled.
  */
 type JoinFragment = {
-  'Join Type': 'Inner' | 'Left' | 'Full' | 'Right' | 'Semi' | 'Anti' | '???'
-  'Inner Unique': boolean
-  'Join Filter': string
-  'Rows Removed by Join Filter': number
+  'Join Type': 'Inner' | 'Left' | 'Full' | 'Right' | 'Semi' | 'Anti' | '???';
+  'Inner Unique': boolean;
+  'Join Filter': string;
+  'Rows Removed by Join Filter': number;
 
   // Only available for "Hash Join".
-  'Hash Cond': string
-}
+  'Hash Cond': string;
+};
 
 type Operation =
   // When "Node Type" is "ModifyTable"
@@ -213,34 +213,34 @@ type Operation =
   | 'Select'
   | 'Insert'
   | 'Update'
-  | 'Delete'
+  | 'Delete';
 
 /**
  * ModifyTableFragment is available when "Node Type" is "ModifyTable".
  */
 type ModifyTableFragment = {
-  'Operation': Operation
-}
+  'Operation': Operation;
+};
 
 /**
  * ForeignScanFragment is available when "Node Type" is "Foreign Scan".
  */
 type ForeignScanFragment = {
-  'Operation': Operation
-}
+  'Operation': Operation;
+};
 
 /**
  * IndexFragment is available when "Node Type" is "Bitmap Index Scan" | "Index
  * Scan" | "Index Only Scan".
  */
 type IndexFragment = {
-  'Index Name': string
-  'Index Cond': string
+  'Index Name': string;
+  'Index Cond': string;
   // Not available for "Bitmap Index Scan".
-  'Rows Removed by Index Recheck': number
+  'Rows Removed by Index Recheck': number;
   // Not available for "Bitmap Index Scan".
-  'Scan Direction': 'Backward' | 'NoMovement' | 'Forward' | '?'
-}
+  'Scan Direction': 'Backward' | 'NoMovement' | 'Forward' | '?';
+};
 
 type Strategy =
   // When "Node Type" is "Aggregate".
@@ -252,75 +252,75 @@ type Strategy =
   // When "Node Type" is "SetOp".
   | 'Sorted'
   | 'Hashed'
-  | '???'
+  | '???';
 
 /**
  * AggregateFragment is available when "Node Type" is "Aggregate".
  */
 type AggregateFragment = {
-  'Strategy': Strategy
+  'Strategy': Strategy;
   /** Available since PostgreSQL 9.6 and later for parallel query. */
-  'Partial Mode'?: 'Simple' | 'Partial' | 'Finalize'
-}
+  'Partial Mode'?: 'Simple' | 'Partial' | 'Finalize';
+};
 
 /**
  * SetOpFragment is available when "Node Type" is "SetOp".
  */
 type SetOpFragment = {
-  'Strategy': Strategy
-  'Command': 'Intersect' | 'Intersect All' | 'Except' | 'Except All' | '???'
-}
+  'Strategy': Strategy;
+  'Command': 'Intersect' | 'Intersect All' | 'Except' | 'Except All' | '???';
+};
 
 /**
  * FunctionScanFragment is available when "Node Type" is "Function Scan".
  */
 type FunctionScanFragment = {
-  'Function Name': string
-  'Schema': string
-  'Function Call'?: string
-}
+  'Function Name': string;
+  'Schema': string;
+  'Function Call'?: string;
+};
 
 /**
  * TableFunctionScanFragment is available when "Node Type" is "Table Function
  * Scan".
  */
 type TableFunctionScanFragment = {
-  'Table Function Name': string
-}
+  'Table Function Name': string;
+};
 
 /**
  * NamedTupleStoreScanFragment is available when "Node Type" is "Named
  * Tuplestore Scan".
  */
 type NamedTupleStoreScanFragment = {
-  'Tuplestore Name': string
-}
+  'Tuplestore Name': string;
+};
 
 /**
  * ResultFragment is available when "Node Type" is "Result".
  */
 type ResultFragment = {
-  'One-Time Filter'?: string
-}
+  'One-Time Filter'?: string;
+};
 
 /**
  * HashFragment is available when "Node Type" is "Hash".
  */
 type HashFragment = {
-  'One-Time Filter'?: string
-  'Hash Buckets': number
-  'Original Hash Buckets': number
-  'Hash Batches': number
-  'Original Hash Batches': number
+  'One-Time Filter'?: string;
+  'Hash Buckets': number;
+  'Original Hash Buckets': number;
+  'Hash Batches': number;
+  'Original Hash Batches': number;
   /** kB */
-  'Peak Memory Usage': number
-}
+  'Peak Memory Usage': number;
+};
 
 /**
  * SortFragment is available when "Node Type" is "Sort".
  */
 type SortFragment = {
-  'Sort Key': string[]
+  'Sort Key': string[];
   'Sort Method':
     | string
     | 'still in progress'
@@ -328,58 +328,58 @@ type SortFragment = {
     | 'quicksort'
     | 'external sort'
     | 'external merge'
-    | 'unknown'
+    | 'unknown';
   /* kB */
-  'Sort Space Used': number
-  'Sort Space Type': string | 'Disk' | 'Memory'
-}
+  'Sort Space Used': number;
+  'Sort Space Type': string | 'Disk' | 'Memory';
+};
 
 /**
  * GatherFragment is available when "Node Type" is "Gather" | "Gather Merge".
  */
 type GatherFragment = {
-  'Workers Planned': number
-  'Workers Launched': number
+  'Workers Planned': number;
+  'Workers Launched': number;
   // Only available for "Gather".
-  'Single Copy': boolean
-}
+  'Single Copy': boolean;
+};
 
 type WorkerFragment = {
-  'Worker Number': number
-} & Partial<TimingFragment & AnalyzedFragment & SortFragment & BuffersFragment & IOTimingFragment>
+  'Worker Number': number;
+} & Partial<TimingFragment & AnalyzedFragment & SortFragment & BuffersFragment & IOTimingFragment>;
 
 type BuffersFragment = {
-  'Shared Hit Blocks': number
-  'Shared Read Blocks': number
-  'Shared Dirtied Blocks': number
-  'Shared Written Blocks': number
-  'Local Hit Blocks': number
-  'Local Read Blocks': number
-  'Local Dirtied Blocks': number
-  'Local Written Blocks': number
-  'Temp Read Blocks': number
-  'Temp Written Blocks': number
-}
+  'Shared Hit Blocks': number;
+  'Shared Read Blocks': number;
+  'Shared Dirtied Blocks': number;
+  'Shared Written Blocks': number;
+  'Local Hit Blocks': number;
+  'Local Read Blocks': number;
+  'Local Dirtied Blocks': number;
+  'Local Written Blocks': number;
+  'Temp Read Blocks': number;
+  'Temp Written Blocks': number;
+};
 
 type IOTimingFragment = {
-  'I/O Read Time': number
-  'I/O Write Time': number
-}
+  'I/O Read Time': number;
+  'I/O Write Time': number;
+};
 
 type JITFragment = {
-  'Worker Number': number
-  'Functions': number
+  'Worker Number': number;
+  'Functions': number;
   'Options': {
-    'Inlining': boolean
-    'Optimization': boolean
-    'Expressions': boolean
-    'Deforming': boolean
-  }
+    'Inlining': boolean;
+    'Optimization': boolean;
+    'Expressions': boolean;
+    'Deforming': boolean;
+  };
   'Timing': {
-    'Generation': number
-    'Inlining': number
-    'Optimization': number
-    'Emission': number
-    'Total': number
-  }
-}
+    'Generation': number;
+    'Inlining': number;
+    'Optimization': number;
+    'Emission': number;
+    'Total': number;
+  };
+};

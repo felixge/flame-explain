@@ -1,4 +1,4 @@
-import { ExamplePlan } from './'
+import { ExamplePlan } from './';
 
 const Sample: ExamplePlan = {
   sql: `
@@ -55,5 +55,5 @@ SELECT 1 WHERE EXISTS (SELECT 2) AND EXISTS (SELECT 3);
       'Execution Time': 0.022,
     },
   ],
-}
-export default Sample
+};
+export default Sample;

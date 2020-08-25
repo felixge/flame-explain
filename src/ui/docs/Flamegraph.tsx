@@ -1,9 +1,9 @@
-import React from 'react'
-import { Page, PageLink } from '../Docs'
-import Heading from '../Heading'
-import { hideThreshold } from '../VisualizerFlamegraph'
-import Inspector from './Inspector'
-import Treetable from './Treetable'
+import React from 'react';
+import { Page, PageLink } from '../Docs';
+import Heading from '../Heading';
+import { hideThreshold } from '../VisualizerFlamegraph';
+import Inspector from './Inspector';
+import Treetable from './Treetable';
 
 const page: Page = {
   name: 'Flame Graph',
@@ -84,6 +84,6 @@ const page: Page = {
       </p>
     </React.Fragment>
   ),
-}
+};
 
-export default page
+export default page;

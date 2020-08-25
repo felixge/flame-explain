@@ -1,4 +1,4 @@
-import { ExamplePlan } from './'
+import { ExamplePlan } from './';
 
 const Sample: ExamplePlan = {
   sql: `
@@ -382,5 +382,5 @@ SELECT * FROM pg_indexes;
       'Execution Time': 10.442,
     },
   ],
-}
-export default Sample
+};
+export default Sample;
