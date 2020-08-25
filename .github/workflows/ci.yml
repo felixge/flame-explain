@@ -18,9 +18,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: 'yarn install'
-      - run: 'yarn prettier --write .'
+      - run: 'yarn format'
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Auto-format code using prettier
+          commit_message: Format code using using yarn format
       - run: 'yarn test'
       - run: 'yarn build'
