@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-type callback = (key: string) => void;
+type callback = (key: string) => void
 
 export function useKeyboardShortcuts(cb: callback) {
   React.useEffect(() => {
@@ -10,11 +10,11 @@ export function useKeyboardShortcuts(cb: callback) {
         (e.target instanceof HTMLInputElement && e.target.type !== 'checkbox') ||
         e.target instanceof HTMLSelectElement
       ) {
-        return;
+        return
       }
-      cb(e.key);
-    };
-    document.addEventListener('keyup', listener);
-    return () => document.removeEventListener('keyup', listener);
-  });
+      cb(e.key)
+    }
+    document.addEventListener('keyup', listener)
+    return () => document.removeEventListener('keyup', listener)
+  })
 }

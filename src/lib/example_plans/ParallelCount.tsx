@@ -1,4 +1,4 @@
-import { ExamplePlan } from './';
+import { ExamplePlan } from './'
 
 const Sample: ExamplePlan = {
   sql: `/** A simple count(*) query that uses a parallel sequential scan. */
@@ -83,5 +83,5 @@ FROM foo;
       'Execution Time': 850.961,
     },
   ],
-};
-export default Sample;
+}
+export default Sample

@@ -1,10 +1,10 @@
-import React from 'react';
-import { Page, PageLink } from '../Docs';
-import Heading from '../Heading';
-import Treetable from './Treetable';
-import Flamegraph from './Flamegraph';
-import 'katex/dist/katex.min.css';
-import { BlockMath, InlineMath } from 'react-katex';
+import React from 'react'
+import { Page, PageLink } from '../Docs'
+import Heading from '../Heading'
+import Treetable from './Treetable'
+import Flamegraph from './Flamegraph'
+import 'katex/dist/katex.min.css'
+import { BlockMath, InlineMath } from 'react-katex'
 
 const page: Page = {
   name: 'Quirk Correction',
@@ -141,6 +141,6 @@ GROUP BY region, product;
       </p>
     </React.Fragment>
   ),
-};
+}
 
-export default page;
+export default page

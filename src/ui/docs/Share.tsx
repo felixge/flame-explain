@@ -1,6 +1,6 @@
-import React from 'react';
-import { Page } from '../Docs';
-import { shareElements } from '../VisualizerShare';
+import React from 'react'
+import { Page } from '../Docs'
+import { shareElements } from '../VisualizerShare'
 
 const page: Page = {
   name: 'Share',
@@ -19,6 +19,6 @@ const page: Page = {
       </p>
     </React.Fragment>
   ),
-};
+}
 
-export default page;
+export default page

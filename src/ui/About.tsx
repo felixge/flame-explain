@@ -1,7 +1,7 @@
-import React from 'react';
-import Heading from './Heading';
-import { PageLink } from './Docs';
-import QuirkCorrection from './docs/QuirkCorrection';
+import React from 'react'
+import Heading from './Heading'
+import { PageLink } from './Docs'
+import QuirkCorrection from './docs/QuirkCorrection'
 
 export default function About() {
   return (
@@ -173,5 +173,5 @@ export default function About() {
         </p>
       </div>
     </section>
-  );
+  )
 }

@@ -1,8 +1,8 @@
-import React from 'react';
-import { HashLink as Link } from 'react-router-hash-link';
+import React from 'react'
+import { HashLink as Link } from 'react-router-hash-link'
 
 export default function Footer() {
-  const version = process.env.REACT_APP_VERSION || 'N/A';
+  const version = process.env.REACT_APP_VERSION || 'N/A'
   return (
     <footer className="footer">
       <div className="content has-text-centered">
@@ -25,5 +25,5 @@ export default function Footer() {
         </p>
       </div>
     </footer>
-  );
+  )
 }

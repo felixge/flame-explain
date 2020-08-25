@@ -1,11 +1,11 @@
-import React from 'react';
-import { Page, PageLink } from '../Docs';
-import Heading from '../Heading';
-import { explainPrefix } from '../VisualizerInput';
-import Flamegraph from './Flamegraph';
-import Treetable from './Treetable';
-import Inspector from './Inspector';
-import Share from './Share';
+import React from 'react'
+import { Page, PageLink } from '../Docs'
+import Heading from '../Heading'
+import { explainPrefix } from '../VisualizerInput'
+import Flamegraph from './Flamegraph'
+import Treetable from './Treetable'
+import Inspector from './Inspector'
+import Share from './Share'
 
 const page: Page = {
   name: 'Input',
@@ -88,6 +88,6 @@ const page: Page = {
       </p>
     </React.Fragment>
   ),
-};
+}
 
-export default page;
+export default page

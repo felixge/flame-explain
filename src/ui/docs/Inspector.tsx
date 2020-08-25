@@ -1,7 +1,7 @@
-import React from 'react';
-import { Page, PageLink } from '../Docs';
-import Treetable from './Treetable';
-import Flamegraph from './Flamegraph';
+import React from 'react'
+import { Page, PageLink } from '../Docs'
+import Treetable from './Treetable'
+import Flamegraph from './Flamegraph'
 
 const page: Page = {
   name: 'Inspector',
@@ -38,6 +38,6 @@ const page: Page = {
       </p>
     </React.Fragment>
   ),
-};
+}
 
-export default page;
+export default page

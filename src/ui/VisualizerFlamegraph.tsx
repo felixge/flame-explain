@@ -1,40 +1,40 @@
-import React from 'react';
-import { FlameNode } from '../lib/FlameExplain';
-import { formatDuration, formatPercent } from '../lib/Util';
-import { ColorScale, colorPair } from './Color';
+import React from 'react'
+import { FlameNode } from '../lib/FlameExplain'
+import { formatDuration, formatPercent } from '../lib/Util'
+import { ColorScale, colorPair } from './Color'
 
 type FlameGraphNode = {
-  node: FlameNode;
-  parentShare: number;
-  color: number;
-  tooltip: string;
-  children: FlameGraphNode[];
-};
-
-interface Props {
-  root: FlameNode;
-  clickNode: (fn: FlameNode) => void;
-  selected?: FlameNode;
+  node: FlameNode
+  parentShare: number
+  color: number
+  tooltip: string
+  children: FlameGraphNode[]
 }
 
-export const hideThreshold = 0.01;
+interface Props {
+  root: FlameNode
+  clickNode: (fn: FlameNode) => void
+  selected?: FlameNode
+}
+
+export const hideThreshold = 0.01
 
 export default function VisualizerFlamegraph(p: Props) {
-  const flameGraphNodes = toFlameGraphNodes(p.root);
+  const flameGraphNodes = toFlameGraphNodes(p.root)
   if (flameGraphNodes === null) {
-    return <React.Fragment />;
+    return <React.Fragment />
   }
 
   const toElements = (f: FlameGraphNode): JSX.Element => {
-    const children = f.children?.map(toElements);
+    const children = f.children?.map(toElements)
     if (f.node.Kind === 'Root') {
-      return <React.Fragment>{children}</React.Fragment>;
+      return <React.Fragment>{children}</React.Fragment>
     }
-    const isActive = f.node === p.selected;
-    let width = f.parentShare * 100 + '%';
-    let colors = {};
+    const isActive = f.node === p.selected
+    let width = f.parentShare * 100 + '%'
+    let colors = {}
     if (!isActive) {
-      colors = colorPair(f.color);
+      colors = colorPair(f.color)
     }
 
     return (
@@ -51,10 +51,10 @@ export default function VisualizerFlamegraph(p: Props) {
         </div>
         {children}
       </div>
-    );
-  };
+    )
+  }
 
-  const groups = toElements(flameGraphNodes);
+  const groups = toElements(flameGraphNodes)
 
   return (
     <React.Fragment>
@@ -67,7 +67,7 @@ export default function VisualizerFlamegraph(p: Props) {
       </div>
       <ColorScale />
     </React.Fragment>
-  );
+  )
 }
 
 function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
@@ -81,48 +81,48 @@ function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
         typeof fn['Self Time %'] === 'number'
       )
     ) {
-      return null;
+      return null
     }
 
-    const rootShare = fn['Total Time %'];
+    const rootShare = fn['Total Time %']
     if (rootShare < hideThreshold || fn['Total Time'] <= 0) {
-      return null;
+      return null
     }
 
-    let parentShare = 0;
+    let parentShare = 0
     if (fn.Parent && typeof fn.Parent['Total Time'] === 'number') {
-      parentShare = fn['Total Time'] / fn.Parent['Total Time'];
+      parentShare = fn['Total Time'] / fn.Parent['Total Time']
     }
 
-    const node = fn;
-    const totalTime = formatDuration(fn['Total Time']);
-    const selfTime = formatDuration(fn['Self Time']);
-    const totalDuration = formatDuration(root['Total Time']);
-    const totalPercent = formatPercent(rootShare);
-    const selfPercent = formatPercent(fn['Self Time %']);
+    const node = fn
+    const totalTime = formatDuration(fn['Total Time'])
+    const selfTime = formatDuration(fn['Self Time'])
+    const totalDuration = formatDuration(root['Total Time'])
+    const totalPercent = formatPercent(rootShare)
+    const selfPercent = formatPercent(fn['Self Time %'])
 
     let tooltipLines: string[] = [
       `Total Time: ${totalTime} of ${totalDuration} (${totalPercent} of total)`,
       `Self Time: ${selfTime} of ${totalDuration} (${selfPercent} of total)`,
-    ];
+    ]
     if (fn['Rows X']) {
-      tooltipLines.push('Rows X: ' + fn['Rows X']?.toFixed(2));
+      tooltipLines.push('Rows X: ' + fn['Rows X']?.toFixed(2))
     }
 
-    const tooltip = tooltipLines.join('\n');
+    const tooltip = tooltipLines.join('\n')
 
-    let children: FlameGraphNode['children'] = [];
+    let children: FlameGraphNode['children'] = []
     fn.Children?.map(mapper).forEach(child => {
       if (child !== null) {
-        children.push(child);
+        children.push(child)
       }
-    });
+    })
 
-    let color = 0.5;
+    let color = 0.5
     if (typeof fn.Colors?.['Rows X'] === 'number') {
-      color = fn.Colors['Rows X'];
+      color = fn.Colors['Rows X']
     } else {
-      color = 0.5;
+      color = 0.5
     }
 
     return {
@@ -131,9 +131,9 @@ function toFlameGraphNodes(root: FlameNode): FlameGraphNode | null {
       color,
       tooltip,
       children,
-    };
-  };
+    }
+  }
 
-  const flames = mapper(root);
-  return flames;
+  const flames = mapper(root)
+  return flames
 }

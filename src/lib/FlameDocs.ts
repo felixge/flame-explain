@@ -1,5 +1,5 @@
-import { FlameKey, FlameFragment } from './FlameExplain';
-import { postgresVersion, nodeTypes } from './RawExplain';
+import { FlameKey, FlameFragment } from './FlameExplain'
+import { postgresVersion, nodeTypes } from './RawExplain'
 
 const flameExplainKeys: { [K in keyof FlameFragment]: boolean } = {
   'CTE Node': true,
@@ -20,7 +20,7 @@ const flameExplainKeys: { [K in keyof FlameFragment]: boolean } = {
   'Warnings': true,
   'Total Blocks': true,
   'Self Blocks': true,
-};
+}
 
 export const blockKeys: FlameKey[] = [
   'Shared Hit Blocks',
@@ -35,11 +35,11 @@ export const blockKeys: FlameKey[] = [
   'Temp Written Blocks',
   'Total Blocks',
   'Self Blocks',
-];
+]
 
-export const categories = ['Node', 'Rows', 'Timing', 'I/O', 'Misc'] as const;
+export const categories = ['Node', 'Rows', 'Timing', 'I/O', 'Misc'] as const
 
-export type Category = typeof categories[number];
+export type Category = typeof categories[number]
 
 export const categoryKeys: { [K in Exclude<Category, 'Misc'>]: FlameKey[] } = {
   'Node': ['Node Type', 'Schema', 'Relation Name', 'Index Name', 'Alias', 'Join Type', 'Output'],
@@ -83,38 +83,38 @@ export const categoryKeys: { [K in Exclude<Category, 'Misc'>]: FlameKey[] } = {
     'Total Blocks',
     'Self Blocks',
   ],
-};
+}
 
 //const categories: {[K: string]: {[]}} = {
 //'Time': [],
 //};
 
 type FlameKeyMeta = {
-  Source: 'PostgreSQL' | 'FlameExplain';
-  Category: Category;
-};
+  Source: 'PostgreSQL' | 'FlameExplain'
+  Category: Category
+}
 
 export const flameKeyMeta = (() => {
-  const meta: { [K in FlameKey]?: FlameKeyMeta } = {};
+  const meta: { [K in FlameKey]?: FlameKeyMeta } = {}
   Object.keys(flameExplainKeys)
     .map(key => key as keyof typeof flameExplainKeys)
     .forEach(key => {
-      let category: Category = 'Misc';
-      let c: keyof typeof categoryKeys;
+      let category: Category = 'Misc'
+      let c: keyof typeof categoryKeys
       for (c in categoryKeys) {
         if (categoryKeys[c].includes(key)) {
-          category = c;
-          break;
+          category = c
+          break
         }
       }
 
       meta[key] = {
         Source: flameExplainKeys[key] ? 'FlameExplain' : 'PostgreSQL',
         Category: category,
-      };
-    });
-  return meta;
-})();
+      }
+    })
+  return meta
+})()
 
 //const hiddenKeys: { [K in FlameKey]?: boolean } = {
 //"CTE Node": true,
@@ -126,11 +126,11 @@ export const flameKeyMeta = (() => {
 //};
 
 export type FlameKeyDesc = {
-  FlameExplainKey?: boolean;
-  Source?: 'PostgreSQL' | 'FlameExplain';
-  Unit?: 'millisecond' | 'row' | 'percent';
-  Description?: string;
-};
+  FlameExplainKey?: boolean
+  Source?: 'PostgreSQL' | 'FlameExplain'
+  Unit?: 'millisecond' | 'row' | 'percent'
+  Description?: string
+}
 
 export const flameKeyDescs: { [K in FlameKey]?: FlameKeyDesc } = {
   'ID': {
@@ -229,4 +229,4 @@ The \`Self Time\` of this node divided by the largest \`Self Time\` of the root 
     Description: `
 The \`Total Time\` of this node divided by the \`Total Time\` of the root node.`,
   },
-};
+}

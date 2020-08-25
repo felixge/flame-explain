@@ -1,4 +1,4 @@
-import { ExamplePlan } from './';
+import { ExamplePlan } from './'
 
 const Sample: ExamplePlan = {
   sql: `
@@ -377,5 +377,5 @@ JOIN LATERAL (
       'Execution Time': 652.388,
     },
   ],
-};
-export default Sample;
+}
+export default Sample
