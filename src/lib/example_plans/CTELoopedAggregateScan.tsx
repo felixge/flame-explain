@@ -1,4 +1,4 @@
-import { ExamplePlan } from './'
+import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
   sql: `
@@ -156,5 +156,5 @@ FROM foo, generate_series(1, 5);
       'Execution Time': 175.487,
     },
   ],
-}
-export default Sample
+};
+export default Sample;

@@ -1,71 +1,71 @@
-import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCopy, faPaste } from '@fortawesome/free-solid-svg-icons'
-import { VisualizerState } from './Visualizer'
-import Clipboard from 'react-clipboard.js'
-import * as clipboard from 'clipboard-polyfill'
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import React from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCopy, faPaste} from '@fortawesome/free-solid-svg-icons';
+import {VisualizerState} from './Visualizer';
+import Clipboard from 'react-clipboard.js';
+import * as clipboard from 'clipboard-polyfill';
+import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {
   faFileCode,
   //faFileArchive,
   faShareAlt,
-} from '@fortawesome/free-solid-svg-icons'
+} from '@fortawesome/free-solid-svg-icons';
 
 export type SharingState = {
-  tab: 'json' | 'gist'
-}
+  tab: 'json' | 'gist';
+};
 
 type Props = {
-  visible: boolean
-  state: VisualizerState
-  onChange: (s: SharingState) => void
-  onClose: () => void
-}
+  visible: boolean;
+  state: VisualizerState;
+  onChange: (s: SharingState) => void;
+  onClose: () => void;
+};
 
 type ShareJSON = {
-  flameExplain: string
-} & Pick<VisualizerState, 'favorites' | 'input' | 'collapsed'>
+  flameExplain: string;
+} & Pick<VisualizerState, 'favorites' | 'input' | 'collapsed'>;
 
 export const shareElements = (
   <React.Fragment>
     <code>Query Plan</code>, <code>SQL</code> and <code>Favs</code> fields
   </React.Fragment>
-)
+);
 
 export default function VisualizerShare(p: Props) {
-  const { tab } = p.state.share
-  const [gistUrl, setGistUrl] = React.useState('')
-  const gistUrlInput = React.useRef<HTMLInputElement>(null)
+  const {tab} = p.state.share;
+  const [gistUrl, setGistUrl] = React.useState('');
+  const gistUrlInput = React.useRef<HTMLInputElement>(null);
 
-  let flameURL = ''
-  const m = gistUrl.match(/\/([^/]+)$/)
+  let flameURL = '';
+  const m = gistUrl.match(/\/([^/]+)$/);
   if (m) {
-    flameURL = window.location.origin + window.location.pathname + '?gist=' + m[1]
+    flameURL = window.location.origin + window.location.pathname + '?gist=' + m[1];
   }
 
   const setTab = (tab: SharingState['tab']) => {
-    p.onChange({ ...p.state.share, ...{ tab } })
-  }
+    p.onChange({...p.state.share, ...{tab}});
+  };
 
   function pasteGistURL() {
     if (gistUrlInput.current) {
       clipboard.readText().then(
         text => {
-          setGistUrl(text)
+          setGistUrl(text);
         },
         () => {}
-      )
-      gistUrlInput.current.focus()
+      );
+      gistUrlInput.current.focus();
     }
   }
 
   if (!p.visible) {
-    return null
+    return null;
   }
 
-  const shareText = stateToShareText(p.state)
+  const shareText = stateToShareText(p.state);
 
-  let tabElement: JSX.Element
+  let tabElement: JSX.Element;
   switch (tab) {
     case 'json':
       tabElement = (
@@ -86,8 +86,8 @@ export default function VisualizerShare(p: Props) {
           </div>
           <textarea rows={8} className="textarea is-info" value={shareText} readOnly></textarea>
         </React.Fragment>
-      )
-      break
+      );
+      break;
     case 'gist':
       tabElement = (
         <React.Fragment>
@@ -111,7 +111,7 @@ export default function VisualizerShare(p: Props) {
 
           <div className="columns">
             <div className="column is-one-third">
-              <button onClick={pasteGistURL} className="button is-info has-text-left" style={{ width: '100%' }}>
+              <button onClick={pasteGistURL} className="button is-info has-text-left" style={{width: '100%'}}>
                 <span className="icon is-small">
                   <FontAwesomeIcon icon={faPaste} />
                 </span>
@@ -134,7 +134,7 @@ export default function VisualizerShare(p: Props) {
               <Clipboard
                 data-clipboard-text={flameURL}
                 className="button is-info has-text-left"
-                style={{ width: '100%' }}
+                style={{width: '100%'}}
               >
                 <span className="icon is-small">
                   <FontAwesomeIcon icon={faCopy} />
@@ -147,14 +147,14 @@ export default function VisualizerShare(p: Props) {
             </div>
           </div>
         </React.Fragment>
-      )
-      break
+      );
+      break;
   }
 
   return (
     <div className="modal is-active">
       <div className="modal-background" onClick={p.onClose}></div>
-      <div className="modal-card" style={{ width: '90%', maxWidth: '870px' }}>
+      <div className="modal-card" style={{width: '90%', maxWidth: '870px'}}>
         <header className="modal-card-head">
           <span className="icon">
             <FontAwesomeIcon icon={faShareAlt} />
@@ -169,8 +169,8 @@ export default function VisualizerShare(p: Props) {
                 <a
                   href="#json"
                   onClick={e => {
-                    e.preventDefault()
-                    setTab('json')
+                    e.preventDefault();
+                    setTab('json');
                   }}
                 >
                   <span className="icon is-small">
@@ -183,8 +183,8 @@ export default function VisualizerShare(p: Props) {
                 <a
                   href="#gist"
                   onClick={e => {
-                    e.preventDefault()
-                    setTab('gist')
+                    e.preventDefault();
+                    setTab('gist');
                   }}
                 >
                   <span className="icon is-small">
@@ -210,12 +210,12 @@ export default function VisualizerShare(p: Props) {
         </section>
       </div>
     </div>
-  )
+  );
 }
 
 function stateToShareText(s: VisualizerState): string {
-  const flameExplain = 'Go to flame-explain.com and paste this JSON in the Input tab.'
-  const { input, favorites, collapsed } = s
-  const shareJSON: ShareJSON = { flameExplain, input, favorites, collapsed }
-  return JSON.stringify(shareJSON, null, '  ')
+  const flameExplain = 'Go to flame-explain.com and paste this JSON in the Input tab.';
+  const {input, favorites, collapsed} = s;
+  const shareJSON: ShareJSON = {flameExplain, input, favorites, collapsed};
+  return JSON.stringify(shareJSON, null, '  ');
 }

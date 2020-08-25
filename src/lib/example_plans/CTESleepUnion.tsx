@@ -1,4 +1,4 @@
-import { ExamplePlan } from './'
+import {ExamplePlan} from './';
 
 const Sample: ExamplePlan = {
   sql: `
@@ -146,5 +146,5 @@ SELECT * FROM foo WHERE EXISTS (SELECT * FROM foo) LIMIT 2
       'Execution Time': 302.832,
     },
   ],
-}
-export default Sample
+};
+export default Sample;

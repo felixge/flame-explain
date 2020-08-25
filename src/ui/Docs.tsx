@@ -1,15 +1,15 @@
-import React from 'react'
-import { NavLink, Switch, Route } from 'react-router-dom'
-import { HashLink as Link } from 'react-router-hash-link'
-import Heading from './Heading'
-import KeyboardShortcuts from './docs/KeyboardShortcuts'
-import GettingStarted from './docs/GettingStarted'
-import Input from './docs/Input'
-import Flamegraph from './docs/Flamegraph'
-import Treetable from './docs/Treetable'
-import Share from './docs/Share'
-import Inspector from './docs/Inspector'
-import QuirkCorrection from './docs/QuirkCorrection'
+import React from 'react';
+import {NavLink, Switch, Route} from 'react-router-dom';
+import {HashLink as Link} from 'react-router-hash-link';
+import Heading from './Heading';
+import KeyboardShortcuts from './docs/KeyboardShortcuts';
+import GettingStarted from './docs/GettingStarted';
+import Input from './docs/Input';
+import Flamegraph from './docs/Flamegraph';
+import Treetable from './docs/Treetable';
+import Share from './docs/Share';
+import Inspector from './docs/Inspector';
+import QuirkCorrection from './docs/QuirkCorrection';
 
 const sections: Section[] = [
   {
@@ -22,53 +22,53 @@ const sections: Section[] = [
     slug: 'visualize',
     pages: [Input, Flamegraph, Treetable, Inspector, Share, KeyboardShortcuts],
   },
-]
+];
 
 type Section = {
-  name: string
-  slug: string
-  pages: Page[]
-}
+  name: string;
+  slug: string;
+  pages: Page[];
+};
 
 export type Page = {
-  name?: string
-  slug?: string
-  page: () => JSX.Element
-  children?: Page[]
-}
+  name?: string;
+  slug?: string;
+  page: () => JSX.Element;
+  children?: Page[];
+};
 
 const pageURL = (p: Page) => {
-  const [section, page] = findPage(p)
+  const [section, page] = findPage(p);
   if (!section || !page) {
-    throw new Error(`could not find page: ${p?.name}`)
+    throw new Error(`could not find page: ${p?.name}`);
   }
-  return `/docs/${section.slug}/${page.slug}`
-}
+  return `/docs/${section.slug}/${page.slug}`;
+};
 
 type PageLinkProps = {
-  page: Page
-  text?: string
-  anchor?: string
-}
+  page: Page;
+  text?: string;
+  anchor?: string;
+};
 
 export function PageLink(p: PageLinkProps) {
-  const text = p.text || p.page.name
-  const anchor = p.anchor ? '#' + p.anchor : ''
-  return <Link to={pageURL(p.page) + anchor}>{text}</Link>
+  const text = p.text || p.page.name;
+  const anchor = p.anchor ? '#' + p.anchor : '';
+  return <Link to={pageURL(p.page) + anchor}>{text}</Link>;
 }
 
 const findPage = (page: Page): [Section, Page] | [null, null] => {
   for (let i = 0; i < sections.length; i++) {
-    const section = sections[i]
+    const section = sections[i];
     for (let j = 0; j < section.pages.length; j++) {
-      const found = section.pages[j]
+      const found = section.pages[j];
       if (found === page) {
-        return [section, found]
+        return [section, found];
       }
     }
   }
-  return [null, null]
-}
+  return [null, null];
+};
 
 export default function Docs() {
   return (
@@ -97,7 +97,7 @@ export default function Docs() {
             <Switch>
               {sections.map(section =>
                 section.pages.map(page => {
-                  const url = pageURL(page)
+                  const url = pageURL(page);
                   return (
                     <Route key={url} path={url} exact={true}>
                       <nav className="breadcrumb" aria-label="breadcrumbs">
@@ -120,7 +120,7 @@ export default function Docs() {
                         {page.page()}
                       </div>
                     </Route>
-                  )
+                  );
                 })
               )}
             </Switch>
@@ -128,5 +128,5 @@ export default function Docs() {
         </div>
       </div>
     </section>
-  )
+  );
 }

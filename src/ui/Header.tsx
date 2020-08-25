@@ -1,9 +1,9 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import 'github-fork-ribbon-css/gh-fork-ribbon.css'
+import React from 'react';
+import {NavLink} from 'react-router-dom';
+import 'github-fork-ribbon-css/gh-fork-ribbon.css';
 
 export default function Header() {
-  let [burgerMenu, setBurgerMenu] = React.useState(false)
+  let [burgerMenu, setBurgerMenu] = React.useState(false);
 
   return (
     <div>
@@ -39,14 +39,14 @@ export default function Header() {
               activeClassName="is-active"
               to="/visualize/input"
               className="navbar-item"
-              isActive={(_, { pathname }) => pathname.startsWith('/visualize')}
+              isActive={(_, {pathname}) => pathname.startsWith('/visualize')}
             >
               Visualize
             </NavLink>
             <NavLink
               activeClassName="is-active"
               to="/docs/general/getting-started"
-              isActive={(_, { pathname }) => pathname.startsWith('/docs')}
+              isActive={(_, {pathname}) => pathname.startsWith('/docs')}
               className="navbar-item"
             >
               Docs
@@ -70,5 +70,5 @@ export default function Header() {
         </a>
       </nav>
     </div>
-  )
+  );
 }

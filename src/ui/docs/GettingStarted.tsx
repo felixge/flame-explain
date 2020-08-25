@@ -1,10 +1,10 @@
-import React from 'react'
-import { Page, PageLink } from '../Docs'
-import Heading from '../Heading'
-import Flamegraph from './Flamegraph'
-import Treetable from './Treetable'
-import QuirkCorrection from './QuirkCorrection'
-import Input from './Input'
+import React from 'react';
+import {Page, PageLink} from '../Docs';
+import Heading from '../Heading';
+import Flamegraph from './Flamegraph';
+import Treetable from './Treetable';
+import QuirkCorrection from './QuirkCorrection';
+import Input from './Input';
 
 const page: Page = {
   name: 'Getting Started',
@@ -56,6 +56,6 @@ const page: Page = {
       <p></p>
     </React.Fragment>
   ),
-}
+};
 
-export default page
+export default page;
