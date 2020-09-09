@@ -11,24 +11,28 @@ import './index.sass';
 export default function App() {
   return (
     <BrowserRouter>
-      <Header />
-      <Switch>
-        <Route path="/" exact={true}>
-          <Redirect to="/visualize/input" />;
-        </Route>
-        <Route path="/visualize">
-          <ErrorBoundary>
-            <Visualizer />
-          </ErrorBoundary>
-        </Route>
-        <Route path="/about">
-          <About />
-        </Route>
-        <Route path="/docs">
-          <Docs />
-        </Route>
-      </Switch>
-      <Footer />
+      <div className="page-wrapper">
+        <div className="content-wrapper">
+          <Header />
+          <Switch>
+            <Route path="/" exact={true}>
+              <Redirect to="/visualize/input" />;
+            </Route>
+            <Route path="/visualize">
+              <ErrorBoundary>
+                <Visualizer />
+              </ErrorBoundary>
+            </Route>
+            <Route path="/about">
+              <About />
+            </Route>
+            <Route path="/docs">
+              <Docs />
+            </Route>
+          </Switch>
+        </div>
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 }
