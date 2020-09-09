@@ -177,6 +177,7 @@ export default function VisualizerInput(p: Props) {
               fontFamily: '"Fira code", "Fira Mono", monospace',
               fontSize: 12,
               minHeight: '320px',
+              border: 'solid rgb(159, 159, 159) 1px',
             }}
           />
         </div>
@@ -219,7 +220,8 @@ FROM generate_series(1, 10000);
             style={{
               fontFamily: '"Fira code", "Fira Mono", monospace',
               fontSize: 12,
-              minHeight: '276px',
+              minHeight: '320px',
+              border: 'solid rgb(159, 159, 159) 1px',
             }}
           />
         </div>
