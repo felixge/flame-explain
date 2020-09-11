@@ -18,3 +18,11 @@ export function setCancelable<T>(set: SetFn<T>): [SetFn<T>, CancelFn] {
 
 type SetFn<T> = (v: T) => void;
 type CancelFn = () => void;
+
+// normalizePlan deals with JSON plans produced by psql which have various
+// text decoration elements that need to be removed, see GH issue for more
+// details: https://github.com/felixge/flame-explain/issues/7
+export function normalizePlan(plan: string): string {
+  let cropped = plan.slice(plan.indexOf('['), plan.lastIndexOf(']') + 1);
+  return cropped.replace(/\+/g, '');
+}

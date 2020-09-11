@@ -14,6 +14,7 @@ import {useLocalStorage} from './LocalStorage';
 import {useGist, GistNotice} from './Gist';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
 import Highlight from './Highlight';
+import {normalizePlan} from './Util';
 
 export type VisualizerState = {
   input: InputState;
@@ -56,7 +57,7 @@ export default function Visualizer() {
     setState(state => ({
       ...state,
       ...{
-        input: newInput,
+        input: {plan: normalizePlan(newInput.plan), sql: newInput.sql},
         collapsed: {},
         selectedNode: undefined,
       },

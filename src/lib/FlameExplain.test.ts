@@ -8,6 +8,7 @@ import {
   rowsXHuman,
   rowsXFraction,
 } from './FlameExplain';
+
 import NestedLoop from './example_plans/NestedLoop';
 import RewriteTwoQueries from './example_plans/RewriteTwoQueries';
 import OneInitFilter from './example_plans/OneInitFilter';
