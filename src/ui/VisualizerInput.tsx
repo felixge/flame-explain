@@ -139,6 +139,7 @@ export default function VisualizerInput(p: Props) {
       <div className="columns">
         <div className="column">
           <Editor
+            className="texteditor"
             value={p.input.plan}
             onPaste={e => {
               const data = e.clipboardData.getData('text');
@@ -173,16 +174,11 @@ export default function VisualizerInput(p: Props) {
   }
 ]
 `.trim()}
-            style={{
-              fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: 12,
-              minHeight: '320px',
-              border: 'solid rgb(159, 159, 159) 1px',
-            }}
           />
         </div>
         <div className="column">
           <Editor
+            className="texteditor"
             value={p.input.sql}
             onPaste={e => {
               // The code below detects if the user accidentally pasted his
@@ -217,12 +213,6 @@ EXPLAIN (ANALYZE, FORMAT JSON)
 SELECT *
 FROM generate_series(1, 10000);
 `.trim()}
-            style={{
-              fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: 12,
-              minHeight: '320px',
-              border: 'solid rgb(159, 159, 159) 1px',
-            }}
           />
         </div>
       </div>
