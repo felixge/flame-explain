@@ -30,12 +30,8 @@ export default function VisualizerTable(p: Props) {
 
         if (col === 'Label') {
           const leafNode = (fn.Children?.length || 0) <= 0;
-          const icon = leafNode
-            ? faLeaf
-            : collapsed
-              ? faPlusSquare
-              : faMinusSquare;
-          colEl =
+          const icon = leafNode ? faLeaf : collapsed ? faPlusSquare : faMinusSquare;
+          colEl = (
             <React.Fragment>
               {'\u00a0'.repeat((depth - 1) * 4)}
               <span
@@ -43,34 +39,41 @@ export default function VisualizerTable(p: Props) {
                 data-tooltip="Shift click to expand/collapse nodes recursively."
                 // prevent text-selection
                 onMouseDown={e => e.preventDefault()}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
-                  p.toggleNode(fn, e.shiftKey || e.altKey)
+                  p.toggleNode(fn, e.shiftKey || e.altKey);
                 }}
               >
-                <FontAwesomeIcon
-                  icon={icon}
-                />
+                <FontAwesomeIcon icon={icon} />
               </span>
               &nbsp;{colVal}
-            </React.Fragment>;
+            </React.Fragment>
+          );
           style.whiteSpace = 'initial';
         }
 
-        const percent = fn.Colors?.[col as keyof FlameNode["Colors"]];
+        const percent = fn.Colors?.[col as keyof FlameNode['Colors']];
         if (typeof percent === 'number') {
           style = {...style, ...colorPair(percent)};
         }
         style.textAlign = typeof fn[col] === 'number' ? 'right' : 'left';
 
-        return <td key={col} style={style}>{colEl}</td>;
+        return (
+          <td key={col} style={style}>
+            {colEl}
+          </td>
+        );
       });
-      rows.push(<tr
-        onClick={() => p.clickNode(fn)}
-        style={{cursor: 'pointer'}}
-        key={fn.ID}
-        className={fn.ID === p.selectedNode ? 'is-active' : ''}
-      >{colVals}</tr>);
+      rows.push(
+        <tr
+          onClick={() => p.clickNode(fn)}
+          style={{cursor: 'pointer'}}
+          key={fn.ID}
+          className={fn.ID === p.selectedNode ? 'is-active' : ''}
+        >
+          {colVals}
+        </tr>
+      );
     }
     if (!collapsed) {
       fn.Children?.forEach(child => visit(child, depth + 1));
@@ -90,23 +93,23 @@ export default function VisualizerTable(p: Props) {
       p.onChangeFavorites(move(p.favorites, p.favorites.indexOf(col), d));
     };
 
-    return <th className="has-arrows" key={col} style={style}>
-      {col}
-      <Arrows arrows={['left', 'right']} onClick={onArrowClick} />
-    </th>
+    return (
+      <th className="has-arrows" key={col} style={style}>
+        {col}
+        <Arrows arrows={['left', 'right']} onClick={onArrowClick} />
+      </th>
+    );
   });
 
-  return (<div className="content">
-    <table className="table tree-table is-narrow">
-      <thead>
-        <tr>
-          {headers}
-        </tr>
-      </thead>
-      <tbody>
-        {rows}
-      </tbody>
-    </table>
-    <ColorScale />
-  </div>);
-};
+  return (
+    <div className="content">
+      <table className="table tree-table is-narrow">
+        <thead>
+          <tr>{headers}</tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+      <ColorScale />
+    </div>
+  );
+}

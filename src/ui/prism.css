@@ -3,80 +3,84 @@
  * Inspired by Github syntax coloring
  */
 
-code[class*="language-"],
-pre[class*="language-"] {
-	color: #393A34;
-	font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
-	direction: ltr;
-	text-align: left;
-	white-space: pre;
-	word-spacing: normal;
-	word-break: normal;
-	font-size: .9em;
-	line-height: 1.2em;
+code[class*='language-'],
+pre[class*='language-'] {
+  color: #393a34;
+  font-family: 'Consolas', 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  font-size: 0.9em;
+  line-height: 1.2em;
 
-	-moz-tab-size: 4;
-	-o-tab-size: 4;
-	tab-size: 4;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
 
-	-webkit-hyphens: none;
-	-moz-hyphens: none;
-	-ms-hyphens: none;
-	hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
 }
 
-pre > code[class*="language-"] {
-	font-size: 1em;
+pre > code[class*='language-'] {
+  font-size: 1em;
 }
 
-pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
-code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
-	background: #b3d4fc;
+pre[class*='language-']::-moz-selection,
+pre[class*='language-'] ::-moz-selection,
+code[class*='language-']::-moz-selection,
+code[class*='language-'] ::-moz-selection {
+  background: #b3d4fc;
 }
 
-pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
-code[class*="language-"]::selection, code[class*="language-"] ::selection {
-	background: #b3d4fc;
+pre[class*='language-']::selection,
+pre[class*='language-'] ::selection,
+code[class*='language-']::selection,
+code[class*='language-'] ::selection {
+  background: #b3d4fc;
 }
 
 /* Code blocks */
-pre[class*="language-"] {
-	padding: 1em;
-	margin: .5em 0;
-	overflow: auto;
-	border: 1px solid #dddddd;
-	background-color: white;
+pre[class*='language-'] {
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+  border: 1px solid #dddddd;
+  background-color: white;
 }
 
 /* Inline code */
-:not(pre) > code[class*="language-"] {
-	padding: .2em;
-	padding-top: 1px;
-	padding-bottom: 1px;
-	background: #f8f8f8;
-	border: 1px solid #dddddd;
+:not(pre) > code[class*='language-'] {
+  padding: 0.2em;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  background: #f8f8f8;
+  border: 1px solid #dddddd;
 }
 
 .prism-token.prism-comment,
 .prism-token.prism-prolog,
 .prism-token.prism-doctype,
 .prism-token.prism-cdata {
-	color: #999988;
-	font-style: italic;
+  color: #999988;
+  font-style: italic;
 }
 
 .prism-token.prism-namespace {
-	opacity: .7;
+  opacity: 0.7;
 }
 
 .prism-token.prism-string,
 .prism-token.prism-attr-value {
-	color: #e3116c;
+  color: #e3116c;
 }
 
 .prism-token.prism-punctuation,
 .prism-token.prism-operator {
-	color: #393A34; /* no highlight */
+  color: #393a34; /* no highlight */
 }
 
 .prism-token.prism-entity,
@@ -89,34 +93,34 @@ pre[class*="language-"] {
 .prism-token.prism-property,
 .prism-token.prism-regex,
 .prism-token.prism-inserted {
-	color: #36acaa;
+  color: #36acaa;
 }
 
 .prism-token.prism-atrule,
 .prism-token.prism-keyword,
 .prism-token.prism-attr-name,
 .prism-language-autohotkey .prism-token.prism-selector {
-	color: #00a4db;
+  color: #00a4db;
 }
 
 .prism-token.prism-function,
 .prism-token.prism-deleted,
 .prism-language-autohotkey .prism-token.prism-tag {
-	color: #9a050f;
+  color: #9a050f;
 }
 
 .prism-token.prism-tag,
 .prism-token.prism-selector,
 .prism-language-autohotkey .prism-token.prism-keyword {
-	color: #00009f;
+  color: #00009f;
 }
 
 .prism-token.prism-important,
 .prism-token.prism-function,
 .prism-token.prism-bold {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .prism-token.prism-italic {
-	font-style: italic;
+  font-style: italic;
 }

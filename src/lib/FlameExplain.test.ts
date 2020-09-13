@@ -20,223 +20,299 @@ import {textTable, Column} from './TextTable';
 
 describe('label', () => {
   test('Result', () => {
-    expect(label({"Node Type": 'Result'})).toEqual('Result');
+    expect(label({'Node Type': 'Result'})).toEqual('Result');
   });
 
   test('ModifyTable', () => {
-    expect(label({
-      "Node Type": 'ModifyTable',
-      "Operation": "Insert",
-    })).toEqual('Insert');
-    expect(label({
-      "Node Type": 'ModifyTable',
-      "Operation": "Update",
-    })).toEqual('Update');
-    expect(label({
-      "Node Type": 'ModifyTable',
-      "Operation": "Delete",
-    })).toEqual('Delete');
+    expect(
+      label({
+        'Node Type': 'ModifyTable',
+        'Operation': 'Insert',
+      })
+    ).toEqual('Insert');
+    expect(
+      label({
+        'Node Type': 'ModifyTable',
+        'Operation': 'Update',
+      })
+    ).toEqual('Update');
+    expect(
+      label({
+        'Node Type': 'ModifyTable',
+        'Operation': 'Delete',
+      })
+    ).toEqual('Delete');
 
-    expect(label({
-      "Node Type": 'ModifyTable',
-      "Operation": "Insert",
-      'Relation Name': 'foo',
-    })).toEqual('Insert on foo');
-    expect(label({
-      "Node Type": 'ModifyTable',
-      "Operation": "Insert",
-      'Relation Name': 'foo',
-      'Alias': 'bar',
-    })).toEqual('Insert on foo bar');
-    expect(label({
-      "Node Type": 'ModifyTable',
-      "Operation": "Insert",
-      'Relation Name': 'foo',
-      'Alias': 'bar',
-      'Schema': 'baz',
-    })).toEqual('Insert on baz.foo bar');
+    expect(
+      label({
+        'Node Type': 'ModifyTable',
+        'Operation': 'Insert',
+        'Relation Name': 'foo',
+      })
+    ).toEqual('Insert on foo');
+    expect(
+      label({
+        'Node Type': 'ModifyTable',
+        'Operation': 'Insert',
+        'Relation Name': 'foo',
+        'Alias': 'bar',
+      })
+    ).toEqual('Insert on foo bar');
+    expect(
+      label({
+        'Node Type': 'ModifyTable',
+        'Operation': 'Insert',
+        'Relation Name': 'foo',
+        'Alias': 'bar',
+        'Schema': 'baz',
+      })
+    ).toEqual('Insert on baz.foo bar');
   });
 
   test('Foreign Scan', () => {
-    expect(label({
-      "Node Type": 'Foreign Scan',
-      "Operation": "Select",
-    })).toEqual('Foreign Scan');
-    expect(label({
-      "Node Type": 'Foreign Scan',
-      "Operation": "Insert",
-    })).toEqual('Foreign Insert');
-    expect(label({
-      "Node Type": 'Foreign Scan',
-      "Operation": "Update",
-    })).toEqual('Foreign Update');
-    expect(label({
-      "Node Type": 'Foreign Scan',
-      "Operation": "Delete",
-    })).toEqual('Foreign Delete');
+    expect(
+      label({
+        'Node Type': 'Foreign Scan',
+        'Operation': 'Select',
+      })
+    ).toEqual('Foreign Scan');
+    expect(
+      label({
+        'Node Type': 'Foreign Scan',
+        'Operation': 'Insert',
+      })
+    ).toEqual('Foreign Insert');
+    expect(
+      label({
+        'Node Type': 'Foreign Scan',
+        'Operation': 'Update',
+      })
+    ).toEqual('Foreign Update');
+    expect(
+      label({
+        'Node Type': 'Foreign Scan',
+        'Operation': 'Delete',
+      })
+    ).toEqual('Foreign Delete');
   });
 
   test('Join Type', () => {
-    expect(label({
-      "Node Type": 'Hash Join',
-      "Join Type": "Left",
-    })).toEqual('Hash Left Join');
-    expect(label({
-      "Node Type": 'Merge Join',
-      "Join Type": "Left",
-    })).toEqual('Merge Left Join');
-    expect(label({
-      "Node Type": 'Hash Join',
-      "Join Type": "Inner",
-    })).toEqual('Hash Join');
-    expect(label({
-      "Node Type": 'Nested Loop',
-      "Join Type": "Inner",
-    })).toEqual('Nested Loop');
-    expect(label({
-      "Node Type": 'Nested Loop',
-      "Join Type": "Left",
-    })).toEqual('Nested Loop Left Join');
+    expect(
+      label({
+        'Node Type': 'Hash Join',
+        'Join Type': 'Left',
+      })
+    ).toEqual('Hash Left Join');
+    expect(
+      label({
+        'Node Type': 'Merge Join',
+        'Join Type': 'Left',
+      })
+    ).toEqual('Merge Left Join');
+    expect(
+      label({
+        'Node Type': 'Hash Join',
+        'Join Type': 'Inner',
+      })
+    ).toEqual('Hash Join');
+    expect(
+      label({
+        'Node Type': 'Nested Loop',
+        'Join Type': 'Inner',
+      })
+    ).toEqual('Nested Loop');
+    expect(
+      label({
+        'Node Type': 'Nested Loop',
+        'Join Type': 'Left',
+      })
+    ).toEqual('Nested Loop Left Join');
   });
 
   test('Aggregate', () => {
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "Plain",
-    })).toEqual('Aggregate');
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "Sorted",
-    })).toEqual('GroupAggregate');
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "Hashed",
-    })).toEqual('HashAggregate');
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "Mixed",
-    })).toEqual('MixedAggregate');
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "???",
-    })).toEqual('Aggregate ???');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': 'Plain',
+      })
+    ).toEqual('Aggregate');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': 'Sorted',
+      })
+    ).toEqual('GroupAggregate');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': 'Hashed',
+      })
+    ).toEqual('HashAggregate');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': 'Mixed',
+      })
+    ).toEqual('MixedAggregate');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': '???',
+      })
+    ).toEqual('Aggregate ???');
 
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "Sorted",
-      "Partial Mode": "Simple",
-    })).toEqual('GroupAggregate');
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "Sorted",
-      "Partial Mode": "Partial",
-    })).toEqual('Partial GroupAggregate');
-    expect(label({
-      "Node Type": 'Aggregate',
-      "Strategy": "Sorted",
-      "Partial Mode": "Finalize",
-    })).toEqual('Finalize GroupAggregate');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': 'Sorted',
+        'Partial Mode': 'Simple',
+      })
+    ).toEqual('GroupAggregate');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': 'Sorted',
+        'Partial Mode': 'Partial',
+      })
+    ).toEqual('Partial GroupAggregate');
+    expect(
+      label({
+        'Node Type': 'Aggregate',
+        'Strategy': 'Sorted',
+        'Partial Mode': 'Finalize',
+      })
+    ).toEqual('Finalize GroupAggregate');
   });
 
   test('SetOp', () => {
-    expect(label({
-      "Node Type": 'SetOp',
-      "Strategy": "Sorted",
-      "Command": "Intersect",
-    })).toEqual('SetOp Intersect');
-    expect(label({
-      "Node Type": 'SetOp',
-      "Strategy": "Hashed",
-      "Command": "Intersect All",
-    })).toEqual('HashedSetOp Intersect All');
-    expect(label({
-      "Node Type": 'SetOp',
-      "Strategy": "???",
-      "Command": "Except",
-    })).toEqual('SetOp ??? Except');
+    expect(
+      label({
+        'Node Type': 'SetOp',
+        'Strategy': 'Sorted',
+        'Command': 'Intersect',
+      })
+    ).toEqual('SetOp Intersect');
+    expect(
+      label({
+        'Node Type': 'SetOp',
+        'Strategy': 'Hashed',
+        'Command': 'Intersect All',
+      })
+    ).toEqual('HashedSetOp Intersect All');
+    expect(
+      label({
+        'Node Type': 'SetOp',
+        'Strategy': '???',
+        'Command': 'Except',
+      })
+    ).toEqual('SetOp ??? Except');
   });
 
   test('Parallel Aware', () => {
-    expect(label({
-      "Node Type": 'Seq Scan',
-      "Parallel Aware": true,
-    })).toEqual('Parallel Seq Scan');
+    expect(
+      label({
+        'Node Type': 'Seq Scan',
+        'Parallel Aware': true,
+      })
+    ).toEqual('Parallel Seq Scan');
   });
 
   test('PlanNodeTargetRel', () => {
-    expect(label({
-      "Node Type": 'Seq Scan',
-      "Relation Name": 'foo',
-    })).toEqual('Seq Scan on foo');
-    expect(label({
-      "Node Type": 'Seq Scan',
-      "Relation Name": 'foo',
-      "Schema": 'myschema',
-    })).toEqual('Seq Scan on myschema.foo');
-    expect(label({
-      "Node Type": 'Seq Scan',
-      "Relation Name": 'foo',
-      "Alias": 'bar',
-      "Schema": 'myschema',
-    })).toEqual('Seq Scan on myschema.foo bar');
+    expect(
+      label({
+        'Node Type': 'Seq Scan',
+        'Relation Name': 'foo',
+      })
+    ).toEqual('Seq Scan on foo');
+    expect(
+      label({
+        'Node Type': 'Seq Scan',
+        'Relation Name': 'foo',
+        'Schema': 'myschema',
+      })
+    ).toEqual('Seq Scan on myschema.foo');
+    expect(
+      label({
+        'Node Type': 'Seq Scan',
+        'Relation Name': 'foo',
+        'Alias': 'bar',
+        'Schema': 'myschema',
+      })
+    ).toEqual('Seq Scan on myschema.foo bar');
 
-    expect(label({
-      "Node Type": 'Function Scan',
-      "Function Name": 'foo',
-      "Schema": 'myschema',
-      "Alias": 'bar',
-    })).toEqual('Function Scan on myschema.foo bar');
+    expect(
+      label({
+        'Node Type': 'Function Scan',
+        'Function Name': 'foo',
+        'Schema': 'myschema',
+        'Alias': 'bar',
+      })
+    ).toEqual('Function Scan on myschema.foo bar');
 
-    expect(label({
-      "Node Type": 'Table Function Scan',
-      "Table Function Name": 'xmltable',
-      "Schema": 'myschema',
-      "Alias": 'bar',
-    })).toEqual('Table Function Scan on myschema.xmltable bar');
+    expect(
+      label({
+        'Node Type': 'Table Function Scan',
+        'Table Function Name': 'xmltable',
+        'Schema': 'myschema',
+        'Alias': 'bar',
+      })
+    ).toEqual('Table Function Scan on myschema.xmltable bar');
 
-    expect(label({
-      "Node Type": 'CTE Scan',
-      "CTE Name": 'foo',
-      "Schema": 'myschema',
-      "Alias": 'bar',
-    })).toEqual('CTE Scan on myschema.foo bar');
-    expect(label({
-      "Node Type": 'WorkTable Scan',
-      "CTE Name": 'foo',
-      "Schema": 'myschema',
-      "Alias": 'bar',
-    })).toEqual('WorkTable Scan on myschema.foo bar');
+    expect(
+      label({
+        'Node Type': 'CTE Scan',
+        'CTE Name': 'foo',
+        'Schema': 'myschema',
+        'Alias': 'bar',
+      })
+    ).toEqual('CTE Scan on myschema.foo bar');
+    expect(
+      label({
+        'Node Type': 'WorkTable Scan',
+        'CTE Name': 'foo',
+        'Schema': 'myschema',
+        'Alias': 'bar',
+      })
+    ).toEqual('WorkTable Scan on myschema.foo bar');
 
-    expect(label({
-      "Node Type": 'Named Tuplestore Scan',
-      "Tuplestore Name": 'foo',
-      "Schema": 'myschema',
-      "Alias": 'bar',
-    })).toEqual('Named Tuplestore Scan on myschema.foo bar');
+    expect(
+      label({
+        'Node Type': 'Named Tuplestore Scan',
+        'Tuplestore Name': 'foo',
+        'Schema': 'myschema',
+        'Alias': 'bar',
+      })
+    ).toEqual('Named Tuplestore Scan on myschema.foo bar');
 
-    expect(label({
-      "Node Type": 'Bitmap Index Scan',
-      "Index Name": 'my_idx',
-    })).toEqual('Bitmap Index Scan on my_idx');
+    expect(
+      label({
+        'Node Type': 'Bitmap Index Scan',
+        'Index Name': 'my_idx',
+      })
+    ).toEqual('Bitmap Index Scan on my_idx');
 
-    expect(label({
-      "Node Type": 'Index Scan',
-      "Index Name": 'my_idx',
-      "Scan Direction": 'Forward',
-      "Rows Removed by Index Recheck": 0,
-      "Relation Name": 'foo',
-      "Alias": 'bar',
-      "Schema": 'myschema',
-    })).toEqual('Index Scan using my_idx on myschema.foo bar');
-    expect(label({
-      "Node Type": 'Index Scan',
-      "Index Name": 'my_idx',
-      "Scan Direction": 'Backward',
-      "Rows Removed by Index Recheck": 0,
-      "Relation Name": 'foo',
-      "Alias": 'bar',
-      "Schema": 'myschema',
-    })).toEqual('Index Scan Backward using my_idx on myschema.foo bar');
+    expect(
+      label({
+        'Node Type': 'Index Scan',
+        'Index Name': 'my_idx',
+        'Scan Direction': 'Forward',
+        'Rows Removed by Index Recheck': 0,
+        'Relation Name': 'foo',
+        'Alias': 'bar',
+        'Schema': 'myschema',
+      })
+    ).toEqual('Index Scan using my_idx on myschema.foo bar');
+    expect(
+      label({
+        'Node Type': 'Index Scan',
+        'Index Name': 'my_idx',
+        'Scan Direction': 'Backward',
+        'Rows Removed by Index Recheck': 0,
+        'Relation Name': 'foo',
+        'Alias': 'bar',
+        'Schema': 'myschema',
+      })
+    ).toEqual('Index Scan Backward using my_idx on myschema.foo bar');
   });
 });
 
@@ -251,25 +327,38 @@ describe('fromRawQueries', () => {
 
       expect(root.Children?.length).toEqual(1);
       const child = (root.Children || [])[0];
-      expect(child.Kind).toEqual("Node");
+      expect(child.Kind).toEqual('Node');
       expect(child.Label).toEqual('Nested Loop');
-      expect(Object.keys(child).sort())
-        .toEqual(Object
-          .keys(queries[0].Plan || {})
+      expect(Object.keys(child).sort()).toEqual(
+        Object.keys(queries[0].Plan || {})
           .filter(key => key !== 'Plans')
-          .concat(['Children', 'Parent', 'Kind', 'Label', 'ID', 'Self Time', 'Self Time %', 'Total Time', 'Total Time %', 'Colors', 'Depth', 'Rows X'])
-          .sort());
+          .concat([
+            'Children',
+            'Parent',
+            'Kind',
+            'Label',
+            'ID',
+            'Self Time',
+            'Self Time %',
+            'Total Time',
+            'Total Time %',
+            'Colors',
+            'Depth',
+            'Rows X',
+          ])
+          .sort()
+      );
       expect(child).not.toBe(queries[0].Plan);
 
       expect(child.Children?.length).toEqual(2);
       const childInner = (child.Children || [])[0];
-      expect(childInner.Kind).toEqual("Node");
+      expect(childInner.Kind).toEqual('Node');
       expect(childInner.Label).toEqual('Function Scan on generate_series a');
       expect(childInner.Alias).toEqual('a');
       expect(childInner).not.toBe(queries[0].Plan?.Plans?.[0]);
 
       const childOuter = (child.Children || [])[1];
-      expect(childOuter.Kind).toEqual("Node");
+      expect(childOuter.Kind).toEqual('Node');
       expect(childOuter.Label).toEqual('Function Scan on generate_series b');
       expect(childOuter.Alias).toEqual('b');
       expect(childOuter).not.toBe(queries[0].Plan?.Plans?.[1]);
@@ -302,13 +391,13 @@ describe('fromRawQueries', () => {
 
       expect(c1.Children?.length).toEqual(2);
       const [cc1, cc2] = c1?.Children;
-      expect(cc1.Kind).toEqual("Planning");
-      expect(cc1.Label).toEqual("Planning");
-      expect(cc2.Kind).toEqual("Execution");
-      expect(cc2.Label).toEqual("Execution");
+      expect(cc1.Kind).toEqual('Planning');
+      expect(cc1.Label).toEqual('Planning');
+      expect(cc2.Kind).toEqual('Execution');
+      expect(cc2.Label).toEqual('Execution');
 
       const [loop] = cc2?.Children;
-      expect(loop.Label).toEqual("Nested Loop");
+      expect(loop.Label).toEqual('Nested Loop');
     });
 
     test('RewriteTwoQueries', () => {
@@ -336,10 +425,10 @@ describe('fromRawQueries', () => {
       const [filter] = root.Children;
       const [init] = filter.Children;
 
-      expect(filter["Filter"]).toEqual("(g > $0)");
-      expect(init["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
-      expect(filter["Filter Nodes"]).toEqual([init]);
-      expect(init["Filter Refs"]).toEqual([filter]);
+      expect(filter['Filter']).toEqual('(g > $0)');
+      expect(init['Subplan Name']).toEqual('InitPlan 1 (returns $0)');
+      expect(filter['Filter Nodes']).toEqual([init]);
+      expect(init['Filter Refs']).toEqual([filter]);
     });
 
     test('OneInitOneTimeFilter', () => {
@@ -348,10 +437,10 @@ describe('fromRawQueries', () => {
       const [filter] = root.Children;
       const [init] = filter.Children;
 
-      expect(filter["One-Time Filter"]).toEqual("$0");
-      expect(init["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
-      expect(filter["Filter Nodes"]).toEqual([init]);
-      expect(init["Filter Refs"]).toEqual([filter]);
+      expect(filter['One-Time Filter']).toEqual('$0');
+      expect(init['Subplan Name']).toEqual('InitPlan 1 (returns $0)');
+      expect(filter['Filter Nodes']).toEqual([init]);
+      expect(init['Filter Refs']).toEqual([filter]);
     });
 
     test('TwoOneTimeFilter', () => {
@@ -360,12 +449,12 @@ describe('fromRawQueries', () => {
       const [filter] = root.Children;
       const [init1, init2] = filter.Children;
 
-      expect(filter["One-Time Filter"]).toEqual("($0 AND $1)");
-      expect(init1["Subplan Name"]).toEqual("InitPlan 1 (returns $0)");
-      expect(init2["Subplan Name"]).toEqual("InitPlan 2 (returns $1)");
-      expect(init1["Filter Refs"]).toEqual([filter]);
-      expect(init2["Filter Refs"]).toEqual([filter]);
-      expect(filter["Filter Nodes"]).toEqual([init1, init2]);
+      expect(filter['One-Time Filter']).toEqual('($0 AND $1)');
+      expect(init1['Subplan Name']).toEqual('InitPlan 1 (returns $0)');
+      expect(init2['Subplan Name']).toEqual('InitPlan 2 (returns $1)');
+      expect(init1['Filter Refs']).toEqual([filter]);
+      expect(init2['Filter Refs']).toEqual([filter]);
+      expect(filter['Filter Nodes']).toEqual([init1, init2]);
     });
   });
 
@@ -376,7 +465,7 @@ describe('fromRawQueries', () => {
       const [cteScan] = root.Children;
       const [cte] = cteScan.Children;
 
-      expect(cteScan["CTE Node"]).toBe(cte);
+      expect(cteScan['CTE Node']).toBe(cte);
       expect(cte['CTE Scans']).toEqual([cteScan]);
     });
 
@@ -388,21 +477,21 @@ describe('fromRawQueries', () => {
       const [innerLoopA, cteB, outerLoop1, outerLoop2] = append.Children;
       const [innerA, innerAScan1, innerAScan2] = innerLoopA.Children;
 
-      expect(innerAScan1["CTE Node"]).toBe(innerA);
-      expect(innerAScan2["CTE Node"]).toBe(innerA);
-      expect(innerA["CTE Scans"]).toEqual([innerAScan1, innerAScan2]);
+      expect(innerAScan1['CTE Node']).toBe(innerA);
+      expect(innerAScan2['CTE Node']).toBe(innerA);
+      expect(innerA['CTE Scans']).toEqual([innerAScan1, innerAScan2]);
 
       let aScans: FlameNode[] = [];
       let bScans: FlameNode[] = [];
       [outerLoop1, outerLoop2].forEach(loop => {
         const [scanA, scanB] = loop.Children;
-        expect(scanA["CTE Node"]).toBe(innerLoopA);
-        expect(scanB["CTE Node"]).toBe(cteB);
+        expect(scanA['CTE Node']).toBe(innerLoopA);
+        expect(scanB['CTE Node']).toBe(cteB);
         aScans.push(scanA);
         bScans.push(scanB);
       });
-      expect(innerLoopA["CTE Scans"]).toEqual(aScans);
-      expect(cteB["CTE Scans"]).toEqual(bScans);
+      expect(innerLoopA['CTE Scans']).toEqual(aScans);
+      expect(cteB['CTE Scans']).toEqual(bScans);
     });
   });
 
@@ -419,7 +508,7 @@ describe('fromRawQueries', () => {
             }
             id++;
             fn.Children?.map(verify);
-          }
+          };
           verify(fromRawQueries(examples[key].queries));
         });
       }
@@ -436,7 +525,7 @@ describe('fromRawQueries', () => {
               expect(fn.Kind).not.toEqual('Root');
             }
             fn.Children?.map(c => verify(c, false));
-          }
+          };
           verify(fromRawQueries(examples[key].queries), true);
         });
       }
@@ -451,7 +540,7 @@ describe('fromRawQueries', () => {
               expect(fn.Label?.length).toBeGreaterThan(0);
             }
             fn.Children?.map(c => verify(c, false));
-          }
+          };
           verify(fromRawQueries(examples[key].queries), true);
         });
       }
@@ -465,7 +554,7 @@ describe('fromRawQueries', () => {
               expect(fn.Parent).toBe(parent);
             }
             fn.Children?.map(c => verify(c, fn));
-          }
+          };
           verify(fromRawQueries(examples[key].queries));
         });
       }
@@ -480,12 +569,12 @@ describe('fromRawQueries', () => {
               return;
             }
 
-            if (typeof fn["Total Time"] !== 'number') {
+            if (typeof fn['Total Time'] !== 'number') {
               console.log(fn);
             }
-            expect(typeof fn["Total Time"]).toEqual("number");
-            expect(typeof fn["Self Time"]).toEqual("number");
-          }
+            expect(typeof fn['Total Time']).toEqual('number');
+            expect(typeof fn['Self Time']).toEqual('number');
+          };
           verify(fromRawQueries(examples[key].queries));
         });
       }
@@ -499,14 +588,7 @@ describe('fromRawQueries', () => {
           VirtualQueryNodes: true,
           VirtualSubplanNodes: true,
         });
-        const columns: Column[] = [
-          'ID',
-          'Label',
-          'Actual Total Time',
-          'Actual Loops',
-          'Total Time',
-          'Self Time',
-        ];
+        const columns: Column[] = ['ID', 'Label', 'Actual Total Time', 'Actual Loops', 'Total Time', 'Self Time'];
         const table = textTable(root, {title: name, columns: columns});
         expect(table).toMatchSnapshot();
       });
@@ -515,14 +597,14 @@ describe('fromRawQueries', () => {
 });
 
 test('parseNumberedSubplanName', () => {
-  expect(parseNumberedSubplanName("InitPlan 1 (returns $0)")).toEqual({
+  expect(parseNumberedSubplanName('InitPlan 1 (returns $0)')).toEqual({
     ID: 1,
-    Type: "InitPlan",
+    Type: 'InitPlan',
     Returns: [0],
   });
-  expect(parseNumberedSubplanName("SubPlan 2 (returns $1,$2,$3)")).toEqual({
+  expect(parseNumberedSubplanName('SubPlan 2 (returns $1,$2,$3)')).toEqual({
     ID: 2,
-    Type: "SubPlan",
+    Type: 'SubPlan',
     Returns: [1, 2, 3],
   });
 });

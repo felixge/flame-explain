@@ -10,7 +10,9 @@ export function setCancelable<T>(set: SetFn<T>): [SetFn<T>, CancelFn] {
       set(v);
     }
   };
-  const cancelFn = () => {canceled = true;};
+  const cancelFn = () => {
+    canceled = true;
+  };
   return [setFn, cancelFn];
 }
 

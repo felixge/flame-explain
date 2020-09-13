@@ -15,4 +15,4 @@ export function useLocalStorage<T>(key: string, defaultVal: T): [T, React.Dispat
   }, [key, value]);
 
   return [value, setValue];
-};
+}

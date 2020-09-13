@@ -7,12 +7,23 @@ export default function Footer() {
     <footer className="footer">
       <div className="content has-text-centered">
         <p>
-          <strong>FlameExplain<span role="img" aria-label="trademark">™️</span></strong>
-          &nbsp;version <a target="_new" href="https://github.com/felixge/flame-explain/releases">{version}</a>
-          &nbsp;by <a target="_new" href="https://twitter.com/felixge">Felix Geisendörfer</a> at fsync GmbH.
-          Licensed under the <Link to={"/about#License"}>AGPLv3</Link>.
+          <strong>
+            FlameExplain
+            <span role="img" aria-label="trademark">
+              ™️
+            </span>
+          </strong>
+          &nbsp;version{' '}
+          <a target="_new" href="https://github.com/felixge/flame-explain/releases">
+            {version}
+          </a>
+          &nbsp;by{' '}
+          <a target="_new" href="https://twitter.com/felixge">
+            Felix Geisendörfer
+          </a>{' '}
+          at fsync GmbH. Licensed under the <Link to={'/about#License'}>AGPLv3</Link>.
         </p>
       </div>
     </footer>
   );
-};
+}

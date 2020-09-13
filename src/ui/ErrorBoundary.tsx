@@ -13,17 +13,17 @@ let debugError = (() => {
 
 export default class ErrorBoundary extends React.Component {
   state: {
-    error: Error | null,
-    errorInfo: React.ErrorInfo | null,
+    error: Error | null;
+    errorInfo: React.ErrorInfo | null;
   } = {
-      error: debugError || null,
-      errorInfo: null
-    };
+    error: debugError || null,
+    errorInfo: null,
+  };
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
   }
 
@@ -40,14 +40,22 @@ export default class ErrorBoundary extends React.Component {
             <div className="notification is-danger">
               <Heading level={1}>Error</Heading>
               <p>An internal error occured. You might be able to fix this issue by pressing the button below.</p>
-              <p><button onClick={() => this.onClearClick()} className="button is-warning">Reset Data & Settings</button></p>
-              <p>Please also <a href="https://github.com/felixge/flame-explain/issues/new" target="_new">report a bug</a>, including the details below:</p>
+              <p>
+                <button onClick={() => this.onClearClick()} className="button is-warning">
+                  Reset Data & Settings
+                </button>
+              </p>
+              <p>
+                Please also{' '}
+                <a href="https://github.com/felixge/flame-explain/issues/new" target="_new">
+                  report a bug
+                </a>
+                , including the details below:
+              </p>
               <pre>
-                {
-                  this.state.errorInfo
-                    ? this.state.error.toString() + this.state.errorInfo.componentStack
-                    : this.state.error.stack
-                }
+                {this.state.errorInfo
+                  ? this.state.error.toString() + this.state.errorInfo.componentStack
+                  : this.state.error.stack}
               </pre>
             </div>
           </div>

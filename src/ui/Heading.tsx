@@ -13,15 +13,17 @@ export default function Heading(p: Props) {
   let classes = ['title heading-anchor'];
   let anchor = p.anchor;
   if (!anchor) {
-    anchor = (p.children + '');
+    anchor = p.children + '';
     anchor = anchor.replace(/ - | /g, '-');
     anchor = anchor.replace(/&/g, 'and');
   }
-  classes.push('is-' + (p.level + 2))
-  return <Tag id={anchor} className={classes.join(' ')}>
-    <a href={"#" + anchor} aria-hidden={true}>
-      <FontAwesomeIcon icon={faAnchor} />
-    </a>
-    {p.children}
-  </Tag>;
-};
+  classes.push('is-' + (p.level + 2));
+  return (
+    <Tag id={anchor} className={classes.join(' ')}>
+      <a href={'#' + anchor} aria-hidden={true}>
+        <FontAwesomeIcon icon={faAnchor} />
+      </a>
+      {p.children}
+    </Tag>
+  );
+}

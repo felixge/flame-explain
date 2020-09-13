@@ -21,11 +21,10 @@ export const useGist = (id: string): null | 'loading' | Result => {
     });
 
     const p = loadFromCacheOrGithub(id);
-    p
-      .then(async (cacheEntry) => {
-        await new Promise(resolve => setTimeout(resolve, debugDelay));
-        return cacheEntry;
-      })
+    p.then(async cacheEntry => {
+      await new Promise(resolve => setTimeout(resolve, debugDelay));
+      return cacheEntry;
+    })
       .then(cacheEntry => {
         let result: Result = {
           id: id,
@@ -52,9 +51,7 @@ export const useGist = (id: string): null | 'loading' | Result => {
     return cancel;
   }, [id]);
 
-  return !id
-    ? null
-    : gist[id] || 'loading';
+  return !id ? null : gist[id] || 'loading';
 };
 
 const loadFromCacheOrGithub = async (id: string) => {
@@ -75,10 +72,10 @@ const loadFromCacheOrGithub = async (id: string) => {
   const entry: cacheEntry = {
     expires: Date.now() + cacheDuration,
     response: ghRes,
-  }
+  };
   localStorage.setItem(cacheKey, JSON.stringify(entry));
   return entry;
-}
+};
 
 type Result = {
   id: string;
@@ -87,16 +84,15 @@ type Result = {
   error?: Error;
 };
 
-
 type githubResponse = {
   meta?: {
     status?: number;
-  },
+  };
   data?: {
     files?: Array<{
       content?: string;
-    }>
-  }
+    }>;
+  };
 };
 
 type cacheEntry = {
@@ -105,7 +101,7 @@ type cacheEntry = {
 };
 
 type Props = {
-  gist: ReturnType<typeof useGist>,
+  gist: ReturnType<typeof useGist>;
 };
 
 export function GistNotice(p: Props) {
@@ -117,32 +113,32 @@ export function GistNotice(p: Props) {
   }
 
   if (gist === 'loading') {
-    return (
-      <progress key="gist-loading" className="progress is-warning" max="100">
-      </progress>
-    );
+    return <progress key="gist-loading" className="progress is-warning" max="100"></progress>;
   }
 
   const gistLink = <a href={'https://gist.github.com/' + gist.id}>{gist.id}</a>;
   let cacheNotice = '';
   if (gist.expires) {
     const remain = ((gist.expires - Date.now()) / 1000).toFixed(0);
-    cacheNotice = ` To avoid API rate limiting, this response will remain ` +
-      `cached for ${remain} second(s).`;
+    cacheNotice = `To avoid API rate limiting, this response will remain cached for ${remain} second(s).`;
   }
 
   if (gist.error) {
-    return <div key="gist-error" className="notification is-danger">
-      Failed to load Gist {gistLink} from GitHub: {gist.error.message + '.'}
-      {cacheNotice}
-    </div>;
+    return (
+      <div key="gist-error" className="notification is-danger">
+        Failed to load Gist {gistLink} from GitHub: {gist.error.message + '.'}
+        {cacheNotice}
+      </div>
+    );
   }
 
   if (!hideNotice) {
-    return <div key="gist-info" className="notification is-success">
-      Showing Gist {gistLink} from GitHub.{cacheNotice}
-      <button onClick={() => setHideNotice(true)} className="delete"></button>
-    </div>;
+    return (
+      <div key="gist-info" className="notification is-success">
+        Showing Gist {gistLink} from GitHub.{cacheNotice}
+        <button onClick={() => setHideNotice(true)} className="delete"></button>
+      </div>
+    );
   }
   return null;
 }

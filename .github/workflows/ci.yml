@@ -1,0 +1,26 @@
+name: CI
+on: [push]
+env:
+  CI: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node-version: [12.x]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: 'yarn install'
+      - run: 'yarn format'
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Format code using using yarn format
+      - run: 'yarn test'
+      - run: 'yarn build'

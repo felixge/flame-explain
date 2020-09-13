@@ -2,26 +2,25 @@ import {FlameKey, FlameFragment} from './FlameExplain';
 import {postgresVersion, nodeTypes} from './RawExplain';
 
 const flameExplainKeys: {[K in keyof FlameFragment]: boolean} = {
-  "CTE Node": true,
-  "CTE Scans": true,
-  "Children": true,
-  "Depth": true,
-  "Filter Nodes": true,
-  "Filter Refs": true,
-  "ID": true,
-  "Kind": true,
-  "Label": true,
-  "Parent": true,
-  "Rows X": true,
-  "Self Time": true,
-  "Self Time %": true,
-  "Total Time %": true,
-  "Total Time": true,
-  "Warnings": true,
-  "Total Blocks": true,
-  "Self Blocks": true,
+  'CTE Node': true,
+  'CTE Scans': true,
+  'Children': true,
+  'Depth': true,
+  'Filter Nodes': true,
+  'Filter Refs': true,
+  'ID': true,
+  'Kind': true,
+  'Label': true,
+  'Parent': true,
+  'Rows X': true,
+  'Self Time': true,
+  'Self Time %': true,
+  'Total Time %': true,
+  'Total Time': true,
+  'Warnings': true,
+  'Total Blocks': true,
+  'Self Blocks': true,
 };
-
 
 export const blockKeys: FlameKey[] = [
   'Shared Hit Blocks',
@@ -38,66 +37,51 @@ export const blockKeys: FlameKey[] = [
   'Self Blocks',
 ];
 
-export const categories = [
-  "Node",
-  "Rows",
-  "Timing",
-  "I/O",
-  "Misc"
-] as const;
+export const categories = ['Node', 'Rows', 'Timing', 'I/O', 'Misc'] as const;
 
-export type Category = (typeof categories)[number];
+export type Category = typeof categories[number];
 
 export const categoryKeys: {[K in Exclude<Category, 'Misc'>]: FlameKey[]} = {
-  "Node": [
-    "Node Type",
-    "Schema",
-    "Relation Name",
-    "Index Name",
-    "Alias",
-    "Join Type",
-    "Output",
-
+  'Node': ['Node Type', 'Schema', 'Relation Name', 'Index Name', 'Alias', 'Join Type', 'Output'],
+  'Rows': [
+    'Actual Loops',
+    'Plan Rows',
+    'Actual Rows',
+    'Join Filter',
+    'Filter',
+    'Index Cond',
+    'Hash Cond',
+    'One-Time Filter',
+    'Rows X',
+    'Rows Removed by Filter',
+    'Rows Removed by Join Filter',
+    'Rows Removed by Index Recheck',
   ],
-  "Rows": [
-    "Actual Loops",
-    "Plan Rows",
-    "Actual Rows",
-    "Join Filter",
-    "Filter",
-    "Index Cond",
-    "Hash Cond",
-    "One-Time Filter",
-    "Rows X",
-    "Rows Removed by Filter",
-    "Rows Removed by Join Filter",
-    "Rows Removed by Index Recheck",
+  'Timing': [
+    'Planning Time',
+    'Execution Time',
+    'Actual Total Time',
+    'Actual Startup Time',
+    'Self Time',
+    'Self Time %',
+    'Total Time',
+    'Total Time %',
+    'I/O Read Time',
+    'I/O Write Time',
   ],
-  "Timing": [
-    "Planning Time",
-    "Execution Time",
-    "Actual Total Time",
-    "Actual Startup Time",
-    "Self Time",
-    "Self Time %",
-    "Total Time",
-    "Total Time %",
-    "I/O Read Time",
-    "I/O Write Time",
-  ],
-  "I/O": [
-    "Shared Hit Blocks",
-    "Shared Read Blocks",
-    "Shared Dirtied Blocks",
-    "Shared Written Blocks",
-    "Local Hit Blocks",
-    "Local Read Blocks",
-    "Local Dirtied Blocks",
-    "Local Written Blocks",
-    "Temp Read Blocks",
-    "Temp Written Blocks",
-    "Total Blocks",
-    "Self Blocks",
+  'I/O': [
+    'Shared Hit Blocks',
+    'Shared Read Blocks',
+    'Shared Dirtied Blocks',
+    'Shared Written Blocks',
+    'Local Hit Blocks',
+    'Local Read Blocks',
+    'Local Dirtied Blocks',
+    'Local Written Blocks',
+    'Temp Read Blocks',
+    'Temp Written Blocks',
+    'Total Blocks',
+    'Self Blocks',
   ],
 };
 
@@ -106,14 +90,13 @@ export const categoryKeys: {[K in Exclude<Category, 'Misc'>]: FlameKey[]} = {
 //};
 
 type FlameKeyMeta = {
-  Source: 'PostgreSQL' | 'FlameExplain',
-  Category: Category,
+  Source: 'PostgreSQL' | 'FlameExplain';
+  Category: Category;
 };
 
 export const flameKeyMeta = (() => {
   const meta: {[K in FlameKey]?: FlameKeyMeta} = {};
-  Object
-    .keys(flameExplainKeys)
+  Object.keys(flameExplainKeys)
     .map(key => key as keyof typeof flameExplainKeys)
     .forEach(key => {
       let category: Category = 'Misc';
@@ -131,7 +114,7 @@ export const flameKeyMeta = (() => {
       };
     });
   return meta;
-})()
+})();
 
 //const hiddenKeys: { [K in FlameKey]?: boolean } = {
 //"CTE Node": true,
@@ -143,7 +126,7 @@ export const flameKeyMeta = (() => {
 //};
 
 export type FlameKeyDesc = {
-  FlameExplainKey?: boolean,
+  FlameExplainKey?: boolean;
   Source?: 'PostgreSQL' | 'FlameExplain';
   Unit?: 'millisecond' | 'row' | 'percent';
   Description?: string;
@@ -246,4 +229,4 @@ The \`Self Time\` of this node divided by the largest \`Self Time\` of the root 
     Description: `
 The \`Total Time\` of this node divided by the \`Total Time\` of the root node.`,
   },
-}
+};

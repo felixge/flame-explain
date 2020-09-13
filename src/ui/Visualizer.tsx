@@ -1,23 +1,19 @@
 import React from 'react';
 import {default as VisualizerInput, InputState} from './VisualizerInput';
-import {Link, useHistory} from "react-router-dom";
+import {Link, useHistory} from 'react-router-dom';
 import VisualizerTable from './VisualizerTable';
 import VisualizerFlamegraph from './VisualizerFlamegraph';
 import {columnText} from '../lib/TextTable';
 import {default as Inspector, InspectorCategory} from './Inspector';
-import {
-  default as VisualizerShare,
-  SharingState,
-} from './VisualizerShare';
+import {default as VisualizerShare, SharingState} from './VisualizerShare';
 import {FlameNode, FlameKey, fromRawQueries, nodeByID} from '../lib/FlameExplain';
-import {useRouteMatch, Redirect} from "react-router-dom";
+import {useRouteMatch, Redirect} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faShareAlt as iconShare} from '@fortawesome/free-solid-svg-icons';
 import {useLocalStorage} from './LocalStorage';
 import {useGist, GistNotice} from './Gist';
 import {useKeyboardShortcuts} from './KeyboardShortcuts';
 import Highlight from './Highlight';
-
 
 export type VisualizerState = {
   input: InputState;
@@ -58,11 +54,12 @@ export default function Visualizer() {
 
   const setInput = (newInput: typeof defaultState.input) => {
     setState(state => ({
-      ...state, ...{
+      ...state,
+      ...{
         input: newInput,
         collapsed: {},
         selectedNode: undefined,
-      }
+      },
     }));
   };
 
@@ -86,10 +83,11 @@ export default function Visualizer() {
 
   const onClickNode = (fn: FlameNode) => {
     setState(state => ({
-      ...state, ...{
+      ...state,
+      ...{
         selectedNode: fn.ID,
         showInspector: true,
-      }
+      },
     }));
   };
 
@@ -127,9 +125,7 @@ export default function Visualizer() {
   const gist = useGist(q.get('gist') || '');
   let [prevGist, setPrevGist] = React.useState<typeof gist>(null);
   if (gist && prevGist !== gist) {
-    const plan = (gist === 'loading')
-      ? '[]'
-      : gist.planText || '[]';
+    const plan = gist === 'loading' ? '[]' : gist.planText || '[]';
 
     let newState: Partial<VisualizerState> = {
       input: {plan: plan, sql: ''},
@@ -207,51 +203,60 @@ export default function Visualizer() {
   let tab: JSX.Element = <div />;
   switch (match.params.tab) {
     case 'input':
-      tab = <VisualizerInput
-        errorText={errorText}
-        input={state.input}
-        onReset={onReset}
-        onChange={(input) => {
-          history.push('/visualize/input');
-          setInput(input);
-        }}
-      />;
+      tab = (
+        <VisualizerInput
+          errorText={errorText}
+          input={state.input}
+          onReset={onReset}
+          onChange={input => {
+            history.push('/visualize/input');
+            setInput(input);
+          }}
+        />
+      );
       break;
     case 'treetable':
       if (!rootNode || !state.input.plan) {
         return <Redirect to="/" />;
       }
-      tab = <div>
-        <VisualizerTable
-          favorites={state.favorites}
-          onChangeFavorites={(favorites) => setState(state => ({
-            ...state, ...{favorites: favorites}
-          }))}
-          root={rootNode}
-          collapsed={state.collapsed}
-          toggleNode={onToggleNode}
-          clickNode={onClickNode}
-          selectedNode={state.selectedNode}
-        />
-        <div className="content">
-          <Highlight language="sql" source={state.input.sql} />
+      tab = (
+        <div>
+          <VisualizerTable
+            favorites={state.favorites}
+            onChangeFavorites={favorites =>
+              setState(state => ({
+                ...state,
+                ...{favorites: favorites},
+              }))
+            }
+            root={rootNode}
+            collapsed={state.collapsed}
+            toggleNode={onToggleNode}
+            clickNode={onClickNode}
+            selectedNode={state.selectedNode}
+          />
+          <div className="content">
+            <Highlight language="sql" source={state.input.sql} />
+          </div>
         </div>
-      </div>
+      );
       break;
     case 'flamegraph':
       if (!rootNode || !state.input.plan) {
         return <Redirect to="/" />;
       }
-      tab = <div>
-        <VisualizerFlamegraph
-          selected={nodeByID(rootNode, state.selectedNode)}
-          root={rootNode}
-          clickNode={onClickNode}
-        />
-        <div className="content">
-          <Highlight language="sql" source={state.input.sql} />
+      tab = (
+        <div>
+          <VisualizerFlamegraph
+            selected={nodeByID(rootNode, state.selectedNode)}
+            root={rootNode}
+            clickNode={onClickNode}
+          />
+          <div className="content">
+            <Highlight language="sql" source={state.input.sql} />
+          </div>
         </div>
-      </div>
+      );
       break;
     default:
       return <Redirect to="/" />;
@@ -261,80 +266,99 @@ export default function Visualizer() {
     setState(state => ({...state, ...{share}}));
   };
 
-  const tabDisabled = (rootNode && state.input.plan) ? '' : 'is-disabled';
+  const tabDisabled = rootNode && state.input.plan ? '' : 'is-disabled';
 
-  return <section className="section visualizer">
-    <VisualizerShare
-      onClose={() => toggleModal('Share')}
-      onChange={onShareChange}
-      state={state}
-      visible={state.modal === 'Share'}
-    />
-    <GistNotice gist={gist} />
-    <div className="tabs is-toggle">
-      <ul>
-        <li className={match.params.tab === 'input' ? 'is-active' : ''}>
-          <Link to={"/visualize/input" + history.location.search}><u>I</u>nput</Link>
-        </li>
-        <li className={`${tabDisabled} ${match.params.tab === 'flamegraph' ? 'is-active' : ''}`}>
-          <Link to={"/visualize/flamegraph" + history.location.search}><u>F</u>lame Graph</Link>
-        </li>
-        <li className={`${tabDisabled} ${match.params.tab === 'treetable' ? 'is-active' : ''}`}>
-          <Link to={"/visualize/treetable" + history.location.search}><u>T</u>ree Table</Link>
-        </li>
-      </ul>
-      <Stats root={rootNode} />
-      <div className="buttons has-addons">
-        <button onClick={() => toggleModal('Share')} className="button">
-          <span className="icon is-small">
-            <FontAwesomeIcon icon={iconShare} />
-          </span>
-          <span><u>S</u>hare</span>
-        </button>
+  return (
+    <section className="section visualizer">
+      <VisualizerShare
+        onClose={() => toggleModal('Share')}
+        onChange={onShareChange}
+        state={state}
+        visible={state.modal === 'Share'}
+      />
+      <GistNotice gist={gist} />
+      <div className="tabs is-toggle">
+        <ul>
+          <li className={match.params.tab === 'input' ? 'is-active' : ''}>
+            <Link to={'/visualize/input' + history.location.search}>
+              <u>I</u>nput
+            </Link>
+          </li>
+          <li className={`${tabDisabled} ${match.params.tab === 'flamegraph' ? 'is-active' : ''}`}>
+            <Link to={'/visualize/flamegraph' + history.location.search}>
+              <u>F</u>lame Graph
+            </Link>
+          </li>
+          <li className={`${tabDisabled} ${match.params.tab === 'treetable' ? 'is-active' : ''}`}>
+            <Link to={'/visualize/treetable' + history.location.search}>
+              <u>T</u>ree Table
+            </Link>
+          </li>
+        </ul>
+        <Stats root={rootNode} />
+        <div className="buttons has-addons">
+          <button onClick={() => toggleModal('Share')} className="button">
+            <span className="icon is-small">
+              <FontAwesomeIcon icon={iconShare} />
+            </span>
+            <span>
+              <u>S</u>hare
+            </span>
+          </button>
+        </div>
       </div>
-    </div>
-    <div className="columns">
-      <div className="column is-narrow">
-        <Inspector
-          favorites={state.favorites}
-          category={state.inspectorCategory}
-          onClickNode={onClickNode}
-          onClickCategory={(category) => setState(state => ({
-            ...state, ...{inspectorCategory: category}
-          }))}
-          onChangeFavorites={(favorites) => setState(state => ({
-            ...state, ...{favorites: favorites}
-          }))}
-          onClose={() => setState(state => (
-            {
-              ...state, ...{
-                showInspector: false,
-                selectedNode: undefined,
-              }
+      <div className="columns">
+        <div className="column is-narrow">
+          <Inspector
+            favorites={state.favorites}
+            category={state.inspectorCategory}
+            onClickNode={onClickNode}
+            onClickCategory={category =>
+              setState(state => ({
+                ...state,
+                ...{inspectorCategory: category},
+              }))
             }
-          ))}
-          visible={state.showInspector && match.params.tab !== 'input'}
-          node={nodeByID(rootNode, state.selectedNode)}
-        />
+            onChangeFavorites={favorites =>
+              setState(state => ({
+                ...state,
+                ...{favorites: favorites},
+              }))
+            }
+            onClose={() =>
+              setState(state => ({
+                ...state,
+                ...{
+                  showInspector: false,
+                  selectedNode: undefined,
+                },
+              }))
+            }
+            visible={state.showInspector && match.params.tab !== 'input'}
+            node={nodeByID(rootNode, state.selectedNode)}
+          />
+        </div>
+        <div className="column">{tab}</div>
       </div>
-      <div className="column">
-        {tab}
-      </div>
-    </div>
-  </section>;
-};
+    </section>
+  );
+}
 
 function Stats(p: {root: FlameNode | undefined}) {
   const keys: FlameKey[] = ['Total Time', 'Total Blocks'];
 
-  let spans = keys.map(key => {
-    if (typeof p.root?.[key] !== 'number') {
-      return null;
-    }
-    return <span key={key}><strong>{key}:</strong> {columnText(p.root, key)}</span>
-  }).filter(span => !!span);
+  let spans = keys
+    .map(key => {
+      if (typeof p.root?.[key] !== 'number') {
+        return null;
+      }
+      return (
+        <span key={key}>
+          <strong>{key}:</strong> {columnText(p.root, key)}
+        </span>
+      );
+    })
+    .filter(span => !!span);
 
-  return <div className="stats">
-    {spans}
-  </div>;
+  return <div className="stats">{spans}</div>;
 }

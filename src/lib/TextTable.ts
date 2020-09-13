@@ -8,16 +8,21 @@ export type Column = keyof FlameNode;
 
 export function textTable(
   fn: FlameNode,
-  {columns = [], title = ''}: {
-    columns: Column[],
-    title?: string
+  {
+    columns = [],
+    title = '',
+  }: {
+    columns: Column[];
+    title?: string;
   }
 ): string {
   let table = new AsciiTable(title);
   let warnTable = new AsciiTable();
-  table.setHeading(...columns.map(c => {
-    return c;
-  }));
+  table.setHeading(
+    ...columns.map(c => {
+      return c;
+    })
+  );
   warnTable.setHeading('#', 'Warning');
 
   columns.forEach((col, i) => {
@@ -38,7 +43,7 @@ export function textTable(
     }
 
     fn.Children?.forEach(child => visit(child, depth + 1));
-  }
+  };
   visit(fn);
 
   let out = table.toString();

@@ -1,5 +1,5 @@
 import React from 'react';
-import {useHistory} from "react-router-dom";
+import {useHistory} from 'react-router-dom';
 import {HashLink as Link} from 'react-router-hash-link';
 import examplePlans from '../lib/example_plans';
 import Editor from 'react-simple-code-editor';
@@ -15,7 +15,7 @@ import Clipboard from 'react-clipboard.js';
 
 // Can't import the theme from prismjs module directly because we need to hack
 // it with prefixes, see below.
-import './prism.css'
+import './prism.css';
 
 // https://github.com/jgthms/bulma/issues/1708#issuecomment-499677204
 Prism.plugins.customClass.prefix('prism-');
@@ -33,8 +33,8 @@ export type InputState = {
 };
 
 interface Props {
-  errorText: string | null,
-  input: InputState,
+  errorText: string | null;
+  input: InputState;
   onChange: (output: InputState) => void;
   onReset: () => void;
 }
@@ -56,7 +56,6 @@ export default function VisualizerInput(p: Props) {
     }
   }
 
-
   useKeyboardShortcuts((key: string) => {
     switch (key) {
       case 'c':
@@ -68,41 +67,51 @@ export default function VisualizerInput(p: Props) {
     }
   });
 
-
   return (
     <div>
       {errorDiv}
       <div className="field content">
         <p>
-          Prefix your PostgreSQL query with <Clipboard component="a" data-clipboard-text={explainPrefix}>
-            <strong className="is-family-monospace has-text-danger"><code>{explainPrefix} <FontAwesomeIcon icon={faCopy} /></code></strong>
+          Prefix your PostgreSQL query with{' '}
+          <Clipboard component="a" data-clipboard-text={explainPrefix}>
+            <strong className="is-family-monospace has-text-danger">
+              <code>
+                {explainPrefix} <FontAwesomeIcon icon={faCopy} />
+              </code>
+            </strong>
           </Clipboard>
           , execute it, paste the resulting JSON below.
         </p>
         <p>
-          <FontAwesomeIcon icon={faLock} /> FlameExplain runs in your browser and never sends your data to another computer, see <Link to="/about#Security-and-Privacy">Security & Privacy</Link>.
+          <FontAwesomeIcon icon={faLock} /> FlameExplain runs in your browser and never sends your data to another
+          computer, see <Link to="/about#Security-and-Privacy">Security & Privacy</Link>.
         </p>
       </div>
       <div className="field is-grouped">
         <div className="control">
           <div className="select">
-            <select value={selectedPlan} onChange={e => {
-              let input: InputState = {plan: '', sql: ''};
-              const plan = examplePlans[e.target.value];
-              if (plan) {
-                input = {
-                  plan: JSON.stringify(plan.queries, null, 2),
-                  sql: plan.sql || '',
-                };
-              }
-              p.onChange({...p.input, ...input});
-            }}>
+            <select
+              value={selectedPlan}
+              onChange={e => {
+                let input: InputState = {plan: '', sql: ''};
+                const plan = examplePlans[e.target.value];
+                if (plan) {
+                  input = {
+                    plan: JSON.stringify(plan.queries, null, 2),
+                    sql: plan.sql || '',
+                  };
+                }
+                p.onChange({...p.input, ...input});
+              }}
+            >
               <option value="">Paste your own Plan</option>
-              {
-                Object.keys(plans).map(plan => {
-                  return <option value={plan} key={plan}>{plan}</option>
-                })
-              }
+              {Object.keys(plans).map(plan => {
+                return (
+                  <option value={plan} key={plan}>
+                    {plan}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>
@@ -110,26 +119,28 @@ export default function VisualizerInput(p: Props) {
           <button
             className="button is-warning"
             disabled={!p.input.plan && !p.input.sql}
-            onClick={() => {p.onChange({sql: '', plan: ''})}}
+            onClick={() => {
+              p.onChange({sql: '', plan: ''});
+            }}
           >
-            <span><u>C</u>lear Data</span>
+            <span>
+              <u>C</u>lear Data
+            </span>
           </button>
 
-          <button
-            className="button is-danger"
-            onClick={p.onReset}
-          >
-            <span><u>R</u>eset Settings & Data</span>
+          <button className="button is-danger" onClick={p.onReset}>
+            <span>
+              <u>R</u>eset Settings & Data
+            </span>
           </button>
         </div>
       </div>
-      <div className="field is-pulled-right">
-      </div>
+      <div className="field is-pulled-right"></div>
       <div className="columns">
         <div className="column">
           <Editor
             value={p.input.plan}
-            onPaste={(e) => {
+            onPaste={e => {
               const data = e.clipboardData.getData('text');
               p.onChange({...p.input, ...{plan: data}});
               history.push('/visualize/flamegraph' + history.location.search);
@@ -172,14 +183,14 @@ export default function VisualizerInput(p: Props) {
         <div className="column">
           <Editor
             value={p.input.sql}
-            onPaste={(e) => {
+            onPaste={e => {
               // The code below detects if the user accidentally pasted his
               // JSON plan into the SQL textbox and corrects their mistake for
               // them.
               const data = e.clipboardData.getData('text');
               let isJSON = false;
               try {
-                JSON.parse(data)
+                JSON.parse(data);
                 isJSON = true;
               } catch (e) {
                 // intentionally blank
@@ -215,4 +226,4 @@ FROM generate_series(1, 10000);
       </div>
     </div>
   );
-};
+}

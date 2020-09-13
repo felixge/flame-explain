@@ -3,7 +3,7 @@ import {format as formatBytes} from 'bytes';
 type Unit = 'byte' | 'page';
 
 type Options = {
-  pageSize: number,
+  pageSize: number;
 };
 
 let defaultOptions = {

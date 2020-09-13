@@ -3,17 +3,14 @@ export type OptionalEmbed<T, Fragment> = T | (T & Fragment);
 // Disjoint returns T1 & T2, or never if the two types share one or more
 // fields. Inspired by:
 // https://spin.atomicobject.com/2019/03/25/disjoint-unions-typescript-conditional-types/
-export type Disjoint<T1, T2> = Extract<keyof T1, keyof T2> extends never
-  ? T1 & T2
-  : never
-
+export type Disjoint<T1, T2> = Extract<keyof T1, keyof T2> extends never ? T1 & T2 : never;
 
 // See https://stackoverflow.com/a/50900933
 type AllowedFieldsWithType<Obj, Type> = {
-  [K in keyof Obj]: Obj[K] extends Type ? K : never
+  [K in keyof Obj]: Obj[K] extends Type ? K : never;
 };
 
-export type ExtractFieldsOfType<Obj, Type> = AllowedFieldsWithType<Required<Obj>, Type>[keyof Obj]
+export type ExtractFieldsOfType<Obj, Type> = AllowedFieldsWithType<Required<Obj>, Type>[keyof Obj];
 
 export function assert(condition: any, msg?: string): asserts condition {
   if (!condition) {
@@ -45,7 +42,5 @@ export function formatDuration(ms: number): string {
 }
 
 export function formatPercent(f: number): string {
-  return (isNaN(f))
-    ? '-'
-    : (f * 100).toFixed(2) + '%';
+  return isNaN(f) ? '-' : (f * 100).toFixed(2) + '%';
 }

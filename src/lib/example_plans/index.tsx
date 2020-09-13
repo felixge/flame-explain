@@ -15,8 +15,8 @@ import RewriteTwoQueries from './RewriteTwoQueries';
 import ParallelSort from './ParallelSort';
 
 export type ExamplePlan = {
-  queries: RawQueries,
-  sql: string,
+  queries: RawQueries;
+  sql: string;
 };
 
 const Plans: {[key: string]: ExamplePlan} = {

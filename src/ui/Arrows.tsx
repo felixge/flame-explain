@@ -1,5 +1,10 @@
 import React from 'react';
-import {faCaretSquareLeft, faCaretSquareRight, faCaretSquareUp, faCaretSquareDown} from '@fortawesome/free-solid-svg-icons';
+import {
+  faCaretSquareLeft,
+  faCaretSquareRight,
+  faCaretSquareUp,
+  faCaretSquareDown,
+} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 export type Direction = 'left' | 'right' | 'up' | 'down';
@@ -7,7 +12,7 @@ export type Direction = 'left' | 'right' | 'up' | 'down';
 type Props = {
   arrows: Direction[];
   onClick: (a: Direction) => void;
-}
+};
 
 const icons: {[K in Direction]: typeof faCaretSquareUp} = {
   left: faCaretSquareLeft,
@@ -17,15 +22,13 @@ const icons: {[K in Direction]: typeof faCaretSquareUp} = {
 };
 
 export function Arrows(p: Props) {
-  return <span className="arrows">
-    {p.arrows.map(direction =>
-      <FontAwesomeIcon
-        key={direction}
-        onClick={() => p.onClick(direction)}
-        icon={icons[direction]}
-      />
-    )}
-  </span>
+  return (
+    <span className="arrows">
+      {p.arrows.map(direction => (
+        <FontAwesomeIcon key={direction} onClick={() => p.onClick(direction)} icon={icons[direction]} />
+      ))}
+    </span>
+  );
 }
 
 export function move<T>(list: T[], i: number, d: Direction): T[] {
@@ -37,7 +40,7 @@ export function move<T>(list: T[], i: number, d: Direction): T[] {
       break;
     case 'down':
     case 'right':
-      delta = 1
+      delta = 1;
       break;
   }
 
