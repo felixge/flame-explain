@@ -3,6 +3,7 @@
 // Update Bulma's global variables
 $family-sans-serif: "Nunito", sans-serif;
 $panel-heading-padding: 0.25em 0.5em;
+$footer-padding: 3rem;
 
 // Import the rest of Bulma
 @import "bulma";
@@ -37,7 +38,13 @@ table.tree-table
   flex-direction: column;
 
 .content-wrapper
-  flex: 1; 
+  flex: 1;
+
+// Center footer content
+.footer
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
 .navbar
   // Align navbar with body content (looks better to me)
